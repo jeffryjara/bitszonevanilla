@@ -1040,12 +1040,13 @@
       bar.style.width = (usedMb > 0 ? Math.max(2, usedPct) : 0).toFixed(1) + '%';
     }
     if (availEl) {
+      var prep = (window.BitszoneI18n && window.BitszoneI18n.getLanguage() === 'en') ? 'of' : 'de';
       if (usedMb <= 0) {
-        availEl.innerHTML = '<strong class="text-white">5.00 GB</strong> de 5.00 GB';
+        availEl.innerHTML = '<strong class="text-white">5.00 GB</strong> ' + prep + ' 5.00 GB';
       } else if (availGb >= 1) {
-        availEl.innerHTML = '<strong class="text-white">' + availGb.toFixed(2) + ' GB</strong> de 5.00 GB';
+        availEl.innerHTML = '<strong class="text-white">' + availGb.toFixed(2) + ' GB</strong> ' + prep + ' 5.00 GB';
       } else {
-        availEl.innerHTML = '<strong class="text-white">' + availMb.toFixed(1) + ' MB</strong> de 5.00 GB';
+        availEl.innerHTML = '<strong class="text-white">' + availMb.toFixed(1) + ' MB</strong> ' + prep + ' 5.00 GB';
       }
     }
     updateDownloadsBadgeUI();
@@ -1617,13 +1618,18 @@
   }
 
   function getLyricsGuestHtml() {
+    var isEn = window.BitszoneI18n && window.BitszoneI18n.getLanguage() === 'en';
+    var title = isEn
+      ? 'Please sign in to enjoy synchronized lyrics'
+      : 'Es necesario iniciar sesión para disfrutar de las letras';
+    var btnText = isEn ? 'Sign in' : 'Iniciar sesión';
     return (
       '<div class="bz-lyrics-guest-hero d-flex flex-column align-items-center justify-content-center text-center px-4 py-5 w-100 flex-grow-1 my-auto">' +
         '<h2 class="display-6 fw-bold mb-3" style="max-width: 380px; letter-spacing: -0.02em; line-height: 1.25; opacity: 0.75; color: #ffffff;">' +
-          'Es necesario iniciar sesión para disfrutar de las letras' +
+          esc(title) +
         '</h2>' +
         '<a href="./login.html" class="btn bz-btn-hero btn-sm px-4 py-2 fw-semibold rounded-pill mt-2 shadow-sm">' +
-          '<i class="bi bi-box-arrow-in-right me-1.5"></i> Iniciar sesión' +
+          '<i class="bi bi-box-arrow-in-right me-1.5"></i> ' + esc(btnText) +
         '</a>' +
       '</div>'
     );
@@ -1783,9 +1789,10 @@
     headerEl.classList.remove('border-bottom', 'border-white', 'border-opacity-10');
     headerEl.style.borderBottom = 'none';
 
+    var isEn = window.BitszoneI18n && window.BitszoneI18n.getLanguage() === 'en';
     var track = appState.nowPlayingTrack;
     if (!track) {
-      // Estado sin canción reproduciéndose: "Letra" de manera sutil y opaca con icono de letra y sin línea divisoria
+      // Estado sin canción reproduciéndose: "Letra" o "Lyrics"
       if (iconEl) {
         iconEl.className = 'bi bi-mic text-white-50 opacity-50';
         iconEl.style.color = '';
@@ -1795,10 +1802,10 @@
       titleEl.style.fontWeight = '500';
       titleEl.style.letterSpacing = 'normal';
       titleEl.style.textTransform = 'none';
-      titleEl.textContent = 'Letra';
+      titleEl.textContent = isEn ? 'Lyrics' : 'Letra';
       titleEl.removeAttribute('title');
     } else {
-      // Estado con canción reproduciéndose: "Letra de (nombre)" con icono de micrófono con relleno blanco y sin línea divisoria
+      // Estado con canción reproduciéndose: "Letra de" o "Lyrics of"
       if (iconEl) {
         iconEl.className = 'bi bi-mic-fill text-white';
         iconEl.style.color = '#ffffff';
@@ -1808,8 +1815,9 @@
       titleEl.style.fontWeight = '600';
       titleEl.style.letterSpacing = 'normal';
       titleEl.style.textTransform = 'none';
-      titleEl.textContent = 'Letra de ' + (track.title || 'canción');
-      titleEl.title = 'Letra de ' + (track.title || 'canción');
+      var prefix = isEn ? 'Lyrics of ' : 'Letra de ';
+      titleEl.textContent = prefix + (track.title || (isEn ? 'song' : 'canción'));
+      titleEl.title = prefix + (track.title || (isEn ? 'song' : 'canción'));
     }
   }
 
@@ -1839,10 +1847,13 @@
 
     var track = appState.nowPlayingTrack;
     if (!track) {
+      var noneText = (window.BitszoneI18n && window.BitszoneI18n.getLanguage() === 'en')
+        ? 'No song currently playing'
+        : 'No hay ninguna canción en reproducción';
       container.innerHTML =
         '<div class="d-flex flex-column align-items-center justify-content-center py-5 text-center px-3 flex-grow-1 my-auto" style="min-height: 260px;">' +
           '<i class="bi bi-mic text-white-50 opacity-25 mb-3" style="font-size: 2.2rem;"></i>' +
-          '<p class="text-white-50 small mb-0" style="max-width: 240px;">No hay ninguna canción en reproducción</p>' +
+          '<p class="text-white-50 small mb-0" style="max-width: 240px;">' + esc(noneText) + '</p>' +
         '</div>';
       return;
     }
@@ -1880,11 +1891,13 @@
           if (res && res.lines && res.lines.length > 0) {
             renderLyricsLinesToContainer(container, res.lines, trackIdStr, false);
           } else {
+            var notFoundTitle = (window.BitszoneI18n && window.BitszoneI18n.getLanguage() === 'en') ? 'Lyrics not available' : 'Letra no disponible';
+            var notFoundDesc = (window.BitszoneI18n && window.BitszoneI18n.getLanguage() === 'en') ? 'No synchronized lyrics found.' : 'No se encontró letra sincronizada.';
             container.innerHTML =
               '<div class="d-flex flex-column align-items-center justify-content-center py-5 text-center px-3 flex-grow-1 my-auto">' +
                 '<i class="bi bi-mic text-white-50 fs-2 mb-2"></i>' +
-                '<p class="text-white fw-bold small mb-1">Letra no disponible</p>' +
-                '<p class="text-white-50 small mb-0">No se encontró letra sincronizada.</p>' +
+                '<p class="text-white fw-bold small mb-1">' + esc(notFoundTitle) + '</p>' +
+                '<p class="text-white-50 small mb-0">' + esc(notFoundDesc) + '</p>' +
               '</div>';
           }
         });
@@ -3987,25 +4000,56 @@
     var scaleVal = document.getElementById('setTextScaleVal');
     var chkReduce = document.getElementById('setReduceMotion');
     var chkNoBlur = document.getElementById('setDisableBlur');
+    var chkHighContrast = document.getElementById('setHighContrast');
     var saveBtn = document.getElementById('btnSettingsSave');
     var resetBtn = document.getElementById('btnSettingsReset');
 
     function syncControls() {
+      // 1. Escala
       scaleRange.value = draft.textScale;
       scaleVal.textContent = draft.textScale + '%';
+
+      // 2. Switches
       chkReduce.checked = Boolean(draft.reduceMotion);
       chkNoBlur.checked = Boolean(draft.disableBlur);
+      if (chkHighContrast) {
+        chkHighContrast.checked = Boolean(draft.highContrast);
+      }
 
+      // 3. Idioma buttons
+      var curLang = draft.language || 'es';
+      document.querySelectorAll('#settingsModal [data-lang-val]').forEach(function (btn) {
+        var val = btn.getAttribute('data-lang-val');
+        var isActive = val === curLang;
+        btn.classList.toggle('is-active', isActive);
+      });
+
+      // 4. Tema buttons
+      var curTheme = draft.theme || 'dark';
+      document.querySelectorAll('#settingsModal [data-theme-val]').forEach(function (btn) {
+        var val = btn.getAttribute('data-theme-val');
+        var isActive = val === curTheme;
+        btn.classList.toggle('is-active', isActive);
+      });
+
+      // 5. Dirty check
       var dirty =
         Number(draft.textScale) !== Number(initial.textScale) ||
         Boolean(draft.reduceMotion) !== Boolean(initial.reduceMotion) ||
-        Boolean(draft.disableBlur) !== Boolean(initial.disableBlur);
+        Boolean(draft.disableBlur) !== Boolean(initial.disableBlur) ||
+        String(draft.language) !== String(initial.language) ||
+        String(draft.theme) !== String(initial.theme) ||
+        Boolean(draft.highContrast) !== Boolean(initial.highContrast);
 
       var isDefault =
         Number(draft.textScale) === Storage.DEFAULT_SETTINGS.textScale &&
         Boolean(draft.reduceMotion) === Storage.DEFAULT_SETTINGS.reduceMotion &&
-        Boolean(draft.disableBlur) === Storage.DEFAULT_SETTINGS.disableBlur;
+        Boolean(draft.disableBlur) === Storage.DEFAULT_SETTINGS.disableBlur &&
+        String(draft.language) === Storage.DEFAULT_SETTINGS.language &&
+        String(draft.theme) === Storage.DEFAULT_SETTINGS.theme &&
+        Boolean(draft.highContrast) === Storage.DEFAULT_SETTINGS.highContrast;
 
+      // 6. Scale points active highlight
       var currentVal = Number(draft.textScale);
       document.querySelectorAll('.bz-scale-point').forEach(function (el) {
         var ptVal = Number(el.getAttribute('data-scale-val'));
@@ -4021,6 +4065,40 @@
 
     syncControls();
 
+    // Eventos selector de idioma
+    document.querySelectorAll('#settingsModal [data-lang-val]').forEach(function (btn) {
+      btn.onclick = function () {
+        var val = btn.getAttribute('data-lang-val');
+        if (val && draft.language !== val) {
+          draft.language = val;
+          Storage.applySettingsToDOM(draft);
+          syncControls();
+        }
+      };
+    });
+
+    // Eventos selector de tema visual
+    document.querySelectorAll('#settingsModal [data-theme-val]').forEach(function (btn) {
+      btn.onclick = function () {
+        var val = btn.getAttribute('data-theme-val');
+        if (val && draft.theme !== val) {
+          draft.theme = val;
+          Storage.applySettingsToDOM(draft);
+          syncControls();
+        }
+      };
+    });
+
+    // Evento switch alto contraste
+    if (chkHighContrast) {
+      chkHighContrast.onchange = function () {
+        draft.highContrast = chkHighContrast.checked;
+        Storage.applySettingsToDOM(draft);
+        syncControls();
+      };
+    }
+
+    // Puntos de escala interactivos
     document.querySelectorAll('.bz-scale-point').forEach(function (el) {
       el.onclick = function () {
         var v = Number(el.getAttribute('data-scale-val'));
@@ -4054,7 +4132,9 @@
       Storage.saveSettings(draft);
       initial = Object.assign({}, draft);
       syncControls();
-      showToast('Configuración guardada');
+      var msg = window.BitszoneI18n ? window.BitszoneI18n.t('toast.saved', 'Configuración guardada') : 'Configuración guardada';
+      showToast(msg);
+      renderCurrentView();
       inst.hide();
     };
 
@@ -4062,19 +4142,25 @@
       draft = Object.assign({}, Storage.DEFAULT_SETTINGS);
       Storage.applySettingsToDOM(draft);
       syncControls();
-      showToast('Valores restablecidos (pulsa Guardar para confirmar)');
+      var msg = window.BitszoneI18n ? window.BitszoneI18n.t('toast.reset', 'Valores restablecidos (pulsa Guardar para confirmar)') : 'Valores restablecidos';
+      showToast(msg);
     };
 
     document.getElementById('btnSettingsCloseGuard').onclick = function () {
       var dirty = !saveBtn.disabled;
       if (dirty) {
-        document.getElementById('unsavedModalPrompt').textContent = 'Tienes cambios sin guardar en Configuración.';
+        var promptMsg = window.BitszoneI18n && window.BitszoneI18n.getLanguage() === 'en'
+          ? 'You have unsaved changes in Settings.'
+          : 'Tienes cambios sin guardar en Configuración.';
+        document.getElementById('unsavedModalPrompt').textContent = promptMsg;
         var unsavedModal = window.bootstrap.Modal.getOrCreateInstance(document.getElementById('unsavedGuardModal'));
         document.getElementById('btnUnsavedSaveExit').onclick = function () {
           Storage.saveSettings(draft);
           unsavedModal.hide();
           inst.hide();
-          showToast('Configuración guardada');
+          var msg = window.BitszoneI18n ? window.BitszoneI18n.t('toast.saved', 'Configuración guardada') : 'Configuración guardada';
+          showToast(msg);
+          renderCurrentView();
         };
         document.getElementById('btnUnsavedDiscardExit').onclick = function () {
           Storage.applySettingsToDOM(initial);

@@ -67,26 +67,26 @@
     </div>
     <div class="offcanvas-body d-flex flex-column gap-2">
       <button type="button" class="bz-nav-btn is-active" data-nav-view="catalog">
-        <i class="bi bi-house-door fs-5"></i><span>Inicio</span>
+        <i class="bi bi-house-door fs-5"></i><span data-i18n="nav.home">Inicio</span>
       </button>
       <button type="button" class="bz-nav-btn" data-nav-view="library-favorites">
-        <i class="bi bi-collection fs-5"></i><span>Biblioteca</span>
+        <i class="bi bi-collection fs-5"></i><span data-i18n="nav.library">Biblioteca</span>
       </button>
       <button type="button" class="bz-nav-btn" data-nav-view="downloads">
-        <i class="bi bi-cloud-arrow-down fs-5"></i><span>Mis descargas</span>
+        <i class="bi bi-cloud-arrow-down fs-5"></i><span data-i18n="nav.downloads">Mis descargas</span>
       </button>
       <button type="button" class="bz-nav-btn bz-nav-btn--admin d-none" data-nav-view="dashboard" data-admin-only>
         <i class="bi bi-speedometer2 fs-5"></i><span>Dashboard</span>
       </button>
       <hr class="border-white border-opacity-10 my-2" />
       <button type="button" class="bz-nav-btn" data-open-shortcuts>
-        <i class="bi bi-keyboard fs-5"></i><span>Atajos</span>
+        <i class="bi bi-keyboard fs-5"></i><span data-i18n="nav.shortcuts">Atajos</span>
       </button>
       <button type="button" class="bz-nav-btn" data-open-settings>
-        <i class="bi bi-gear fs-5"></i><span>Configuración</span>
+        <i class="bi bi-gear fs-5"></i><span data-i18n="nav.settings">Configuración</span>
       </button>
       <a href="./index.html" class="bz-nav-btn text-decoration-none">
-        <i class="bi bi-globe2 fs-5"></i><span>Ir al Landing</span>
+        <i class="bi bi-globe2 fs-5"></i><span>Landing</span>
       </a>
     </div>
   </div>
@@ -108,15 +108,15 @@
       </div>
 
       <nav class="d-flex flex-column gap-1 flex-grow-1">
-        <button type="button" class="bz-nav-btn is-active" data-nav-view="catalog" title="Inicio">
-          <i class="bi bi-house-door fs-6"></i><span class="bz-nav-label">Inicio</span>
+        <button type="button" class="bz-nav-btn is-active" data-nav-view="catalog" title="Inicio" data-i18n-title="nav.home">
+          <i class="bi bi-house-door fs-6"></i><span class="bz-nav-label" data-i18n="nav.home">Inicio</span>
         </button>
-        <button type="button" class="bz-nav-btn" data-nav-view="library-favorites" title="Biblioteca">
-          <i class="bi bi-collection fs-6"></i><span class="bz-nav-label">Biblioteca</span>
+        <button type="button" class="bz-nav-btn" data-nav-view="library-favorites" title="Biblioteca" data-i18n-title="nav.library">
+          <i class="bi bi-collection fs-6"></i><span class="bz-nav-label" data-i18n="nav.library">Biblioteca</span>
         </button>
-        <button type="button" class="bz-nav-btn" data-nav-view="downloads" title="Mis descargas">
+        <button type="button" class="bz-nav-btn" data-nav-view="downloads" title="Mis descargas" data-i18n-title="nav.downloads">
           <i class="bi bi-cloud-arrow-down fs-6"></i>
-          <span class="bz-nav-label flex-grow-1 text-start">Mis descargas</span>
+          <span class="bz-nav-label flex-grow-1 text-start" data-i18n="nav.downloads">Mis descargas</span>
           <span id="downloadsCountBadge" class="badge rounded-pill d-none bz-nav-label ms-auto" style="background: rgba(96,165,250,0.22); color: #93c5fd;">0</span>
         </button>
         <button type="button" class="bz-nav-btn bz-nav-btn--admin d-none mt-1" data-nav-view="dashboard" data-admin-only title="Dashboard Demo">
@@ -126,35 +126,35 @@
 
       <!-- Sección Inferior del Sidebar -->
       <div class="mt-auto d-flex flex-column gap-1 pt-2">
-        <button id="btnSidebarProfile" type="button" class="bz-nav-btn d-none" title="Mi perfil">
+        <button id="btnSidebarProfile" type="button" class="bz-nav-btn d-none" title="Mi perfil" data-i18n-title="nav.profile">
           <span id="sidebarAvatarBox" class="rounded-circle bg-white bg-opacity-10 d-inline-flex align-items-center justify-content-center overflow-hidden flex-shrink-0" style="width:22px;height:22px;">
             <i class="bi bi-person-fill"></i>
           </span>
-          <span id="sidebarAccountName" class="bz-nav-label text-truncate">Perfil</span>
+          <span id="sidebarAccountName" class="bz-nav-label text-truncate" data-i18n="nav.profile">Perfil</span>
         </button>
 
-        <a id="linkSidebarLogin" href="./login.html" class="bz-nav-btn text-decoration-none" title="Acceder">
-          <i class="bi bi-person fs-6"></i><span class="bz-nav-label">Acceder</span>
+        <a id="linkSidebarLogin" href="./login.html" class="bz-nav-btn text-decoration-none" title="Acceder" data-i18n-title="nav.signIn">
+          <i class="bi bi-person fs-6"></i><span class="bz-nav-label" data-i18n="nav.signIn">Acceder</span>
         </a>
 
-        <button id="btnSidebarShortcuts" type="button" class="bz-nav-btn" data-open-shortcuts title="Atajos de teclado">
-          <i class="bi bi-keyboard fs-6"></i><span class="bz-nav-label">Atajos</span>
+        <button id="btnSidebarShortcuts" type="button" class="bz-nav-btn" data-open-shortcuts title="Atajos de teclado" data-i18n-title="nav.shortcuts">
+          <i class="bi bi-keyboard fs-6"></i><span class="bz-nav-label" data-i18n="nav.shortcuts">Atajos</span>
         </button>
 
-        <button type="button" class="bz-nav-btn" data-open-settings title="Configuración">
-          <i class="bi bi-gear fs-6"></i><span class="bz-nav-label">Configuración</span>
+        <button type="button" class="bz-nav-btn" data-open-settings title="Configuración" data-i18n-title="nav.settings">
+          <i class="bi bi-gear fs-6"></i><span class="bz-nav-label" data-i18n="nav.settings">Configuración</span>
         </button>
 
         <!-- Separador superior con más espacio antes del almacenamiento -->
         <hr class="border-white border-opacity-10 my-3" />
 
-        <!-- Sección Almacenamiento integrada al sidebar (fiel a Bitszone original: pasa desapercibida, visible colapsado y expandido) -->
-        <div id="btnSidebarStorage" role="button" tabindex="0" class="bz-storage-details w-100 text-start" title="Mis descargas y almacenamiento">
+        <!-- Sección Almacenamiento integrada al sidebar -->
+        <div id="btnSidebarStorage" role="button" tabindex="0" class="bz-storage-details w-100 text-start" title="Mis descargas y almacenamiento" data-i18n-title="storage.manage">
           <div class="d-flex align-items-center justify-content-between bz-storage-row">
             <div class="d-flex align-items-center min-w-0">
               <i class="bi bi-hdd text-white-50 fs-5 flex-shrink-0 bz-storage-icon" style="width: 24px; text-align: center;"></i>
               <div class="min-w-0 bz-storage-text-wrap">
-                <div class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.08em;">Almacenamiento</div>
+                <div class="text-white-50 text-uppercase fw-semibold" data-i18n="nav.storage" style="font-size: 0.65rem; letter-spacing: 0.08em;">Almacenamiento</div>
                 <div id="storageAvailText" style="font-size: 0.76rem; color: rgba(255,255,255,0.7);">
                   <strong class="text-white">5.00 GB</strong> de 5.00 GB
                 </div>
@@ -549,34 +549,92 @@
     </div>
   </div>
 
-  <!-- Modal: Configuración Simplificada (Estructura de dos columnas, más alto y elegante) -->
+  <!-- Modal: Configuración (Estructura de dos columnas, moderna y accesible) -->
   <div class="modal fade bz-modal-glass" id="settingsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content position-relative" style="min-height: 520px; border-radius: 1.5rem;">
+      <div class="modal-content position-relative" style="min-height: 560px; border-radius: 1.5rem; overflow: hidden;">
         <button id="btnSettingsCloseGuard" type="button" class="bz-modal-close-float" aria-label="Cerrar">
           <i class="bi bi-x-lg"></i>
         </button>
 
-        <div class="row g-0 flex-grow-1" style="min-height: 520px;">
+        <div class="row g-0 flex-grow-1" style="min-height: 560px;">
           <!-- Sidebar Izquierda con Acciones en la parte inferior -->
-          <div class="col-12 col-md-4 p-4 p-md-5 d-flex flex-column justify-content-between bz-col-divider-md" style="background: rgba(255,255,255,0.025);">
+          <div class="col-12 col-md-4 p-4 p-md-5 d-flex flex-column justify-content-between bz-col-divider-md bz-settings-left-col" style="background: rgba(255,255,255,0.025);">
             <div>
-              <span class="small text-uppercase text-white-50 font-mono-bz" style="letter-spacing: 0.14em;">Preferencias</span>
-              <h3 class="font-serif-italic h2 text-white mt-1 mb-3">Configuración</h3>
-              <p class="small text-white-50">Ajusta la escala visual y los efectos de desenfoque de la interfaz.</p>
+              <span class="small text-uppercase text-white-50 font-mono-bz" data-i18n="settings.preferences" style="letter-spacing: 0.14em;">Preferencias</span>
+              <h3 class="font-serif-italic h2 text-white mt-1 mb-3" data-i18n="settings.title">Configuración</h3>
+              <p class="small text-white-50" data-i18n="settings.desc">Personaliza idioma, tema visual, accesibilidad y escala de la interfaz.</p>
             </div>
 
             <div class="d-grid gap-2 mt-4">
-              <button id="btnSettingsSave" type="button" class="btn bz-btn-hero-subtle py-2.5 rounded-pill fw-semibold" disabled>Guardar cambios</button>
-              <button id="btnSettingsReset" type="button" class="btn bz-btn-subtle py-2 rounded-pill btn-sm" disabled>Restablecer</button>
+              <button id="btnSettingsSave" type="button" class="btn bz-btn-hero-subtle py-2.5 rounded-pill fw-semibold" data-i18n="settings.save" disabled>Guardar cambios</button>
+              <button id="btnSettingsReset" type="button" class="btn bz-btn-subtle py-2 rounded-pill btn-sm" data-i18n="settings.reset" disabled>Restablecer</button>
             </div>
           </div>
 
-          <!-- Cuerpo Derecho -->
-          <div class="col-12 col-md-8 p-4 p-md-5 d-flex flex-column justify-content-center gap-4">
+          <!-- Cuerpo Derecho con Desplazamiento Cómodo -->
+          <div class="col-12 col-md-8 p-4 p-md-5 d-flex flex-column gap-4 overflow-y-auto" style="max-height: 82vh;">
+            
+            <!-- Selector de Idioma -->
             <div>
               <div class="d-flex justify-content-between align-items-center mb-2">
-                <label for="setTextScaleRange" class="fw-semibold text-white">Escala de texto global</label>
+                <label class="fw-semibold text-white d-flex align-items-center gap-2">
+                  <i class="bi bi-translate text-lavender"></i>
+                  <span data-i18n="settings.language">Idioma</span>
+                </label>
+              </div>
+              <div class="bz-segmented-pill w-100">
+                <button type="button" id="btnLangEs" class="btn flex-fill bz-seg-btn is-active" data-lang-val="es">
+                  <i class="bi bi-check2 me-1"></i>Español
+                </button>
+                <button type="button" id="btnLangEn" class="btn flex-fill bz-seg-btn" data-lang-val="en">
+                  English
+                </button>
+              </div>
+            </div>
+
+            <!-- Selector de Tema Visual -->
+            <div class="pt-3 border-top border-white border-opacity-10">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label class="fw-semibold text-white d-flex align-items-center gap-2">
+                  <i class="bi bi-palette text-lavender"></i>
+                  <span data-i18n="settings.theme">Tema visual</span>
+                </label>
+              </div>
+              <div class="bz-segmented-pill w-100">
+                <button type="button" id="btnThemeDark" class="btn flex-fill bz-seg-btn is-active" data-theme-val="dark">
+                  <i class="bi bi-moon-stars me-1.5"></i><span data-i18n="settings.themeDark">Oscuro</span>
+                </button>
+                <button type="button" id="btnThemeLight" class="btn flex-fill bz-seg-btn" data-theme-val="light">
+                  <i class="bi bi-sun me-1.5"></i><span data-i18n="settings.themeLight">Claro</span>
+                </button>
+                <button type="button" id="btnThemeSystem" class="btn flex-fill bz-seg-btn" data-theme-val="system">
+                  <i class="bi bi-display me-1.5"></i><span data-i18n="settings.themeSystem">Sistema</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Accesibilidad: Alto Contraste (Blanco y Negro puro) -->
+            <div class="pt-3 border-top border-white border-opacity-10">
+              <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
+                <div class="pe-3">
+                  <div class="fw-semibold text-white d-flex align-items-center gap-2">
+                    <i class="bi bi-circle-half text-lavender"></i>
+                    <span data-i18n="settings.highContrast">Alto contraste (Accesibilidad)</span>
+                  </div>
+                  <small class="text-white-50" data-i18n="settings.highContrastDesc">Modo blanco y negro puro de máximo contraste para personas con discapacidad visual.</small>
+                </div>
+                <input id="setHighContrast" class="form-check-input ms-2 fs-5 flex-shrink-0" type="checkbox" role="switch" />
+              </div>
+            </div>
+
+            <!-- Escala de texto global -->
+            <div class="pt-3 border-top border-white border-opacity-10">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label for="setTextScaleRange" class="fw-semibold text-white d-flex align-items-center gap-2">
+                  <i class="bi bi-type text-lavender"></i>
+                  <span data-i18n="settings.textScale">Escala de texto global</span>
+                </label>
                 <span id="setTextScaleVal" class="badge rounded-pill font-mono-bz" style="background: rgba(255,255,255,0.1); color: #ffffff;">100%</span>
               </div>
               <div class="bz-scale-slider-wrap position-relative pt-2 pb-1">
@@ -596,23 +654,25 @@
               </div>
             </div>
 
+            <!-- Rendimiento: Reducir animaciones y Desactivar desenfoque -->
             <div class="d-grid gap-4 pt-3 border-top border-white border-opacity-10">
               <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
-                <div>
-                  <div class="fw-semibold text-white">Reducir animaciones</div>
-                  <small class="text-white-50">Desactiva transiciones continuas y ondas SVG.</small>
+                <div class="pe-3">
+                  <div class="fw-semibold text-white" data-i18n="settings.reduceMotion">Reducir animaciones</div>
+                  <small class="text-white-50" data-i18n="settings.reduceMotionDesc">Desactiva transiciones continuas y ondas SVG.</small>
                 </div>
-                <input id="setReduceMotion" class="form-check-input ms-3 fs-5" type="checkbox" role="switch" />
+                <input id="setReduceMotion" class="form-check-input ms-2 fs-5 flex-shrink-0" type="checkbox" role="switch" />
               </div>
 
               <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
-                <div>
-                  <div class="fw-semibold text-white">Desactivar desenfoque (Blur)</div>
-                  <small class="text-white-50">Usa paneles sólidos para mejorar fluidez en PCs básicos.</small>
+                <div class="pe-3">
+                  <div class="fw-semibold text-white" data-i18n="settings.disableBlur">Desactivar desenfoque (Blur)</div>
+                  <small class="text-white-50" data-i18n="settings.disableBlurDesc">Usa paneles sólidos para mejorar fluidez en PCs básicos.</small>
                 </div>
-                <input id="setDisableBlur" class="form-check-input ms-3 fs-5" type="checkbox" role="switch" />
+                <input id="setDisableBlur" class="form-check-input ms-2 fs-5 flex-shrink-0" type="checkbox" role="switch" />
               </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -863,6 +923,7 @@
   <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <script defer src="./js/auth.js"></script>
   <script defer src="./js/storage.js"></script>
+  <script defer src="./js/i18n.js"></script>
   <script defer src="./js/catalog.js"></script>
   <script defer src="./js/dashboard.js"></script>
   <script defer src="./js/player.js"></script>

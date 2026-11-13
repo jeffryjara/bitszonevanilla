@@ -4421,3 +4421,477 @@ body.bz-reduce-motion .bz-loading-logo {
   background: rgba(56, 189, 248, 0.12) !important;
   transition: background-color 0.25s ease;
 }
+
+/* ==========================================================================
+   CONTROLES SEGMENTADOS (Idioma y Tema en Configuración)
+   ========================================================================== */
+.bz-segmented-pill {
+  display: inline-flex;
+  padding: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  gap: 4px;
+}
+.bz-seg-btn {
+  border: none !important;
+  background: transparent !important;
+  color: rgba(255, 255, 255, 0.55) !important;
+  font-size: 0.82rem;
+  padding: 6px 14px;
+  border-radius: 999px !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+.bz-seg-btn:hover {
+  color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+.bz-seg-btn.is-active {
+  background: #ffffff !important;
+  color: #0d0c14 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+}
+
+/* ==========================================================================
+   MODO CLARO (LIGHT THEME) — Pure White Obsidian & Lavender Glow
+   ========================================================================== */
+body.bz-theme-light {
+  --bz-bg-canvas: #ffffff;
+  --bz-bg-deep: #f8fafc;
+  --bz-bg-surface: #ffffff;
+  --bz-bg-surface-2: #f1f5f9;
+  --bz-text: #0f172a;
+  --bz-muted: #475569;
+  --bz-dim: #64748b;
+  --bz-glass-bg: rgba(255, 255, 255, 0.86);
+  --bz-glass-border: rgba(15, 23, 42, 0.08);
+  --bz-glass-highlight: rgba(255, 255, 255, 0.95);
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
+/* Lienzo ambiental luminoso con sutil degradado lavanda y rosa sobre blanco puro */
+body.bz-theme-light .bz-ambient-canvas {
+  background:
+    radial-gradient(ellipse 90% 70% at 15% 15%, rgba(168, 85, 247, 0.09), transparent 60%),
+    radial-gradient(ellipse 80% 65% at 85% 20%, rgba(244, 114, 182, 0.08), transparent 58%),
+    radial-gradient(ellipse 85% 70% at 50% 90%, rgba(99, 102, 241, 0.06), transparent 65%),
+    #ffffff !important;
+}
+body.bz-theme-light .bz-molten-orb {
+  opacity: 0.12 !important;
+  filter: blur(110px) !important;
+}
+
+/* Tipografía en Modo Claro: textos blancos adaptados a contraste nítido oscuro */
+body.bz-theme-light .text-white:not(.bz-keep-white):not(.badge):not(.btn-primary):not(.bz-btn-primary):not(.bz-btn-hero) {
+  color: #0f172a !important;
+}
+body.bz-theme-light .text-white-50 {
+  color: #64748b !important;
+}
+body.bz-theme-light .opacity-40,
+body.bz-theme-light .opacity-50 {
+  opacity: 0.75 !important;
+}
+
+/* Sidebar en Modo Claro */
+body.bz-theme-light .bz-sidebar {
+  background: rgba(255, 255, 255, 0.88) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border-right: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-sidebar .bz-brand-group span.fw-bold {
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-sidebar .bz-brand-group span.fw-bold span {
+  color: #7e22ce !important;
+}
+body.bz-theme-light .bz-nav-btn {
+  color: #475569 !important;
+}
+body.bz-theme-light .bz-nav-btn:hover {
+  background: rgba(15, 23, 42, 0.04) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-nav-btn.is-active {
+  background: linear-gradient(90deg, rgba(168, 85, 247, 0.14), rgba(216, 180, 254, 0.08)) !important;
+  color: #7e22ce !important;
+  font-weight: 700 !important;
+  border-left-color: #7e22ce !important;
+}
+body.bz-theme-light #btnToggleDesktopSidebar {
+  background: rgba(15, 23, 42, 0.05) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  color: #475569 !important;
+}
+
+/* Almacenamiento en Sidebar */
+body.bz-theme-light #btnSidebarStorage {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-storage-progress-wrap {
+  background: rgba(15, 23, 42, 0.1) !important;
+}
+body.bz-theme-light #storageAvailText {
+  color: #64748b !important;
+}
+body.bz-theme-light #storageAvailText strong {
+  color: #0f172a !important;
+}
+
+/* MiniPlayer en Modo Claro */
+body.bz-theme-light .bz-miniplayer {
+  background: rgba(255, 255, 255, 0.94) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 -4px 30px rgba(15, 23, 42, 0.05) !important;
+}
+body.bz-theme-light .bz-miniplayer #miniTrackTitle {
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-miniplayer #miniArtistName {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-miniplayer .btn-icon-subtle {
+  color: #475569 !important;
+}
+body.bz-theme-light .bz-miniplayer .btn-icon-subtle:hover {
+  color: #0f172a !important;
+  background: rgba(15, 23, 42, 0.05) !important;
+}
+body.bz-theme-light .bz-seek-track {
+  background: rgba(15, 23, 42, 0.1) !important;
+}
+body.bz-theme-light .bz-vol-track {
+  background: rgba(15, 23, 42, 0.1) !important;
+}
+body.bz-theme-light #miniPlayBtn,
+body.bz-theme-light #mobMiniPlayBtn {
+  background: #0f172a !important;
+  color: #ffffff !important;
+}
+
+/* Tarjetas y Vidrio en Modo Claro */
+body.bz-theme-light .bz-glass,
+body.bz-theme-light .bz-glass-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  border: 1px solid rgba(15, 23, 42, 0.07) !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02) !important;
+}
+body.bz-theme-light .bz-glass-card:hover {
+  border-color: rgba(168, 85, 247, 0.35) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-card-title {
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-card-sub {
+  color: #64748b !important;
+}
+
+/* Modales en Modo Claro */
+body.bz-theme-light .bz-modal-glass .modal-content,
+body.bz-theme-light .modal-content {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.15) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-modal-close-float {
+  background: rgba(15, 23, 42, 0.05) !important;
+  color: #475569 !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-modal-close-float:hover {
+  background: rgba(15, 23, 42, 0.1) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-col-divider-md {
+  border-right-color: rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-settings-left-col {
+  background: rgba(15, 23, 42, 0.025) !important;
+}
+body.bz-theme-light .bz-btn-hero-subtle {
+  background: rgba(15, 23, 42, 0.06) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-btn-hero-subtle:hover:not(:disabled) {
+  background: rgba(15, 23, 42, 0.12) !important;
+}
+body.bz-theme-light .bz-btn-subtle {
+  background: rgba(15, 23, 42, 0.04) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  color: #475569 !important;
+}
+
+/* Segmented Buttons en Modo Claro */
+body.bz-theme-light .bz-segmented-pill {
+  background: rgba(15, 23, 42, 0.05) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-seg-btn {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-seg-btn:hover {
+  color: #0f172a !important;
+  background: rgba(15, 23, 42, 0.04) !important;
+}
+body.bz-theme-light .bz-seg-btn.is-active {
+  background: #0f172a !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2) !important;
+}
+
+/* Slider de Escala en Modo Claro */
+body.bz-theme-light .bz-subtle-range {
+  background: rgba(15, 23, 42, 0.1) !important;
+}
+body.bz-theme-light .bz-subtle-range:hover {
+  background: rgba(15, 23, 42, 0.16) !important;
+}
+body.bz-theme-light .bz-scale-point {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-scale-point.is-active {
+  color: #7e22ce !important;
+  font-weight: 800 !important;
+  text-shadow: 0 0 10px rgba(168, 85, 247, 0.4) !important;
+}
+
+/* Panel Lateral de Letras en Modo Claro */
+body.bz-theme-light .bz-side-lyrics-panel {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-left-color: rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light #sideLyricsTitle {
+  color: #0f172a !important;
+}
+body.bz-theme-light #sideLyricsIcon.bi-mic-fill {
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-side-lyrics-scroll .bz-lyric-line {
+  color: rgba(15, 23, 42, 0.38) !important;
+}
+body.bz-theme-light .bz-side-lyrics-scroll .bz-lyric-line:hover {
+  color: rgba(15, 23, 42, 0.78) !important;
+}
+body.bz-theme-light .bz-side-lyrics-scroll .bz-lyric-line.is-active {
+  color: #0f172a !important;
+  text-shadow: 0 2px 14px rgba(168, 85, 247, 0.32) !important;
+}
+body.bz-theme-light .bz-side-lyrics-scroll .bz-lyric-line.is-past {
+  color: rgba(15, 23, 42, 0.22) !important;
+}
+
+/* Drawer de Cola en Modo Claro */
+body.bz-theme-light .bz-queue-drawer {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-left-color: rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-queue-item:hover {
+  background: rgba(15, 23, 42, 0.04) !important;
+}
+body.bz-theme-light .bz-queue-item.is-active {
+  background: rgba(168, 85, 247, 0.1) !important;
+}
+
+/* Buscadores y Entradas en Modo Claro */
+body.bz-theme-light .bz-search-input-clean {
+  background: rgba(15, 23, 42, 0.04) !important;
+  border-color: rgba(15, 23, 42, 0.1) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-search-input-clean::placeholder {
+  color: #94a3b8 !important;
+}
+body.bz-theme-light .bz-search-clean-wrap > i {
+  color: #64748b !important;
+}
+body.bz-theme-light .border-white {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+
+/* ==========================================================================
+   MODO ALTO CONTRASTE (WCAG AAA) — Blanco Puro (#FFFFFF) y Negro Puro (#000000)
+   Diseñado específicamente para personas con discapacidad visual.
+   ========================================================================== */
+body.bz-high-contrast,
+body.bz-high-contrast * {
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+body.bz-high-contrast {
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+
+body.bz-high-contrast .bz-ambient-canvas,
+body.bz-high-contrast .bz-molten-orb,
+body.bz-high-contrast .bz-dynamic-bg-cover,
+body.bz-high-contrast .bz-ambient-glow,
+body.bz-high-contrast .bz-exp-backdrop-glow,
+body.bz-high-contrast .bz-mini-ambient-glow {
+  display: none !important;
+}
+
+/* Superficies, paneles, modales y barras: Negro Puro sólido con Bordes Blancos Puros */
+body.bz-high-contrast .bz-sidebar,
+body.bz-high-contrast .bz-miniplayer,
+body.bz-high-contrast .bz-glass,
+body.bz-high-contrast .bz-glass-card,
+body.bz-high-contrast .modal-content,
+body.bz-high-contrast .bz-side-lyrics-panel,
+body.bz-high-contrast .bz-queue-drawer,
+body.bz-high-contrast .dropdown-menu,
+body.bz-high-contrast .offcanvas,
+body.bz-high-contrast .bz-mobile-tabbar,
+body.bz-high-contrast .bz-mobile-topbar {
+  background: #000000 !important;
+  background-color: #000000 !important;
+  border: 2px solid #ffffff !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  color: #ffffff !important;
+}
+
+/* Todos los textos en blanco puro */
+body.bz-high-contrast,
+body.bz-high-contrast h1,
+body.bz-high-contrast h2,
+body.bz-high-contrast h3,
+body.bz-high-contrast h4,
+body.bz-high-contrast h5,
+body.bz-high-contrast h6,
+body.bz-high-contrast p,
+body.bz-high-contrast span,
+body.bz-high-contrast label,
+body.bz-high-contrast small,
+body.bz-high-contrast strong,
+body.bz-high-contrast a,
+body.bz-high-contrast i,
+body.bz-high-contrast .text-white,
+body.bz-high-contrast .text-white-50,
+body.bz-high-contrast .text-muted,
+body.bz-high-contrast .bz-nav-label {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  opacity: 1 !important;
+}
+
+/* Botones: Negro con Borde Blanco Puro / Hover o Activo Blanco Puro con Texto Negro */
+body.bz-high-contrast .btn,
+body.bz-high-contrast .bz-btn-hero-subtle,
+body.bz-high-contrast .bz-btn-subtle,
+body.bz-high-contrast .bz-btn-primary,
+body.bz-high-contrast .bz-btn-hero,
+body.bz-high-contrast .bz-seg-btn,
+body.bz-high-contrast button {
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  font-weight: 800 !important;
+}
+
+body.bz-high-contrast .btn:hover,
+body.bz-high-contrast .bz-btn-hero-subtle:hover,
+body.bz-high-contrast .bz-btn-subtle:hover,
+body.bz-high-contrast .bz-seg-btn:hover {
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+body.bz-high-contrast .btn:hover *,
+body.bz-high-contrast .bz-seg-btn:hover * {
+  color: #000000 !important;
+}
+
+/* Elementos activos seleccionados: Invertidos a Blanco Puro de Fondo */
+body.bz-high-contrast .bz-nav-btn.is-active,
+body.bz-high-contrast .bz-seg-btn.is-active,
+body.bz-high-contrast .bz-scale-point.is-active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  border: 2px solid #ffffff !important;
+}
+body.bz-high-contrast .bz-nav-btn.is-active *,
+body.bz-high-contrast .bz-seg-btn.is-active * {
+  color: #000000 !important;
+}
+
+/* Foco Visible Ultra Accesible para Navegación por Teclado */
+body.bz-high-contrast :focus-visible {
+  outline: 4px solid #ffffff !important;
+  outline-offset: 3px !important;
+}
+
+/* Barras de Progreso: Blanco y Negro de Alto Grosor y Contraste */
+body.bz-high-contrast .progress,
+body.bz-high-contrast .bz-storage-progress-wrap,
+body.bz-high-contrast .bz-seek-track,
+body.bz-high-contrast .bz-vol-track {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  height: 10px !important;
+}
+body.bz-high-contrast .progress-bar,
+body.bz-high-contrast .bz-seek-fill,
+body.bz-high-contrast .bz-vol-fill {
+  background: #ffffff !important;
+}
+
+/* Sliders */
+body.bz-high-contrast .bz-subtle-range {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  height: 8px !important;
+}
+body.bz-high-contrast .bz-subtle-range::-webkit-slider-thumb {
+  background: #ffffff !important;
+  border: 3px solid #000000 !important;
+  width: 22px !important;
+  height: 22px !important;
+}
+body.bz-high-contrast .bz-subtle-range::-moz-range-thumb {
+  background: #ffffff !important;
+  border: 3px solid #000000 !important;
+  width: 22px !important;
+  height: 22px !important;
+}
+
+/* Letras Sincronizadas en Alto Contraste */
+body.bz-high-contrast .bz-lyric-line {
+  color: #ffffff !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  opacity: 0.65 !important;
+  font-weight: 700 !important;
+}
+body.bz-high-contrast .bz-lyric-line.is-active {
+  background: #ffffff !important;
+  color: #000000 !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 6px !important;
+  padding: 4px 8px !important;
+}
+
+/* Líneas divisorias en Alto Contraste */
+body.bz-high-contrast hr,
+body.bz-high-contrast .border-top,
+body.bz-high-contrast .border-bottom,
+body.bz-high-contrast .border-start,
+body.bz-high-contrast .border-end {
+  border-color: #ffffff !important;
+}

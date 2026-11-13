@@ -10,7 +10,10 @@
   var DEFAULT_SETTINGS = {
     textScale: 100,
     reduceMotion: false,
-    disableBlur: false
+    disableBlur: false,
+    language: 'es',
+    theme: 'dark',
+    highContrast: false
   };
 
   function scopeKey(baseKey) {
@@ -280,10 +283,46 @@
   }
   function applySettingsToDOM(settings) {
     var s = settings || getSettings();
+
+    // 1. Escala de texto
     var scale = Math.max(85, Math.min(130, Number(s.textScale) || 100));
     document.documentElement.style.fontSize = (16 * (scale / 100)).toFixed(2) + 'px';
+
+    // 2. Reducción de animaciones y desactivación de desenfoques
     document.body.classList.toggle('bz-reduce-motion', Boolean(s.reduceMotion));
     document.body.classList.toggle('bz-no-blur', Boolean(s.disableBlur));
+
+    // 3. Modo Alto Contraste (Blanco y Negro puro para discapacidad visual)
+    var isHc = Boolean(s.highContrast);
+    document.body.classList.toggle('bz-high-contrast', isHc);
+
+    // 4. Tema: 'dark' | 'light' | 'system'
+    var themeMode = s.theme || 'dark';
+    var effectiveTheme = themeMode;
+    if (themeMode === 'system') {
+      var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      effectiveTheme = prefersDark ? 'dark' : 'light';
+    }
+    document.documentElement.setAttribute('data-theme', effectiveTheme);
+    document.body.classList.toggle('bz-theme-light', effectiveTheme === 'light');
+    document.body.classList.toggle('bz-theme-dark', effectiveTheme === 'dark');
+
+    // 5. Idioma
+    if (window.BitszoneI18n && typeof window.BitszoneI18n.applyLanguage === 'function') {
+      window.BitszoneI18n.applyLanguage(s.language || 'es');
+    }
+  }
+
+  // Listener para cambio de tema del sistema en tiempo real
+  if (window.matchMedia) {
+    try {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () {
+        var s = getSettings();
+        if (s.theme === 'system') {
+          applySettingsToDOM(s);
+        }
+      });
+    } catch (e) {}
   }
 
   window.BitszoneStorage = {
