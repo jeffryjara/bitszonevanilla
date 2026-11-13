@@ -3265,20 +3265,62 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   50% { opacity: 0.85; }
 }
 
-/* Panel lateral derecho (drawer) */
+/* Panel lateral derecho (drawer de letras) */
+#sideLyricsHeader {
+  border-bottom: none !important;
+}
+
+.bz-side-lyrics-scroll {
+  position: relative;
+}
+
 .bz-side-lyrics-scroll .bz-lyrics-stage {
-  gap: 1.25rem;
-  padding: 1.5rem 0.5rem 25vh;
+  position: relative;
+  gap: 1.35rem;
+  padding: 1.5rem 0.5rem 30vh;
 }
+
 .bz-side-lyrics-scroll .bz-lyric-line {
-  font-size: 1.15rem;
-  line-height: 1.35;
-  filter: blur(0.8px);
-  -webkit-filter: blur(0.8px);
+  font-size: 1.18rem !important;
+  line-height: 1.38 !important;
+  color: rgba(255, 255, 255, 0.35);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  filter: blur(0.6px);
+  -webkit-filter: blur(0.6px);
+  transform: none !important;
+  transition: color 0.3s ease, opacity 0.3s ease, filter 0.3s ease, text-shadow 0.3s ease;
+  will-change: color, opacity;
+  word-break: break-word;
 }
-.bz-side-lyrics-scroll .bz-lyric-line.is-active {
-  font-size: 1.28rem;
-  text-shadow: 0 2px 12px rgba(255, 255, 255, 0.35);
+
+.bz-side-lyrics-scroll .bz-lyric-line:hover {
+  color: rgba(255, 255, 255, 0.75);
+  filter: none;
+  -webkit-filter: none;
+  transform: none !important;
+}
+
+.bz-side-lyrics-scroll .bz-lyric-line.is-active,
+.bz-side-lyrics-scroll .bz-lyric-line[data-active-lyric="true"] {
+  font-size: 1.18rem !important;
+  line-height: 1.38 !important;
+  font-weight: 800 !important;
+  color: #ffffff !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  transform: none !important;
+  opacity: 1 !important;
+  text-shadow: 0 2px 14px rgba(255, 255, 255, 0.45);
+}
+
+.bz-side-lyrics-scroll .bz-lyric-line.is-past {
+  color: rgba(255, 255, 255, 0.26);
+  font-weight: 500;
+  filter: blur(0.6px);
+  -webkit-filter: blur(0.6px);
+  transform: none !important;
+  opacity: 0.75;
 }
 
 /* Vista Restringida de Letras (Centrada elegantemente) */

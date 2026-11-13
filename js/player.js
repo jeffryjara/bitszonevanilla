@@ -1754,11 +1754,16 @@
             lastActiveSideLyricIndex = activeIndexSide;
             var activeSideLine = sideLines[activeIndexSide];
             if (activeSideLine) {
-              var sContainerRect = sideContainer.getBoundingClientRect();
-              var sLineRect = activeSideLine.getBoundingClientRect();
-              var sTargetScroll = sideContainer.scrollTop + (sLineRect.top - sContainerRect.top) - (sContainerRect.height * 0.36) + (sLineRect.height / 2);
+              var lineTop = activeSideLine.offsetTop;
+              var p = activeSideLine.offsetParent;
+              while (p && p !== sideContainer) {
+                lineTop += p.offsetTop || 0;
+                p = p.offsetParent;
+              }
+              // Anclar la parte superior de la estrofa suavemente a ~32% de la altura visible
+              var targetScroll = lineTop - (sideContainer.clientHeight * 0.32);
               sideContainer.scrollTo({
-                top: Math.max(0, sTargetScroll),
+                top: Math.max(0, targetScroll),
                 behavior: 'smooth'
               });
             }
@@ -1774,11 +1779,13 @@
     var titleEl = document.getElementById('sideLyricsTitle');
     if (!headerEl || !titleEl) return;
 
+    // Sin línea divisoria en ningún estado: super limpio como en la tercera imagen
+    headerEl.classList.remove('border-bottom', 'border-white', 'border-opacity-10');
+    headerEl.style.borderBottom = 'none';
+
     var track = appState.nowPlayingTrack;
     if (!track) {
       // Estado sin canción reproduciéndose: "Letra" de manera sutil y opaca con icono de letra y sin línea divisoria
-      headerEl.classList.remove('border-bottom', 'border-white', 'border-opacity-10');
-      headerEl.style.borderBottom = 'none';
       if (iconEl) {
         iconEl.className = 'bi bi-mic text-white-50 opacity-50';
         iconEl.style.color = '';
@@ -1791,15 +1798,13 @@
       titleEl.textContent = 'Letra';
       titleEl.removeAttribute('title');
     } else {
-      // Estado con canción reproduciéndose: "Letra de (nombre de la canción)" con línea divisoria
-      headerEl.classList.add('border-bottom', 'border-white', 'border-opacity-10');
-      headerEl.style.borderBottom = '';
+      // Estado con canción reproduciéndose: "Letra de (nombre)" con icono de micrófono con relleno blanco y sin línea divisoria
       if (iconEl) {
-        iconEl.className = 'bi bi-mic-fill';
-        iconEl.style.color = 'var(--bz-lavender, #c084fc)';
+        iconEl.className = 'bi bi-mic-fill text-white';
+        iconEl.style.color = '#ffffff';
       }
       titleEl.className = 'text-white small text-truncate fw-semibold';
-      titleEl.style.color = '';
+      titleEl.style.color = '#ffffff';
       titleEl.style.fontWeight = '600';
       titleEl.style.letterSpacing = 'normal';
       titleEl.style.textTransform = 'none';
