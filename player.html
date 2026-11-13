@@ -149,21 +149,19 @@
         <!-- Separador superior con más espacio antes del almacenamiento -->
         <hr class="border-white border-opacity-10 my-3" />
 
-        <!-- Botón de almacenamiento más espacioso y prominente -->
+        <!-- Botón de almacenamiento integrado al sidebar (fiel al Bitszone original pero más alto) -->
         <button id="btnSidebarStorage" type="button" class="bz-storage-btn bz-storage-details w-100 text-start border-0" data-nav-view="downloads" title="Mis descargas y almacenamiento">
           <div class="d-flex align-items-center justify-content-between mb-2">
-            <div class="d-flex align-items-center gap-2.5">
-              <div class="bz-storage-icon-box">
-                <i class="bi bi-hdd-fill"></i>
-              </div>
+            <div class="d-flex align-items-center gap-2.5 min-w-0">
+              <i class="bi bi-hdd text-white-50 fs-5 flex-shrink-0"></i>
               <div class="min-w-0">
-                <div class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.68rem; letter-spacing: 0.09em;">Almacenamiento</div>
-                <div id="storageAvailText" class="font-mono-bz text-truncate" style="font-size: 0.78rem; color: rgba(255,255,255,0.85);">
-                  <strong class="text-white">5,120.0 MB</strong> de 5.00 GB
+                <div class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.08em;">Almacenamiento</div>
+                <div id="storageAvailText" style="font-size: 0.76rem; color: rgba(255,255,255,0.7);">
+                  <strong class="text-white">5.00 GB</strong> de 5.00 GB
                 </div>
               </div>
             </div>
-            <i class="bi bi-chevron-right text-white-50 small opacity-60 bz-storage-chevron ms-1"></i>
+            <i class="bi bi-chevron-right text-white-50 small opacity-40 bz-storage-chevron ms-2 flex-shrink-0"></i>
           </div>
           <div class="progress rounded-pill" style="height: 4px; background: rgba(255,255,255,0.12);">
             <div id="storageProgressBar" class="progress-bar rounded-pill" style="width: 0%; background: linear-gradient(90deg, #60a5fa, #a855f7);"></div>

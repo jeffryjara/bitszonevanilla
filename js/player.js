@@ -965,6 +965,7 @@
     var usedMb = Storage.getUsedMb ? Storage.getUsedMb() : (Storage.getUsedBytes() / (1024 * 1024));
     var baseMb = Storage.BASE_STORAGE_MB || 5120.0;
     var availMb = Math.max(0, baseMb - usedMb);
+    var availGb = availMb / 1024;
     var usedPct = Math.min(100, (usedMb / baseMb) * 100);
 
     var bar = document.getElementById('storageProgressBar');
@@ -972,10 +973,16 @@
     var badge = document.getElementById('downloadsCountBadge');
 
     if (bar) {
-      bar.style.width = (usedMb > 0 ? Math.max(3, usedPct) : 0).toFixed(1) + '%';
+      bar.style.width = (usedMb > 0 ? Math.max(2, usedPct) : 0).toFixed(1) + '%';
     }
     if (availEl) {
-      availEl.innerHTML = '<strong class="text-white">' + availMb.toFixed(1) + ' MB</strong> de 5.00 GB';
+      if (usedMb <= 0) {
+        availEl.innerHTML = '<strong class="text-white">5.00 GB</strong> de 5.00 GB';
+      } else if (availGb >= 1) {
+        availEl.innerHTML = '<strong class="text-white">' + availGb.toFixed(2) + ' GB</strong> de 5.00 GB';
+      } else {
+        availEl.innerHTML = '<strong class="text-white">' + availMb.toFixed(1) + ' MB</strong> de 5.00 GB';
+      }
     }
     if (badge) {
       badge.textContent = String(dlCount);
@@ -2243,33 +2250,37 @@
     var stage = document.getElementById('bzMainStage');
     if (!stage) return;
 
-    syncThemeMode(appState.view);
+    try {
+      syncThemeMode(appState.view);
 
-    if (appState.loading) {
-      stage.innerHTML =
-        '<div class="d-flex flex-column align-items-center justify-content-center py-5 my-5 text-center">' +
-          '<div class="spinner-border mb-3" style="color:var(--bz-lavender); width:2.8rem; height:2.8rem;" role="status"></div>' +
-          '<p class="text-white-50">Cargando catálogo de Bitszone…</p>' +
-        '</div>';
-      return;
-    }
+      if (appState.loading) {
+        stage.innerHTML =
+          '<div class="d-flex flex-column align-items-center justify-content-center py-5 my-5 text-center">' +
+            '<div class="spinner-border mb-3" style="color:var(--bz-lavender); width:2.8rem; height:2.8rem;" role="status"></div>' +
+            '<p class="text-white-50">Cargando catálogo de Bitszone…</p>' +
+          '</div>';
+        return;
+      }
 
-    if (appState.view === 'catalog') renderCatalogView(stage);
-    else if (appState.view === 'album') renderAlbumView(stage, appState.selectedAlbum);
-    else if (appState.view === 'artist') renderArtistView(stage, appState.selectedArtist);
-    else if (appState.view.indexOf('library') === 0) renderLibraryView(stage);
-    else if (appState.view === 'downloads') renderDownloadsView(stage);
-    else if (appState.view === 'dashboard') {
-      window.BitszoneDashboard.renderDashboard(stage, {
-        notify: showToast,
-        onBack: function () { navigate('catalog'); },
-        catalogStats: {
-          albumsCount: appState.albums.length,
-          tracksCount: appState.tracksCount,
-          source: appState.catalogSource,
-          latencyMs: appState.latencyMs
-        }
-      });
+      if (appState.view === 'catalog') renderCatalogView(stage);
+      else if (appState.view === 'album') renderAlbumView(stage, appState.selectedAlbum);
+      else if (appState.view === 'artist') renderArtistView(stage, appState.selectedArtist);
+      else if (appState.view.indexOf('library') === 0) renderLibraryView(stage);
+      else if (appState.view === 'downloads') renderDownloadsView(stage);
+      else if (appState.view === 'dashboard') {
+        window.BitszoneDashboard.renderDashboard(stage, {
+          notify: showToast,
+          onBack: function () { navigate('catalog'); },
+          catalogStats: {
+            albumsCount: appState.albums.length,
+            tracksCount: appState.tracksCount,
+            source: appState.catalogSource,
+            latencyMs: appState.latencyMs
+          }
+        });
+      }
+    } catch (err) {
+      console.error('Error al renderizar vista ' + appState.view + ':', err);
     }
   }
 
@@ -2293,6 +2304,7 @@
   function renderAlbumCardHtml(album, isSongMode) {
     var mainTrack = album.tracks && album.tracks[0];
     var titleText = isSongMode && mainTrack ? mainTrack.title : album.title;
+    var fav = mainTrack ? Storage.isFavorite(mainTrack.id) : false;
     var allDl = album.tracks && album.tracks.length > 0 && album.tracks.every(function (t) { return Storage.isDownloaded(t.id); });
     var dl = isSongMode ? (mainTrack ? Storage.isDownloaded(mainTrack.id) : false) : allDl;
     var lic = mainTrack ? Storage.isLicensed(mainTrack.id) : false;
@@ -4415,6 +4427,8 @@
       setTimeout(hideLoadingScreen, waitMs);
     }).catch(function (err) {
       console.warn('Error al cargar catálogo inicial:', err);
+      appState.loading = false;
+      renderCurrentView();
       hideLoadingScreen();
     });
     window.addEventListener('storage', function (e) {
