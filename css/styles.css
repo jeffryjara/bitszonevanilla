@@ -4171,13 +4171,20 @@ body.bz-has-miniplayer .bz-detail-viewport {
   display: inline-flex;
   align-items: center;
   gap: 0.15rem;
-  opacity: 0.22;
+  opacity: 0;
   transition: opacity 0.2s ease;
 }
+/* Las opciones de cada canción aparecen solo al pasar el ratón (o al enfocar con teclado) */
 .bz-album-track-row:hover .bz-row-hover-actions,
-.bz-album-track-row.is-playing .bz-row-hover-actions {
+.bz-album-track-row:focus-within .bz-row-hover-actions {
   opacity: 1;
 }
+@media (hover: none) {
+  .bz-row-hover-actions { opacity: 0.75; }
+}
+/* Con la canción sonando, al pasar el ratón el ecualizador cede su lugar al botón de pausa */
+.bz-row-idx-wrap .fx-eq { transition: opacity 0.15s ease; }
+.bz-album-track-row:hover .bz-row-idx-wrap .fx-eq { opacity: 0; }
 
 .bz-artist-hero-wrap {
   position: relative;
@@ -5718,7 +5725,6 @@ html, body {
   .bz-album-track-row [data-row-addpl],
   .bz-album-track-row [data-row-dl],
   .bz-album-track-row .font-mono-bz.text-end { display: none !important; }
-  .bz-row-hover-actions { opacity: 1; }
 
   /* Pistas y cola del reproductor expandido: más espacio para el título */
   .bz-exp-track-item [data-exp-q-pl],
@@ -5894,4 +5900,3 @@ html, body {
 
 /* Efecto resorte: el contenido se desplaza con un rebote suave al llegar al tope; se evita el rebote nativo para que no se duplique */
 .bz-main-scroll, #expandedPlayerModal { overscroll-behavior-y: none; }
-#bzMainStage, #expandedPlayerModal .modal-dialog { will-change: transform; }

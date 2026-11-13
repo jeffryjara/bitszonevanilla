@@ -3023,7 +3023,7 @@
       '<div class="col-12 col-lg-7">' +
         (tracks.length === 0
           ? '<div class="py-5 text-center text-white-50">' + _t('album.emptyPlaylist', 'Esta lista aún no tiene canciones. Usa el botón + en cualquier canción del catálogo para agregarla.') + '</div>'
-          : '<div class="bz-album-tracklist-scroll">' +
+          : '<div class="bz-album-tracklist-scroll"><div class="bz-elastic-inner">' +
               tracks.map(function (t, i) {
                 var playing = appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) === Number(t.id);
                 var fav = Storage.isFavorite(t.id);
@@ -3034,7 +3034,7 @@
                   '<div class="bz-album-track-row ' + (playing ? 'is-playing' : '') + '" data-row-play-idx="' + i + '">' +
                     '<div class="bz-row-idx-wrap text-white-50 font-mono-bz small">' +
                       (playing && appState.isPlaying
-                        ? '<div class="fx-eq" style="width:18px;"><i></i><i></i><i></i></div>'
+                        ? '<div class="fx-eq" style="width:18px;"><i></i><i></i><i></i></div><span class="bz-row-play-glyph"><i class="bi bi-pause-fill fs-5"></i></span>'
                         : '<span class="bz-row-idx-num">' + (t.trackNumber || (i + 1)) + '</span><span class="bz-row-play-glyph"><i class="bi bi-play-fill fs-5"></i></span>') +
                     '</div>' +
                     '<div class="min-w-0">' +
@@ -3065,7 +3065,7 @@
                   '</div>'
                 );
               }).join('') +
-            '</div>') +
+            '</div></div>') +
       '</div>';
 
     container.innerHTML =
@@ -3204,7 +3204,11 @@
     container.querySelectorAll('[data-row-play-idx]').forEach(function (row) {
       row.addEventListener('click', function () {
         var i = Number(row.getAttribute('data-row-play-idx'));
-        if (tracks[i]) playTrack(tracks[i], albumObj, tracks);
+        var tr = tracks[i];
+        if (!tr) return;
+        // Si es la canción cargada, el clic alterna pausa / reproducir en vez de reiniciarla
+        if (appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) === Number(tr.id)) { togglePlay(); return; }
+        playTrack(tr, albumObj, tracks);
       });
     });
 
@@ -4491,65 +4495,85 @@
       if (e.key === 'Escape') document.body.classList.remove('bz-drawer-open');
     });
 
-    // Efecto resorte (rubber-band): al llegar al tope arriba o abajo el contenido cede y rebota
-    function attachElastic(scroller, getContent) {
-      if (!scroller || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-      var MAX = 120;
-      var last = 0, pull = 0, timer = null;
-      function atTop() { return scroller.scrollTop <= 0; }
-      function atBottom() { return scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1; }
-      function rubber(d) { var a = Math.abs(d); return Math.sign(d) * MAX * (1 - 1 / (a * 0.5 / MAX + 1)); }
-      function apply(d) {
-        var el = getContent();
-        if (!el) return;
-        el.style.transition = 'none';
+    // Efecto resorte (rubber-band): solo en zonas que realmente se desplazan (hay contenido de sobra).
+    // Si la pantalla o la lista caben completas no hay nada que jalar, así que no rebotan.
+    (function () {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var MAX = 90;
+      var st = null; // gesto táctil actual
+      var wheelPull = 0, wheelSc = null, wheelTimer = null;
+
+      function scrollableAncestor(el) {
+        while (el && el !== document.body && el.nodeType === 1) {
+          var oy = getComputedStyle(el).overflowY;
+          if ((oy === 'auto' || oy === 'scroll') && el.scrollHeight > el.clientHeight + 1) return el;
+          el = el.parentElement;
+        }
+        return null;
+      }
+      function contentOf(sc) {
+        if (sc.id === 'bzMainScroll') return document.getElementById('bzMainStage');
+        if (sc.classList.contains('modal')) return sc.querySelector('.modal-dialog');
+        var inner = sc.querySelector(':scope > .bz-elastic-inner');
+        if (inner) return inner;
+        return sc.children.length === 1 ? sc.firstElementChild : null;
+      }
+      function atTop(sc) { return sc.scrollTop <= 0; }
+      function atBottom(sc) { return sc.scrollTop + sc.clientHeight >= sc.scrollHeight - 1; }
+      function rubber(d) { return Math.sign(d) * MAX * (1 - 1 / (Math.abs(d) * 0.4 / MAX + 1)); }
+      function setY(el, d, smooth) {
+        el.style.transition = smooth ? 'transform 0.14s ease-out' : 'none';
         el.style.transform = d ? 'translate3d(0,' + rubber(d).toFixed(1) + 'px,0)' : '';
       }
-      function release() {
-        var el = getContent();
-        pull = 0;
+      function release(el) {
         if (!el) return;
-        el.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        el.style.transition = 'transform 0.8s cubic-bezier(0.22, 1, 0.36, 1)';
         el.style.transform = '';
       }
+
       // Dedo
-      scroller.addEventListener('touchstart', function (e) { last = e.touches[0].clientY; pull = 0; }, { passive: true });
-      scroller.addEventListener('touchmove', function (e) {
+      document.addEventListener('touchstart', function (e) {
+        var sc = scrollableAncestor(e.target);
+        var content = sc && contentOf(sc);
+        st = content ? { sc: sc, el: content, last: e.touches[0].clientY, pull: 0 } : null;
+      }, { passive: true });
+      document.addEventListener('touchmove', function (e) {
+        if (!st) return;
         var y = e.touches[0].clientY;
-        var d = y - last;
-        last = y;
-        if (pull === 0) {
-          if ((d > 0 && atTop()) || (d < 0 && atBottom())) pull = d;
+        var d = y - st.last;
+        st.last = y;
+        if (st.pull === 0) {
+          if ((d > 0 && atTop(st.sc)) || (d < 0 && atBottom(st.sc))) st.pull = d;
         } else {
-          var wasTop = pull > 0;
-          pull += d;
-          // si el dedo regresa más allá del punto de partida, se vuelve al scroll normal
-          if ((wasTop && pull <= 0) || (!wasTop && pull >= 0)) pull = 0;
+          var wasTop = st.pull > 0;
+          st.pull += d;
+          if ((wasTop && st.pull <= 0) || (!wasTop && st.pull >= 0)) st.pull = 0; // volvió al scroll normal
         }
-        if (pull !== 0) {
-          apply(pull);
+        if (st.pull !== 0) {
+          setY(st.el, st.pull, false);
           if (e.cancelable) e.preventDefault();
-        } else {
-          var el = getContent();
-          if (el && el.style.transform) { apply(0); }
+        } else if (st.el.style.transform) {
+          setY(st.el, 0, false);
         }
       }, { passive: false });
-      scroller.addEventListener('touchend', function () { if (pull !== 0 || (getContent() && getContent().style.transform)) release(); });
-      scroller.addEventListener('touchcancel', function () { release(); });
+      function endTouch() { if (st) { release(st.el); st = null; } }
+      document.addEventListener('touchend', endTouch);
+      document.addEventListener('touchcancel', endTouch);
+
       // Rueda / trackpad
-      scroller.addEventListener('wheel', function (e) {
-        if (!((e.deltaY > 0 && atBottom()) || (e.deltaY < 0 && atTop()))) return;
-        pull -= e.deltaY * 0.6;
-        pull = Math.max(-MAX * 3, Math.min(MAX * 3, pull));
-        apply(pull);
-        clearTimeout(timer);
-        timer = setTimeout(release, 110);
+      document.addEventListener('wheel', function (e) {
+        var sc = scrollableAncestor(e.target);
+        if (!sc) return;
+        var el = contentOf(sc);
+        if (!el) return;
+        if (!((e.deltaY > 0 && atBottom(sc)) || (e.deltaY < 0 && atTop(sc)))) return;
+        if (wheelSc !== sc) { wheelPull = 0; wheelSc = sc; }
+        wheelPull -= e.deltaY * 0.5;
+        wheelPull = Math.max(-MAX * 6, Math.min(MAX * 6, wheelPull));
+        setY(el, wheelPull, true);
+        clearTimeout(wheelTimer);
+        wheelTimer = setTimeout(function () { wheelPull = 0; release(el); }, 160);
       }, { passive: true });
-    }
-    attachElastic(document.getElementById('bzMainScroll'), function () { return document.getElementById('bzMainStage'); });
-    (function () {
-      var m = document.getElementById('expandedPlayerModal');
-      if (m) attachElastic(m, function () { return m.querySelector('.modal-dialog'); });
     })();
 
     // Barra inferior líquida: el selector se desliza (con efecto de estiramiento) hacia la pestaña activa
