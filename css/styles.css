@@ -2438,15 +2438,52 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   color: #ffffff;
 }
 
+/* Bloqueo estricto de scroll e interacción exterior durante el anuncio */
+html.bz-ad-locked,
+body.bz-ad-locked {
+  overflow: hidden !important;
+  touch-action: none !important;
+  overscroll-behavior: none !important;
+  height: 100% !important;
+}
+
+body.bz-ad-locked .bz-main-scroll,
+body.bz-ad-locked #bzDesktopSidebar,
+body.bz-ad-locked #mainContainer,
+body.bz-ad-locked #bzMiniPlayer,
+body.bz-ad-locked .bz-mobile-tabbar,
+body.bz-ad-locked #expandedPlayerModal {
+  overflow: hidden !important;
+  pointer-events: none !important;
+  user-select: none !important;
+}
+
 /* Modal Intersticial de Anuncios (Liquid Glass Ad Player) */
+.bz-ad-modal {
+  z-index: 1090 !important;
+  overflow: hidden !important;
+  touch-action: none !important;
+}
+
+/* Fondo / Backdrop impenetrable con desenfoque extremo */
+.modal-backdrop.bz-ad-backdrop,
+.bz-ad-modal ~ .modal-backdrop {
+  z-index: 1085 !important;
+  background-color: rgba(6, 2, 14, 0.9) !important;
+  backdrop-filter: blur(32px) !important;
+  -webkit-backdrop-filter: blur(32px) !important;
+  opacity: 1 !important;
+}
+
 .bz-ad-modal .modal-content {
   border-radius: 28px;
-  background: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.24), transparent 75%),
-              rgba(14, 8, 25, 0.94);
-  border: 1px solid rgba(192, 132, 252, 0.32);
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(168, 85, 247, 0.28);
+  background: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.22), transparent 75%),
+              rgba(15, 8, 28, 0.96);
+  border: 1px solid rgba(192, 132, 252, 0.35);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 45px rgba(168, 85, 247, 0.32);
+  pointer-events: auto !important;
 }
 
 .bz-ad-progress-track {
@@ -2475,27 +2512,14 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   padding: 0.38em 0.85em;
 }
 
-.bz-ad-sponsor-box {
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 1.4rem;
-  transition: all 0.3s ease;
-}
-
-.bz-ad-sponsor-box:hover {
-  border-color: rgba(192, 132, 252, 0.35);
-  background: rgba(255, 255, 255, 0.05);
-}
-
 .bz-ad-cover-wrap {
-  width: 90px;
-  height: 90px;
+  width: 86px;
+  height: 86px;
   margin: 0 auto;
-  border-radius: 18px;
+  border-radius: 20px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55), 0 0 20px rgba(168, 85, 247, 0.35);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 28px rgba(168, 85, 247, 0.4);
 }
 
 .bz-ad-cover-img {

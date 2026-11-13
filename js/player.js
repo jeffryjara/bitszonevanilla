@@ -68,31 +68,27 @@
   var AD_SPONSORS = [
     {
       badge: 'Bitszone Premium',
-      title: 'Desbloquea Bitszone Premium',
-      desc: 'Escucha todas tus canciones completas sin límites de 30 segundos, sin anuncios y con streaming Hi-Res a 320 kbps.',
-      image: './assets/img/bitszone-icon.png',
-      tag: 'Plan Gratuito · Regístrate en 1 minuto'
+      title: 'Música sin límites',
+      desc: 'Escucha canciones completas sin límites de 30 segundos ni anuncios.',
+      image: './assets/img/bitszone-icon.png'
     },
     {
-      badge: 'Hardware · Audio',
-      title: 'SoundWave Studio Wireless',
-      desc: 'Cancelación activa de ruido híbrida y drivers de titanio de 40mm. Diseñado para audiófilos exigentes.',
-      image: './assets/img/albums/meteora.jpg',
-      tag: 'Patrocinado por SoundWave Audio'
+      badge: 'SoundWave Audio',
+      title: 'Audio Espacial Hi-Res',
+      desc: 'Disfruta la máxima fidelidad en todas tus pistas favoritas.',
+      image: './assets/img/albums/meteora.jpg'
     },
     {
-      badge: 'Festival en Vivo',
-      title: 'CyberGroove Fest 2026',
-      desc: 'El festival de música electrónica y synthwave más esperado del año. Más de 40 artistas internacionales en escena.',
-      image: './assets/img/albums/calm.jpg',
-      tag: 'Preventa exclusiva en Bitszone'
+      badge: 'CyberGroove 2026',
+      title: 'Festival en Vivo',
+      desc: 'Más de 40 artistas internacionales. Entradas ya disponibles.',
+      image: './assets/img/albums/calm.jpg'
     },
     {
-      badge: 'Caché Offline',
-      title: 'Toda tu música sin conexión',
-      desc: 'Crea tu cuenta gratis para guardar y descargar canciones directamente en tu navegador y escuchar sin conexión.',
-      image: './assets/img/albums/thriller.jpg',
-      tag: 'Bitszone Offline Player'
+      badge: 'Bitszone Offline',
+      title: 'Música sin conexión',
+      desc: 'Crea tu cuenta gratis para descargar y escuchar sin internet.',
+      image: './assets/img/albums/thriller.jpg'
     }
   ];
 
@@ -115,6 +111,36 @@
     }
   }
 
+  // Bloqueo total de scroll del mouse y gestos táctiles mientras el anuncio está activo
+  function blockAdScroll(e) {
+    if (!adState.isActive) return;
+    var modal = document.getElementById('adInterstitialModal');
+    // Permitir interacción solo dentro del modal si es clickeable
+    if (!modal || !modal.contains(e.target)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }
+
+  // Bloqueo estricto de atajos de teclado y teclas que muevan el scroll (Space, Flechas, etc.)
+  function blockAdKeys(e) {
+    if (!adState.isActive) return;
+    var blocked = [
+      'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+      'PageUp', 'PageDown', 'Home', 'End', 'Tab', 'KeyF', 'KeyM', 'KeyA', 'KeyR', 'KeyS'
+    ];
+    if (blocked.indexOf(e.code) !== -1 || e.key === 'Tab') {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+  }
+
+  window.addEventListener('wheel', blockAdScroll, { passive: false });
+  window.addEventListener('touchmove', blockAdScroll, { passive: false });
+  window.addEventListener('keydown', blockAdKeys, { capture: true });
+
   function triggerAdFlow(onComplete) {
     if (isUserAuthenticated()) {
       if (typeof onComplete === 'function') onComplete();
@@ -125,6 +151,10 @@
     adState.isActive = true;
     adState.onComplete = onComplete;
     adState.secondsLeft = 15;
+
+    // Bloquear scroll e interacción exterior
+    document.documentElement.classList.add('bz-ad-locked');
+    document.body.classList.add('bz-ad-locked');
 
     if (audioEl) {
       audioEl.pause();
@@ -137,8 +167,7 @@
 
     var modalEl = document.getElementById('adInterstitialModal');
     if (!modalEl) {
-      adState.isActive = false;
-      if (typeof onComplete === 'function') onComplete();
+      finishAdFlow();
       return;
     }
 
@@ -146,7 +175,6 @@
     var titleEl = document.getElementById('adSponsorTitle');
     var descEl = document.getElementById('adSponsorDesc');
     var imgEl = document.getElementById('adSponsorImage');
-    var tagEl = document.getElementById('adSponsorTag');
     var secLeftEl = document.getElementById('adSecondsLeft');
     var barEl = document.getElementById('adProgressBar');
     var skipBtn = document.getElementById('btnSkipAd');
@@ -155,7 +183,6 @@
     if (titleEl) titleEl.textContent = sponsor.title;
     if (descEl) descEl.textContent = sponsor.desc;
     if (imgEl) imgEl.src = sponsor.image;
-    if (tagEl) tagEl.textContent = sponsor.tag;
     if (secLeftEl) secLeftEl.textContent = '15s';
 
     if (barEl) {
@@ -175,6 +202,14 @@
 
     var bsModal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
     bsModal.show();
+
+    // Asegurar fondo difuminado y oscuro impenetrable
+    setTimeout(function () {
+      var backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(function (b) {
+        b.classList.add('bz-ad-backdrop');
+      });
+    }, 10);
 
     if (adState.intervalId) clearInterval(adState.intervalId);
     adState.intervalId = setInterval(function () {
@@ -199,6 +234,11 @@
       clearInterval(adState.intervalId);
       adState.intervalId = null;
     }
+
+    // Desbloquear scroll e interacción
+    document.documentElement.classList.remove('bz-ad-locked');
+    document.body.classList.remove('bz-ad-locked');
+
     var modalEl = document.getElementById('adInterstitialModal');
     if (modalEl) {
       var bsModal = window.bootstrap.Modal.getInstance(modalEl);
@@ -3198,6 +3238,7 @@
         }
       }
 
+      if (adState.isActive) return;
       var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
 
