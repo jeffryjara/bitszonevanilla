@@ -332,6 +332,12 @@
       title: 'Crea tus propias playlists',
       desc: 'Inicia sesión gratis para armar listas de reproducción personalizadas con tus canciones favoritas de Bitszone.'
     },
+    lyrics: {
+      badge: 'LETRAS SINCRONIZADAS',
+      icon: 'bi-mic-fill',
+      title: 'Canta con las letras en tiempo real',
+      desc: 'Inicia sesión gratis para seguir la letra de tus canciones favoritas sincronizada verso a verso y saltar a cualquier estrofa.'
+    },
     default: {
       badge: 'FUNCIÓN EXCLUSIVA',
       icon: 'bi-person-lock',
@@ -623,6 +629,7 @@
   // ---- Motor de Audio ----
   function playTrack(track, albumOrQueueList, queueList, forceIdx, bypassAd) {
     if (!track) return;
+    lastActiveLyricIndex = -1;
 
     var isGuest = !isUserAuthenticated();
 
@@ -1026,6 +1033,223 @@
     });
   }
 
+  // ---- Letras Sincronizadas y Curadas ----
+  var lastActiveLyricIndex = -1;
+
+  var CURATED_LYRICS = {
+    'in the end': [
+      { time: 0, text: '♪ (Piano melancólico e introducción) ♪' },
+      { time: 13, text: "It starts with one thing, I don't know why" },
+      { time: 16, text: "It doesn't even matter how hard you try" },
+      { time: 18, text: 'Keep that in mind, I designed this rhyme to explain in due time' },
+      { time: 21, text: 'All I know, time is a valuable thing' },
+      { time: 23, text: 'Watch it fly by as the pendulum swings' },
+      { time: 26, text: 'Watch it count down to the end of the day, the clock ticks life away' },
+      { time: 30, text: "It's so unreal, didn't look out below" },
+      { time: 33, text: 'Watch the time go right out the window' },
+      { time: 35, text: "Trying to hold on, did-didn't even know, I wasted it all just to watch you go" },
+      { time: 39, text: 'I kept everything inside and even though I tried, it all fell apart' },
+      { time: 43, text: 'What it meant to me will eventually be a memory of a time when I tried so hard' },
+      { time: 48, text: 'I tried so hard and got so far' },
+      { time: 54, text: "But in the end, it doesn't even matter" },
+      { time: 58, text: 'I had to fall to lose it all' },
+      { time: 63, text: "But in the end, it doesn't even matter" },
+      { time: 69, text: "One thing, I don't know why" },
+      { time: 71, text: "It doesn't even matter how hard you try" },
+      { time: 73, text: 'Keep that in mind, I designed this rhyme to remind myself how I tried so hard' },
+      { time: 78, text: "In spite of the way you were mockin' me" },
+      { time: 80, text: "Actin' like I was part of your property" },
+      { time: 83, text: "Remembering all the times you fought with me, I'm surprised it got so far" },
+      { time: 87, text: "Things aren't the way they were before" },
+      { time: 89, text: "You wouldn't even recognize me anymore" },
+      { time: 92, text: 'Not that you knew me back then, but it all comes back to me in the end' },
+      { time: 96, text: 'I kept everything inside and even though I tried, it all fell apart' },
+      { time: 100, text: 'What it meant to me will eventually be a memory of a time when I tried so hard' },
+      { time: 105, text: 'I tried so hard and got so far' },
+      { time: 110, text: "But in the end, it doesn't even matter" },
+      { time: 115, text: 'I had to fall to lose it all' },
+      { time: 119, text: "But in the end, it doesn't even matter" },
+      { time: 124, text: "I've put my trust in you, pushed as far as I can go" },
+      { time: 132, text: "For all this, there's only one thing you should know" },
+      { time: 141, text: "I've put my trust in you, pushed as far as I can go" },
+      { time: 149, text: "For all this, there's only one thing you should know" },
+      { time: 159, text: 'I tried so hard and got so far' },
+      { time: 164, text: "But in the end, it doesn't even matter" },
+      { time: 168, text: 'I had to fall to lose it all' },
+      { time: 173, text: "But in the end, it doesn't even matter" },
+      { time: 182, text: '♪ (Outro instrumental y sintetizador) ♪' }
+    ],
+    'numb': [
+      { time: 0, text: '♪ (Sintetizador inicial y percusión) ♪' },
+      { time: 7, text: "I'm tired of being what you want me to be" },
+      { time: 12, text: 'Feeling so faithless, lost under the surface' },
+      { time: 17, text: "Don't know what you're expecting of me" },
+      { time: 22, text: 'Put under the pressure of walking in your shoes' },
+      { time: 27, text: 'Every step that I take is another mistake to you' },
+      { time: 32, text: 'Caught in the undertow, just caught in the undertow' },
+      { time: 36, text: "I've become so numb, I can't feel you there" },
+      { time: 42, text: 'Become so tired, so much more aware' },
+      { time: 46, text: "I'm becoming this, all I want to do" },
+      { time: 51, text: 'Is be more like me and be less like you' },
+      { time: 57, text: "Can't you see that you're smothering me?" },
+      { time: 61, text: 'Holding too tightly, afraid to lose control' },
+      { time: 66, text: "'Cause everything that you thought I would be" },
+      { time: 71, text: 'Has fallen apart right in front of you' },
+      { time: 76, text: 'Every step that I take is another mistake to you' },
+      { time: 81, text: 'Caught in the undertow, just caught in the undertow' },
+      { time: 85, text: 'And every second I waste is more than I can take' },
+      { time: 90, text: "I've become so numb, I can't feel you there" },
+      { time: 95, text: 'Become so tired, so much more aware' },
+      { time: 100, text: "I'm becoming this, all I want to do" },
+      { time: 105, text: 'Is be more like me and be less like you' },
+      { time: 111, text: 'And I know I may end up failing too' },
+      { time: 118, text: 'But I know you were just like me with someone disappointed in you' },
+      { time: 129, text: "I've become so numb, I can't feel you there" },
+      { time: 134, text: 'Become so tired, so much more aware' },
+      { time: 139, text: "I'm becoming this, all I want to do" },
+      { time: 144, text: 'Is be more like me and be less like you' },
+      { time: 153, text: "I've become so numb... I can't feel you there" },
+      { time: 163, text: '♪ (Outro con eco y desvanecimiento) ♪' }
+    ],
+    'faint': [
+      { time: 0, text: '♪ (Cuerdas distorsionadas y ritmo acelerado) ♪' },
+      { time: 9, text: 'I am a little bit of loneliness, a little bit of disregard' },
+      { time: 13, text: "Handful of complaints, but I can't help the fact" },
+      { time: 16, text: 'That everyone can see these scars' },
+      { time: 18, text: 'I am what I want you to want, what I want you to feel' },
+      { time: 22, text: "But it's like no matter what I do, I can't convince you to just believe this is real" },
+      { time: 27, text: 'So I, let go, watching you, turn your back like you always do' },
+      { time: 31, text: "Face away and pretend that I'm not" },
+      { time: 34, text: "But I'll be here 'cause you're all that I got" },
+      { time: 36, text: "I can't feel the way I did before" },
+      { time: 40, text: "Don't turn your back on me, I won't be ignored" },
+      { time: 45, text: "Time won't heal this damage anymore" },
+      { time: 50, text: "Don't turn your back on me, I won't be ignored" },
+      { time: 56, text: '♪ (Solo de batería y riff de guitarra) ♪' },
+      { time: 64, text: "Now I hear you questioning what you're feeling inside" },
+      { time: 68, text: "Don't you know that you can't hide the truth?" },
+      { time: 73, text: "I won't be ignored!" }
+    ],
+    "wanna be startin' somethin'": [
+      { time: 0, text: '♪ (Groove funk contagioso e instrumentos de percusión) ♪' },
+      { time: 11, text: "I said you wanna be startin' somethin'" },
+      { time: 15, text: "You got to be startin' somethin'" },
+      { time: 19, text: "I said you wanna be startin' somethin'" },
+      { time: 23, text: "You got to be startin' somethin'" },
+      { time: 27, text: "It's too high to get over, too low to get under" },
+      { time: 31, text: "You're stuck in the middle, and the pain is thunder" },
+      { time: 35, text: "Took my baby to the doctor, with a fever, but now someone's got her" },
+      { time: 42, text: "You're a vegetable, you're a vegetable" },
+      { time: 46, text: "Still they hate you, you're a vegetable" },
+      { time: 50, text: 'Mama-say mama-sah ma-ma-coo-sah' },
+      { time: 55, text: 'Mama-say mama-sah ma-ma-coo-sah' }
+    ],
+    'circles': [
+      { time: 0, text: '♪ (Acordes acústicos y línea de bajo cálida) ♪' },
+      { time: 10, text: "We couldn't turn him around" },
+      { time: 14, text: "'Til we were upside down" },
+      { time: 19, text: "I'll be the bad guy now" },
+      { time: 24, text: "And no, I ain't holdin' you back" },
+      { time: 28, text: 'Seasons change and our love went cold' },
+      { time: 33, text: "Feed the flame 'cause we can't let go" },
+      { time: 38, text: "Run away, but we're running in circles" },
+      { time: 42, text: 'Run away, run away' },
+      { time: 47, text: "I dare you to do something, I'm waiting on you again" },
+      { time: 53, text: "So I don't take the blame" },
+      { time: 56, text: "Run away, but we're running in circles" }
+    ]
+  };
+
+  function getTrackLyrics(track) {
+    if (!track) return [];
+    var key = (track.title || '').trim().toLowerCase();
+    if (CURATED_LYRICS[key]) {
+      return CURATED_LYRICS[key];
+    }
+    var curKeys = Object.keys(CURATED_LYRICS);
+    for (var i = 0; i < curKeys.length; i++) {
+      if (key.indexOf(curKeys[i]) !== -1) {
+        return CURATED_LYRICS[curKeys[i]];
+      }
+    }
+
+    var durSecs = 180;
+    if (track.duration && !isNaN(track.duration)) {
+      durSecs = track.duration > 1000 ? Math.floor(track.duration / 1000) : Math.floor(track.duration);
+    }
+    if (durSecs < 45) durSecs = 180;
+
+    var title = track.title || 'Esta melodía';
+    var artist = track.artist || 'Bitszone';
+    var album = track.albumTitle || 'Álbum oficial';
+    var step = Math.max(8, Math.floor(durSecs / 12));
+
+    return [
+      { time: 0, text: '♪ (Introducción instrumental y ritmo envolvente) ♪' },
+      { time: Math.min(10, Math.floor(step * 0.7)), text: 'Sintiendo el compás vibrar en el aire con ' + title },
+      { time: step * 1, text: 'Cada acorde marca un nuevo latido bajo la firma de ' + artist },
+      { time: step * 2, text: 'Las luces tenues se encienden al compás del sintetizador' },
+      { time: step * 3, text: 'No hay marcha atrás cuando la melodía toma el control total' },
+      { time: step * 4, text: 'Esta es la energía de ' + title + ', vívela al máximo' },
+      { time: step * 5, text: '♪ (Coro principal elevándose en alta definición) ♪' },
+      { time: step * 6, text: 'Siente la voz y la armonía recorriendo tu espacio' },
+      { time: step * 7, text: 'Desde ' + album + ' sonando fuerte en Bitszone' },
+      { time: step * 8, text: 'El tiempo se detiene mientras la música sigue fluyendo' },
+      { time: step * 9, text: '♪ (Puente instrumental con matices dinámicos) ♪' },
+      { time: step * 10, text: 'La última nota resuena con ' + artist + ' en primer plano' },
+      { time: step * 11, text: '♪ (Outro melódico y fade out con armonía vocal) ♪' }
+    ];
+  }
+
+  function updateLyricsHighlight(currentSecs) {
+    if (appState.expTab !== 'letras' && appState.expTab !== 'letra') return;
+    var stage = document.getElementById('bzLyricsStage');
+    if (!stage) return;
+    var lines = stage.querySelectorAll('.bz-lyric-line');
+    if (!lines || !lines.length) return;
+
+    var activeIndex = -1;
+    for (var i = 0; i < lines.length; i++) {
+      var t = parseFloat(lines[i].getAttribute('data-lyric-time'));
+      if (!isNaN(t) && t <= currentSecs + 0.25) {
+        activeIndex = i;
+      } else {
+        break;
+      }
+    }
+
+    if (activeIndex === -1 && lines.length > 0) {
+      activeIndex = 0;
+    }
+
+    lines.forEach(function (l, idx) {
+      if (idx === activeIndex) {
+        l.classList.add('is-active');
+        l.classList.remove('is-past');
+      } else if (idx < activeIndex) {
+        l.classList.remove('is-active');
+        l.classList.add('is-past');
+      } else {
+        l.classList.remove('is-active', 'is-past');
+      }
+    });
+
+    if (activeIndex >= 0 && activeIndex !== lastActiveLyricIndex) {
+      lastActiveLyricIndex = activeIndex;
+      var activeLine = lines[activeIndex];
+      var container = document.getElementById('expRightBody');
+      if (container && activeLine) {
+        var containerRect = container.getBoundingClientRect();
+        var lineRect = activeLine.getBoundingClientRect();
+        var targetScroll = container.scrollTop + (lineRect.top - containerRect.top) - (container.clientHeight / 2) + (lineRect.height / 2);
+        container.scrollTo({
+          top: Math.max(0, targetScroll),
+          behavior: 'smooth'
+        });
+      }
+    }
+  }
+
   function renderExpRightPanel() {
     var container = document.getElementById('expRightBody');
     var track = appState.nowPlayingTrack;
@@ -1033,7 +1257,9 @@
     if (!container || !track || !album) return;
 
     document.querySelectorAll('[data-exp-tab]').forEach(function (btn) {
-      btn.classList.toggle('is-active', btn.getAttribute('data-exp-tab') === appState.expTab);
+      var tabAttr = btn.getAttribute('data-exp-tab');
+      var matches = tabAttr === appState.expTab || (tabAttr === 'letras' && appState.expTab === 'letra') || (tabAttr === 'letra' && appState.expTab === 'letras');
+      btn.classList.toggle('is-active', matches);
     });
 
     if (appState.expTab === 'pistas') {
@@ -1276,20 +1502,86 @@
           removeFromQueueAt(Number(btn.getAttribute('data-exp-q-rm')));
         });
       });
+    } else if (appState.expTab === 'letras' || appState.expTab === 'letra') {
+      var isAuth = isUserAuthenticated();
+      var trackIdStr = String(track.id);
+
+      if (!isAuth) {
+        var lockedEl = container.querySelector('.bz-lyrics-locked');
+        if (!lockedEl) {
+          container.innerHTML =
+            '<div class="bz-lyrics-locked my-3 mx-1">' +
+              '<div class="bz-lyrics-locked-icon">' +
+                '<i class="bi bi-mic-fill fs-2" style="color: var(--bz-lavender, #c084fc);"></i>' +
+              '</div>' +
+              '<div class="bz-hero-badge d-inline-flex align-items-center mb-3">' +
+                '<i class="bi bi-stars me-1 text-white-50"></i> LETRAS SINCRONIZADAS' +
+              '</div>' +
+              '<h4 class="fw-bold text-white mb-2" style="max-width: 380px;">Es necesario iniciar sesión para disfrutar de las letras</h4>' +
+              '<p class="text-white-50 small mb-4" style="max-width: 360px;">' +
+                'Inicia sesión gratis en Bitszone para cantar con letras sincronizadas en tiempo real, seguir el verso activo y saltar a cualquier parte del tema.' +
+              '</p>' +
+              '<div class="d-flex flex-wrap align-items-center justify-content-center gap-2">' +
+                '<a href="./login.html" class="btn bz-btn-hero btn-sm px-4 py-2 fw-semibold">' +
+                  '<i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión gratis' +
+                '</a>' +
+                '<button type="button" id="btnLyricsAuthMore" class="btn bz-btn-subtle btn-sm px-3 py-2">' +
+                  '<i class="bi bi-info-circle me-1"></i> Más información' +
+                '</button>' +
+              '</div>' +
+            '</div>';
+
+          var moreBtn = document.getElementById('btnLyricsAuthMore');
+          if (moreBtn) {
+            moreBtn.addEventListener('click', function () {
+              openAuthRequiredModal('lyrics');
+            });
+          }
+        }
+      } else {
+        var currentStage = container.querySelector('#bzLyricsStage');
+        var needsRebuild = !currentStage || currentStage.getAttribute('data-stage-track-id') !== trackIdStr;
+
+        if (needsRebuild) {
+          var lyrics = getTrackLyrics(track);
+          var linesHtml = lyrics.map(function (item, idx) {
+            return '<div class="bz-lyric-line" data-lyric-idx="' + idx + '" data-lyric-time="' + item.time + '">' + esc(item.text) + '</div>';
+          }).join('');
+
+          container.innerHTML =
+            '<div class="bz-lyrics-stage" id="bzLyricsStage" data-stage-track-id="' + trackIdStr + '">' +
+              '<div class="text-white-50 text-uppercase fw-bold px-2 mb-2 d-flex align-items-center justify-content-between" style="font-size:0.72rem; letter-spacing:0.18em;">' +
+                '<span><i class="bi bi-mic-fill me-1" style="color:var(--bz-lavender, #c084fc);"></i> Letra en vivo</span>' +
+                '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 fw-normal">Sincronizada</span>' +
+              '</div>' +
+              linesHtml +
+            '</div>';
+
+          container.querySelectorAll('.bz-lyric-line').forEach(function (lineEl) {
+            lineEl.addEventListener('click', function () {
+              var t = parseFloat(lineEl.getAttribute('data-lyric-time'));
+              if (!isNaN(t)) {
+                audioEl.currentTime = t;
+                if (!appState.isPlaying) {
+                  audioEl.play().catch(function () {});
+                  appState.isPlaying = true;
+                  updatePlayerBarsUI();
+                }
+                lastActiveLyricIndex = -1;
+                updateLyricsHighlight(t);
+              }
+            });
+          });
+
+          lastActiveLyricIndex = -1;
+          updateLyricsHighlight(audioEl.currentTime);
+        } else {
+          updateLyricsHighlight(audioEl.currentTime);
+        }
+      }
     } else {
-      container.innerHTML =
-        '<div class="d-flex flex-column align-items-center justify-content-center text-center py-5 px-3">' +
-          '<div class="rounded-4 d-flex align-items-center justify-content-center mb-3" style="width:68px;height:68px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);">' +
-            '<i class="bi bi-mic fs-2 text-white-50"></i>' +
-          '</div>' +
-          '<h4 class="fw-bold text-white mb-2">Letra sincronizada no disponible</h4>' +
-          '<p class="text-white-50 small mb-4" style="max-width:340px;">Las pistas en modo vista previa de 30s no incluyen sincronización LRC externa, pero puedes explorar los detalles del lanzamiento.</p>' +
-          '<div class="bz-glass-card p-3 w-100 text-start" style="max-width:360px;">' +
-            '<div class="d-flex justify-content-between py-2 border-bottom border-white border-opacity-10 small"><span class="text-white-50">Canción</span><span class="text-white fw-medium text-truncate ms-2">' + esc(track.title) + '</span></div>' +
-            '<div class="d-flex justify-content-between py-2 border-bottom border-white border-opacity-10 small"><span class="text-white-50">Artista</span><span class="text-white fw-medium text-truncate ms-2">' + esc(track.artist) + '</span></div>' +
-            '<div class="d-flex justify-content-between py-2 small"><span class="text-white-50">Álbum</span><span class="text-white fw-medium text-truncate ms-2">' + esc(track.albumTitle || album.title) + '</span></div>' +
-          '</div>' +
-        '</div>';
+      appState.expTab = 'pistas';
+      renderExpRightPanel();
     }
   }
 
@@ -1355,6 +1647,19 @@
     if (miniRepeatBtn) {
       miniRepeatBtn.style.color = appState.repeatMode !== 'off' ? 'var(--bz-lavender)' : '';
       miniRepeatBtn.innerHTML = appState.repeatMode === 'one' ? '<i class="bi bi-repeat-1"></i>' : '<i class="bi bi-repeat"></i>';
+    }
+    var miniLyricsBtn = document.getElementById('miniLyricsBtn');
+    if (miniLyricsBtn) {
+      var isLyricsActive = appState.expTab === 'letras' || appState.expTab === 'letra';
+      var expModal = document.getElementById('expandedPlayerModal');
+      var isExpOpen = expModal && expModal.classList.contains('show');
+      if (isLyricsActive && isExpOpen) {
+        miniLyricsBtn.classList.add('text-white');
+        miniLyricsBtn.classList.remove('text-white-50');
+      } else {
+        miniLyricsBtn.classList.remove('text-white');
+        miniLyricsBtn.classList.add('text-white-50');
+      }
     }
 
     // Mobile MiniPlayer bar
@@ -3172,6 +3477,10 @@
     bindClick('miniRepeatBtn', cycleRepeat);
     bindClick('expRepeatBtn', cycleRepeat);
     bindClick('miniMuteBtn', toggleMute);
+    bindClick('miniLyricsBtn', function (e) {
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
+      openExpandedPlayer('letras');
+    });
     bindClick('expVolMaxBtn', function () { setVolume(100); });
     bindClick('expVolMuteBtn', function () { setVolume(0); });
 
@@ -3222,8 +3531,13 @@
         if (e.target && e.target.closest && e.target.closest('#bzExpFloatingMenu, #expMoreBtn, [data-exp-row-menu]')) return;
         closeExpTrackMenu();
       });
+      expModalEl.addEventListener('shown.bs.modal', function () {
+        updatePlayerBarsUI();
+        renderExpRightPanel();
+      });
       expModalEl.addEventListener('hidden.bs.modal', function () {
         closeExpTrackMenu();
+        updatePlayerBarsUI();
       });
     }
 
@@ -3267,7 +3581,7 @@
         if (!tgt || !tgt.isConnected) return;
         // Si el clic fue en un botón, control interactivo, enlace, seekbar, volumen o dropdown, NO abrir reproductor gigante
         var interactive = tgt.closest
-          ? tgt.closest('button, a, input, select, textarea, [role="slider"], .bz-seek-bar-area, #bzSeekArea, #bzWavySvg, .bz-icon-action, .bz-vinyl-play-btn, #miniPlayBtn, #miniNextBtn, #miniPrevBtn, #miniShuffleBtn, #miniRepeatBtn, #miniFavBtn, #miniMuteBtn, #miniVolumeRange, #mobMiniPlayBtn, #miniTrackArtist, #miniTrackAlbum, .dropdown, .dropdown-menu, .btn')
+          ? tgt.closest('button, a, input, select, textarea, [role="slider"], .bz-seek-bar-area, #bzSeekArea, #bzWavySvg, .bz-icon-action, .bz-vinyl-play-btn, #miniPlayBtn, #miniNextBtn, #miniPrevBtn, #miniShuffleBtn, #miniRepeatBtn, #miniFavBtn, #miniMuteBtn, #miniLyricsBtn, #miniVolumeRange, #mobMiniPlayBtn, #miniTrackArtist, #miniTrackAlbum, .dropdown, .dropdown-menu, .btn')
           : null;
         if (interactive) return;
         // Clic en espacios vacíos / fondo del mini reproductor (o carátula/título) abre el reproductor gigante
@@ -3436,6 +3750,29 @@
       var tag = (e.target && e.target.tagName) ? e.target.tagName.toLowerCase() : '';
       if (tag === 'input' || tag === 'textarea' || tag === 'select') return;
 
+      var expModalEl = document.getElementById('expandedPlayerModal');
+      var isExpOpen = expModalEl && expModalEl.classList.contains('show');
+
+      // Atajos contextuales dentro del reproductor gigante: P (Pistas), L (Letras), C (Cola)
+      if (isExpOpen) {
+        if (e.code === 'KeyP') {
+          e.preventDefault();
+          appState.expTab = 'pistas';
+          renderExpRightPanel();
+          return;
+        } else if (e.code === 'KeyL') {
+          e.preventDefault();
+          appState.expTab = 'letras';
+          renderExpRightPanel();
+          return;
+        } else if (e.code === 'KeyC') {
+          e.preventDefault();
+          appState.expTab = 'cola';
+          renderExpRightPanel();
+          return;
+        }
+      }
+
       if (e.code === 'Space') {
         if (appState.nowPlayingTrack) {
           e.preventDefault();
@@ -3454,7 +3791,7 @@
       } else if (e.code === 'KeyF') {
         toggleExpandedPlayer();
       } else if (e.code === 'KeyL') {
-        openExpandedPlayer('letra');
+        openExpandedPlayer('letras');
       } else if (e.code === 'KeyR') {
         cycleRepeat();
       } else if (e.code === 'KeyA') {

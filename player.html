@@ -226,6 +226,7 @@
         <div class="d-flex align-items-center justify-content-end gap-3" style="width: 30%; min-width: 220px;">
           <span id="miniTimeText" class="font-mono-bz small text-white-50">0:00 / 0:00</span>
           <div class="d-flex align-items-center gap-1">
+            <button id="miniLyricsBtn" type="button" class="bz-icon-action text-white-50" title="Ver Letras (L)"><i class="bi bi-mic fs-5"></i></button>
             <button id="miniMuteBtn" type="button" class="bz-icon-action text-white-50" title="Silenciar (M)"><i class="bi bi-volume-up-fill fs-5"></i></button>
             <input id="miniVolumeRange" type="range" min="0" max="100" value="100" class="bz-volume-range" aria-label="Volumen" />
           </div>
@@ -394,8 +395,8 @@
                     <button type="button" class="bz-segmented-btn is-active" data-exp-tab="pistas">
                       <i class="bi bi-music-note-list"></i><span>Pistas</span>
                     </button>
-                    <button type="button" class="bz-segmented-btn" data-exp-tab="letra">
-                      <i class="bi bi-mic"></i><span>Letra</span>
+                    <button type="button" class="bz-segmented-btn" data-exp-tab="letras">
+                      <i class="bi bi-mic"></i><span>Letras</span>
                     </button>
                     <button type="button" class="bz-segmented-btn" data-exp-tab="cola">
                       <i class="bi bi-list-ol"></i><span>Cola</span>
@@ -444,8 +445,16 @@
             <span class="bz-kbd">F</span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Mostrar pestaña de letra</span>
+            <span class="text-white-50">Pestaña Pistas (en reproductor gigante)</span>
+            <span class="bz-kbd">P</span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
+            <span class="text-white-50">Pestaña Letras (en reproductor gigante)</span>
             <span class="bz-kbd">L</span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
+            <span class="text-white-50">Pestaña Cola (en reproductor gigante)</span>
+            <span class="bz-kbd">C</span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
             <span class="text-white-50">Agregar o quitar de favoritos</span>
