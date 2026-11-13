@@ -990,6 +990,84 @@
     }
   }
 
+  function downloadAlbumProgressively(album, missingTracks, onFinish) {
+    if (!missingTracks || !missingTracks.length) {
+      if (typeof onFinish === 'function') onFinish();
+      return;
+    }
+
+    var total = missingTracks.length;
+    var albumId = album && album.id;
+    var albumTitle = (album && album.title) || 'Álbum';
+
+    var dockBtn = document.getElementById('btnAlbumDownloadAll');
+    if (dockBtn) {
+      dockBtn.innerHTML = '<span class="bz-dl-spinner" style="width: 18px; height: 18px; border-width: 2.5px;"></span>';
+      dockBtn.style.pointerEvents = 'none';
+      dockBtn.setAttribute('title', 'Descargando álbum...');
+    }
+    var cardBtn = albumId ? document.querySelector('[data-album-quick-dl="' + albumId + '"]') : null;
+    if (cardBtn) {
+      cardBtn.innerHTML = '<span class="bz-dl-spinner"></span>';
+      cardBtn.style.pointerEvents = 'none';
+      cardBtn.setAttribute('title', 'Descargando álbum...');
+    }
+
+    showToast('Iniciando descarga de "' + albumTitle + '" (0/' + total + ')...');
+
+    var index = 0;
+    function processNext() {
+      if (index >= total) {
+        if (dockBtn) {
+          dockBtn.classList.add('is-downloaded');
+          dockBtn.innerHTML = '<i class="bi bi-check-circle-fill fs-5 bz-pop-check" style="color: #4ade80;"></i>';
+          dockBtn.style.pointerEvents = '';
+          dockBtn.setAttribute('title', 'Álbum ya descargado');
+        }
+        if (cardBtn) {
+          cardBtn.classList.add('is-downloaded');
+          cardBtn.innerHTML = '<i class="bi bi-check-circle-fill bz-pop-check" style="color: #4ade80; font-size: 0.86rem;"></i>';
+          cardBtn.style.pointerEvents = '';
+          cardBtn.setAttribute('title', 'Álbum ya descargado');
+        }
+        showToast('¡Álbum "' + albumTitle + '" guardado en Mis descargas (' + total + ' canciones)!');
+        setTimeout(function () {
+          if (typeof onFinish === 'function') onFinish();
+        }, 450);
+        return;
+      }
+
+      var track = missingTracks[index];
+      var rowBtn = document.querySelector('[data-row-dl="' + track.id + '"]');
+      var rowEl = rowBtn ? rowBtn.closest('.bz-album-track-row') : null;
+
+      if (rowBtn) {
+        rowBtn.innerHTML = '<span class="bz-dl-spinner"></span>';
+        if (rowEl) rowEl.classList.add('bz-dl-row-pulse');
+      }
+
+      setTimeout(function () {
+        Storage.downloadTrack(track, false);
+        updateStorageMeterUI();
+
+        if (rowBtn) {
+          rowBtn.classList.add('is-downloaded');
+          rowBtn.innerHTML = '<i class="bi bi-check-circle-fill bz-pop-check" style="color: #4ade80;"></i>';
+          if (rowEl) rowEl.classList.remove('bz-dl-row-pulse');
+        }
+
+        index++;
+        if (total > 3 && index < total && index % 2 === 0) {
+          showToast('Descargando "' + albumTitle + '" (' + index + '/' + total + ')...');
+        }
+
+        setTimeout(processNext, 80);
+      }, 160);
+    }
+
+    processNext();
+  }
+
   var expMenuAnchor = null;
 
   function closeExpAndNavigate(viewName, extra) {
@@ -2601,10 +2679,9 @@
               '¿Descargar álbum completo?',
               'Se descargarán ' + missing.length + (missing.length === 1 ? ' canción' : ' canciones') + ' del álbum "' + alb.title + '" (~' + totalMb.toFixed(1) + ' MB) en Mis descargas para escucharlas sin conexión.',
               function () {
-                Storage.downloadTracks(missing);
-                updateStorageMeterUI();
-                showToast('Álbum "' + alb.title + '" guardado en Mis descargas (' + missing.length + ' canciones)');
-                renderCurrentView();
+                downloadAlbumProgressively(alb, missing, function () {
+                  renderCurrentView();
+                });
               },
               'Descargar álbum',
               'btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill',
@@ -2826,10 +2903,9 @@
               '¿Descargar álbum completo?',
               'Se descargarán ' + missing.length + (missing.length === 1 ? ' canción' : ' canciones') + ' del álbum "' + albumObj.title + '" (~' + totalMb.toFixed(1) + ' MB) en Mis descargas para escucharlas sin conexión.',
               function () {
-                Storage.downloadTracks(missing);
-                updateStorageMeterUI();
-                showToast('Álbum "' + albumObj.title + '" guardado en Mis descargas (' + missing.length + ' canciones)');
-                renderAlbumView(container, albumObj, isPlaylist);
+                downloadAlbumProgressively(albumObj, missing, function () {
+                  renderAlbumView(container, albumObj, isPlaylist);
+                });
               },
               'Descargar álbum',
               'btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill',
