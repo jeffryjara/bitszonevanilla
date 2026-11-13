@@ -41,14 +41,59 @@ body.bz-reduce-motion *::after {
   scroll-behavior: auto !important;
 }
 
-body.bz-no-blur .bz-glass,
-body.bz-no-blur .bz-glass-card,
-body.bz-no-blur .bz-modal-glass,
-body.bz-no-blur .bz-miniplayer,
-body.bz-no-blur .bz-sidebar {
+/* Desactivación Universal y Total de Blur (Modo Rendimiento) */
+body.bz-no-blur,
+body.bz-no-blur *,
+body.bz-no-blur *::before,
+body.bz-no-blur *::after {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  background-color: rgba(12, 9, 20, 0.94) !important;
+}
+
+body.bz-no-blur .bz-dynamic-bg-cover,
+body.bz-no-blur .bz-molten-orb,
+body.bz-no-blur .bz-ambient-glow,
+body.bz-no-blur .bz-ambient-mesh,
+body.bz-no-blur .bz-exp-backdrop-glow,
+body.bz-no-blur .bz-exp-ambient-scrim,
+body.bz-no-blur .bz-album-header-ambient,
+body.bz-no-blur .bz-lyric-line,
+body.bz-no-blur .bz-mini-ambient-glow,
+body.bz-no-blur .bz-artist-hero-glow,
+body.bz-no-blur .bz-loading-glow,
+body.bz-no-blur .bz-skeleton-line,
+body.bz-no-blur [class*="blur"],
+body.bz-no-blur [class*="ambient"],
+body.bz-no-blur [class*="glow"],
+body.bz-no-blur [class*="orb"] {
+  filter: none !important;
+  -webkit-filter: none !important;
+}
+
+body.bz-no-blur .bz-dynamic-bg-cover,
+body.bz-no-blur .bz-molten-orb,
+body.bz-no-blur .bz-mini-ambient-glow,
+body.bz-no-blur .bz-exp-backdrop-glow,
+body.bz-no-blur .bz-artist-hero-glow,
+body.bz-no-blur .bz-loading-glow {
+  display: none !important;
+}
+
+body.bz-no-blur .bz-glass,
+body.bz-no-blur .bz-glass-card,
+body.bz-no-blur .bz-modal-glass .modal-content,
+body.bz-no-blur .bz-miniplayer,
+body.bz-no-blur .bz-sidebar,
+body.bz-no-blur .bz-side-lyrics-panel,
+body.bz-no-blur .bz-queue-drawer,
+body.bz-no-blur .bz-expanded-player,
+body.bz-no-blur .bz-mobile-tabbar,
+body.bz-no-blur .bz-mobile-topbar,
+body.bz-no-blur .bz-ad-card,
+body.bz-no-blur .modal-content,
+body.bz-no-blur .dropdown-menu,
+body.bz-no-blur .offcanvas {
+  background-color: #0d0c14 !important;
 }
 
 *,
@@ -3396,6 +3441,77 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   background: rgba(255, 255, 255, 0.18);
   color: #ffffff;
   transform: scale(1.06);
+}
+
+/* Modal de Configuración (Más alto, espacioso y elegante) */
+#settingsModal .modal-content {
+  min-height: 520px;
+}
+@media (min-width: 768px) {
+  #settingsModal .modal-content {
+    min-height: 540px;
+  }
+}
+
+/* Control deslizante sutil de escala de texto */
+.bz-subtle-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+  outline: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+.bz-subtle-range:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
+.bz-subtle-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--bz-lavender, #c084fc);
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.5), 0 2px 4px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.bz-subtle-range::-webkit-slider-thumb:hover {
+  transform: scale(1.18);
+  box-shadow: 0 0 14px rgba(192, 132, 252, 0.8), 0 2px 6px rgba(0, 0, 0, 0.6);
+}
+.bz-subtle-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 2px solid var(--bz-lavender, #c084fc);
+  box-shadow: 0 0 10px rgba(192, 132, 252, 0.5), 0 2px 4px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.bz-subtle-range::-moz-range-thumb:hover {
+  transform: scale(1.18);
+}
+.bz-scale-point {
+  cursor: pointer;
+  padding: 3px 4px;
+  border-radius: 4px;
+  transition: color 0.15s ease, transform 0.15s ease;
+  user-select: none;
+}
+.bz-scale-point:hover {
+  color: #ffffff !important;
+  transform: translateY(-1px);
+}
+.bz-scale-point.is-active {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 8px rgba(192, 132, 252, 0.6);
 }
 
 .bz-ad-pl-btn {

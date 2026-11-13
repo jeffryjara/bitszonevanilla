@@ -4001,11 +4001,31 @@
         Boolean(draft.reduceMotion) === Storage.DEFAULT_SETTINGS.reduceMotion &&
         Boolean(draft.disableBlur) === Storage.DEFAULT_SETTINGS.disableBlur;
 
+      var currentVal = Number(draft.textScale);
+      document.querySelectorAll('.bz-scale-point').forEach(function (el) {
+        var ptVal = Number(el.getAttribute('data-scale-val'));
+        var isAct = ptVal === currentVal;
+        el.classList.toggle('is-active', isAct);
+        el.classList.toggle('text-white', isAct);
+        el.classList.toggle('fw-bold', isAct);
+      });
+
       saveBtn.disabled = !dirty;
       resetBtn.disabled = isDefault;
     }
 
     syncControls();
+
+    document.querySelectorAll('.bz-scale-point').forEach(function (el) {
+      el.onclick = function () {
+        var v = Number(el.getAttribute('data-scale-val'));
+        if (!isNaN(v)) {
+          draft.textScale = v;
+          Storage.applySettingsToDOM(draft);
+          syncControls();
+        }
+      };
+    });
 
     scaleRange.oninput = function () {
       draft.textScale = Number(scaleRange.value);

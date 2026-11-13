@@ -549,43 +549,54 @@
     </div>
   </div>
 
-  <!-- Modal: Configuración Simplificada (Estructura de dos columnas) -->
+  <!-- Modal: Configuración Simplificada (Estructura de dos columnas, más alto y elegante) -->
   <div class="modal fade bz-modal-glass" id="settingsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content position-relative">
+      <div class="modal-content position-relative" style="min-height: 520px; border-radius: 1.5rem;">
         <button id="btnSettingsCloseGuard" type="button" class="bz-modal-close-float" aria-label="Cerrar">
           <i class="bi bi-x-lg"></i>
         </button>
 
-        <div class="row g-0">
+        <div class="row g-0 flex-grow-1" style="min-height: 520px;">
           <!-- Sidebar Izquierda con Acciones en la parte inferior -->
-          <div class="col-12 col-md-4 p-4 d-flex flex-column justify-content-between bz-col-divider-md" style="background: rgba(255,255,255,0.03);">
+          <div class="col-12 col-md-4 p-4 p-md-5 d-flex flex-column justify-content-between bz-col-divider-md" style="background: rgba(255,255,255,0.025);">
             <div>
               <span class="small text-uppercase text-white-50 font-mono-bz" style="letter-spacing: 0.14em;">Preferencias</span>
               <h3 class="font-serif-italic h2 text-white mt-1 mb-3">Configuración</h3>
-              <p class="small text-white-50">Ajusta la escala visual, efectos de desenfoque y consulta los atajos del reproductor.</p>
+              <p class="small text-white-50">Ajusta la escala visual y los efectos de desenfoque de la interfaz.</p>
             </div>
 
             <div class="d-grid gap-2 mt-4">
-              <button id="btnSettingsSave" type="button" class="btn bz-btn-primary py-2" disabled>Guardar cambios</button>
-              <button id="btnSettingsReset" type="button" class="btn bz-btn-subtle py-2 btn-sm" disabled>Restablecer</button>
+              <button id="btnSettingsSave" type="button" class="btn bz-btn-hero-subtle py-2.5 rounded-pill fw-semibold" disabled>Guardar cambios</button>
+              <button id="btnSettingsReset" type="button" class="btn bz-btn-subtle py-2 rounded-pill btn-sm" disabled>Restablecer</button>
             </div>
           </div>
 
           <!-- Cuerpo Derecho -->
-          <div class="col-12 col-md-8 p-4 p-md-5 d-grid gap-4">
+          <div class="col-12 col-md-8 p-4 p-md-5 d-flex flex-column justify-content-center gap-4">
             <div>
               <div class="d-flex justify-content-between align-items-center mb-2">
                 <label for="setTextScaleRange" class="fw-semibold text-white">Escala de texto global</label>
-                <span id="setTextScaleVal" class="badge rounded-pill font-mono-bz" style="background: rgba(168,85,247,0.3);">100%</span>
+                <span id="setTextScaleVal" class="badge rounded-pill font-mono-bz" style="background: rgba(255,255,255,0.1); color: #ffffff;">100%</span>
               </div>
-              <input id="setTextScaleRange" type="range" min="85" max="130" step="5" value="100" class="form-range" />
-              <div class="d-flex justify-content-between small text-white-50 font-mono-bz">
-                <span>85%</span><span>100%</span><span>130%</span>
+              <div class="bz-scale-slider-wrap position-relative pt-2 pb-1">
+                <input id="setTextScaleRange" type="range" min="85" max="130" step="5" value="100" class="bz-subtle-range w-100" />
+                <div class="bz-scale-ticks d-flex justify-content-between mt-2 font-mono-bz" style="font-size: 0.68rem; color: rgba(255, 255, 255, 0.45);">
+                  <span data-scale-val="85" class="bz-scale-point" role="button">85%</span>
+                  <span data-scale-val="90" class="bz-scale-point" role="button">90%</span>
+                  <span data-scale-val="95" class="bz-scale-point" role="button">95%</span>
+                  <span data-scale-val="100" class="bz-scale-point fw-bold text-white is-active" role="button">100%</span>
+                  <span data-scale-val="105" class="bz-scale-point" role="button">105%</span>
+                  <span data-scale-val="110" class="bz-scale-point" role="button">110%</span>
+                  <span data-scale-val="115" class="bz-scale-point" role="button">115%</span>
+                  <span data-scale-val="120" class="bz-scale-point" role="button">120%</span>
+                  <span data-scale-val="125" class="bz-scale-point" role="button">125%</span>
+                  <span data-scale-val="130" class="bz-scale-point" role="button">130%</span>
+                </div>
               </div>
             </div>
 
-            <div class="d-grid gap-3 pt-2 border-top border-white border-opacity-10">
+            <div class="d-grid gap-4 pt-3 border-top border-white border-opacity-10">
               <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
                 <div>
                   <div class="fw-semibold text-white">Reducir animaciones</div>
@@ -600,16 +611,6 @@
                   <small class="text-white-50">Usa paneles sólidos para mejorar fluidez en PCs básicos.</small>
                 </div>
                 <input id="setDisableBlur" class="form-check-input ms-3 fs-5" type="checkbox" role="switch" />
-              </div>
-            </div>
-
-            <div class="pt-2 border-top border-white border-opacity-10">
-              <h6 class="text-white-50 text-uppercase small mb-2">Atajos de teclado rápidos</h6>
-              <div class="row g-2 small">
-                <div class="col-6"><span class="badge bg-white bg-opacity-10 font-mono-bz me-1">Espacio</span> Play / Pausa</div>
-                <div class="col-6"><span class="badge bg-white bg-opacity-10 font-mono-bz me-1">← / →</span> Pista Ant / Sig</div>
-                <div class="col-6"><span class="badge bg-white bg-opacity-10 font-mono-bz me-1">↑ / ↓</span> Volumen</div>
-                <div class="col-6"><span class="badge bg-white bg-opacity-10 font-mono-bz me-1">F / S / M</span> Expandir / Fav / Mute</div>
               </div>
             </div>
           </div>
