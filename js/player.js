@@ -181,6 +181,16 @@
       return;
     }
 
+    var isAuth = isUserAuthenticated();
+    var loginBtn = modalEl.querySelector('a[href="./login.html"]');
+    if (loginBtn) {
+      if (isAuth) {
+        loginBtn.classList.add('d-none');
+      } else {
+        loginBtn.classList.remove('d-none');
+      }
+    }
+
     var badgeEl = document.getElementById('adSponsorBadge');
     var titleEl = document.getElementById('adSponsorTitle');
     var descEl = document.getElementById('adSponsorDesc');
@@ -191,7 +201,11 @@
 
     if (badgeEl) badgeEl.innerHTML = '<i class="bi bi-stars me-1 text-white-50"></i> ' + esc(sponsor.badge);
     if (titleEl) titleEl.textContent = sponsor.title;
-    if (descEl) descEl.textContent = sponsor.desc;
+    if (descEl) {
+      descEl.textContent = isAuth
+        ? 'Espacio publicitario patrocinado. La música continuará automáticamente en unos segundos.'
+        : sponsor.desc;
+    }
     if (imgEl) {
       imgEl.onerror = function () {
         this.onerror = null;
@@ -276,6 +290,8 @@
       modalEl.classList.remove('is-active', 'show');
       modalEl.style.display = 'none';
       modalEl.setAttribute('aria-hidden', 'true');
+      var loginBtn = modalEl.querySelector('a[href="./login.html"]');
+      if (loginBtn) loginBtn.classList.remove('d-none');
     }
 
     // Limpieza de seguridad de backdrops de anuncios
@@ -675,6 +691,7 @@
     appState.isAudioLoading = true;
 
     Storage.recordListen(track);
+    fetchLyricsLrclib(track.title, track.artist, refAlbum.title, track.duration);
 
     if (audioEl) {
       audioEl.src = track.previewUrl || '';
@@ -1174,51 +1191,289 @@
     ]
   };
 
-  function getTrackLyrics(track) {
-    if (!track) return [];
-    var key = (track.title || '').trim().toLowerCase();
-    if (CURATED_LYRICS[key]) {
-      return CURATED_LYRICS[key];
+  // Hardcoded fallback for Somewhere I Belong (Linkin Park) identical to Bitszone original
+  var SOMEWHERE_I_BELONG_LYRICS = [
+    { time: 43.71, text: "When it began" },
+    { time: 45.15, text: "I had nothing to say" },
+    { time: 46.82, text: "And I get lost in the nothingness inside of me" },
+    { time: 49.7, text: "(I was confused)" },
+    { time: 50.59, text: "And I let it all out to find" },
+    { time: 52.6, text: "That I'm not the only person with these things in mind" },
+    { time: 55.53, text: "(Inside of me)" },
+    { time: 56.45, text: "But all that they can see the words revealed" },
+    { time: 58.48, text: "Is the only real thing that I've got left to feel" },
+    { time: 61.25, text: "(Nothing to lose)" },
+    { time: 62.16, text: "Just stuck, hollow and alone" },
+    { time: 64.24, text: "And the fault is my own, and the fault is my own" },
+    { time: 67.33, text: "I wanna heal, I wanna feel what I thought was never real" },
+    { time: 73.14, text: "I wanna let go of the pain I've felt so long" },
+    { time: 77.1, text: "(Erase all the pain till it's gone)" },
+    { time: 79.09, text: "I wanna heal, I wanna feel like I'm close to something real" },
+    { time: 85.00, text: "I wanna find something I've wanted all along" },
+    { time: 89.89, text: "Somewhere I belong" },
+    { time: 92.29, text: "And I've got nothing to say" },
+    { time: 93.87, text: "I can't believe I didn't fall right down on my face" },
+    { time: 96.86, text: "(I was confused)" },
+    { time: 97.8, text: "Looking everywhere only to find" },
+    { time: 99.88, text: "That it's not the way I had imagined it all in my mind" },
+    { time: 102.73, text: "(So what am I?)" },
+    { time: 103.73, text: "What do I have but negativity?" },
+    { time: 105.65, text: "'Cause I can't justify the way everyone is looking at me" },
+    { time: 108.6, text: "(Nothing to lose)" },
+    { time: 109.61, text: "Nothing to gain, hollow and alone" },
+    { time: 111.6, text: "And the fault is my own, and the fault is my own" },
+    { time: 114.6, text: "I wanna heal, I wanna feel what I thought was never real" },
+    { time: 120.46, text: "I wanna let go of the pain I've felt so long" },
+    { time: 124.38, text: "(Erase all the pain till it's gone)" },
+    { time: 126.42, text: "I wanna heal, I wanna feel like I'm close to something real" },
+    { time: 132.42, text: "I wanna find something I've wanted all along" },
+    { time: 137.29, text: "Somewhere I belong" },
+    { time: 139.63, text: "I will never know myself until I do this on my own" },
+    { time: 145.48, text: "And I will never feel anything else until my wounds are healed" },
+    { time: 151.38, text: "I will never be anything till I break away from me" },
+    { time: 157.26, text: "I will break away, I'll find myself today" },
+    { time: 166.95, text: "I wanna heal, I wanna feel what I thought was never real" },
+    { time: 173.79, text: "I wanna let go of the pain I've felt so long" },
+    { time: 177.91, text: "(Erase all the pain till it's gone)" },
+    { time: 179.75, text: "I wanna heal, I wanna feel like I'm close to something real" },
+    { time: 185.66, text: "I wanna find something I've wanted all along" },
+    { time: 190.62, text: "Somewhere I belong" },
+    { time: 193.02, text: "(I wanna heal, I wanna feel like I'm somewhere I belong)" },
+    { time: 198.73, text: "(I wanna heal, I wanna feel like I'm somewhere I belong)" },
+    { time: 208.46, text: "Somewhere I belong" }
+  ];
+
+  // ---- LRCLIB API Integration (fiel a Bitszone original) ----
+  var LRCLIB_BASE_URL = 'https://lrclib.net/api';
+  var lyricsMemoryCache = new Map();
+
+  function cleanTrackTitle(title) {
+    return (title || '')
+      .replace(/\s*[\(\[](feat\.|featuring|with|remastered|remaster|live|bonus|deluxe|version|edit|mono|stereo)[^\)\]]*[\)\]]/gi, '')
+      .replace(/\s*-\s*(feat\.|featuring|remastered|remaster|\d{4}\s*remaster).*/gi, '')
+      .trim();
+  }
+
+  function cleanArtistName(artist) {
+    return (artist || '')
+      .replace(/\s*(feat\.|featuring|ft\.|with|&|,|\/).*/gi, '')
+      .trim();
+  }
+
+  function parseLrc(rawLrc) {
+    if (!rawLrc) return [];
+    var lines = rawLrc.split(/\r?\n/);
+    var result = [];
+    var regex = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g;
+    for (var i = 0; i < lines.length; i++) {
+      var raw = lines[i].trim();
+      if (!raw) continue;
+      var timestamps = [];
+      regex.lastIndex = 0;
+      var match, lastIdx = 0;
+      while ((match = regex.exec(raw)) !== null) {
+        var min = parseInt(match[1], 10);
+        var sec = parseInt(match[2], 10);
+        var frac = match[3] || '0';
+        var ms = parseInt(frac.padEnd(3, '0').slice(0, 3), 10);
+        timestamps.push(min * 60 + sec + ms / 1000);
+        lastIdx = regex.lastIndex;
+      }
+      if (timestamps.length > 0) {
+        var text = raw.slice(lastIdx).trim();
+        if (text) {
+          for (var k = 0; k < timestamps.length; k++) {
+            result.push({ time: timestamps[k], text: text });
+          }
+        }
+      }
     }
-    var curKeys = Object.keys(CURATED_LYRICS);
-    for (var i = 0; i < curKeys.length; i++) {
-      if (key.indexOf(curKeys[i]) !== -1) {
-        return CURATED_LYRICS[curKeys[i]];
+    return result.sort(function (a, b) { return a.time - b.time; });
+  }
+
+  function parsePlainLyrics(plainLyrics, duration) {
+    var dur = duration || 180;
+    var lines = (plainLyrics || '').split(/\r?\n/)
+      .map(function (x) { return x.trim(); })
+      .filter(function (x) { return x.length > 0 && !x.startsWith('['); });
+    if (lines.length === 0) return [];
+    var start = Math.min(8, dur * 0.05);
+    var step = Math.max(10, dur - start - 8) / lines.length;
+    return lines.map(function (text, idx) {
+      return {
+        time: Math.round((start + idx * step) * 100) / 100,
+        text: text
+      };
+    });
+  }
+
+  function fetchLyricsLrclib(rawTitle, rawArtist, rawAlbum, rawDuration, callback) {
+    var cleanTitle = cleanTrackTitle(rawTitle);
+    var cleanArtist = cleanArtistName(rawArtist);
+    var cacheKey = (cleanArtist.toLowerCase() + ':::' + cleanTitle.toLowerCase()).trim();
+
+    if (lyricsMemoryCache.has(cacheKey)) {
+      var mem = lyricsMemoryCache.get(cacheKey);
+      if (typeof callback === 'function') callback(mem);
+      return mem;
+    }
+
+    try {
+      var stored = sessionStorage.getItem('bz_lyrics_' + cacheKey);
+      if (stored) {
+        var parsed = JSON.parse(stored);
+        lyricsMemoryCache.set(cacheKey, parsed);
+        if (typeof callback === 'function') callback(parsed);
+        return parsed;
+      }
+    } catch (e) {}
+
+    if (cleanTitle.toLowerCase() === 'somewhere i belong' && cleanArtist.toLowerCase().indexOf('linkin park') !== -1) {
+      var sibData = { synced: true, lines: SOMEWHERE_I_BELONG_LYRICS, source: 'hardcoded' };
+      lyricsMemoryCache.set(cacheKey, sibData);
+      try {
+        sessionStorage.setItem('bz_lyrics_' + cacheKey, JSON.stringify(sibData));
+      } catch (e) {}
+      if (typeof callback === 'function') callback(sibData);
+      return sibData;
+    }
+
+    // Buscar en CURATED_LYRICS
+    var curKey = cleanTitle.toLowerCase();
+    var curatedLines = CURATED_LYRICS[curKey];
+    if (!curatedLines) {
+      var curKeys = Object.keys(CURATED_LYRICS);
+      for (var k = 0; k < curKeys.length; k++) {
+        if (curKey.indexOf(curKeys[k]) !== -1) {
+          curatedLines = CURATED_LYRICS[curKeys[k]];
+          break;
+        }
       }
     }
 
-    var durSecs = 180;
-    if (track.duration && !isNaN(track.duration)) {
-      durSecs = track.duration > 1000 ? Math.floor(track.duration / 1000) : Math.floor(track.duration);
+    var durSecs = rawDuration && rawDuration > 1000 ? Math.round(rawDuration / 1000) : Math.round(rawDuration || 180);
+
+    var controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    var timeoutId = setTimeout(function () {
+      if (controller) controller.abort();
+    }, 6000);
+
+    var getParams = new URLSearchParams({
+      track_name: cleanTitle,
+      artist_name: cleanArtist
+    });
+    if (rawAlbum) getParams.set('album_name', rawAlbum);
+    if (durSecs > 0) getParams.set('duration', String(durSecs));
+
+    fetch(LRCLIB_BASE_URL + '/get?' + getParams.toString(), {
+      signal: controller ? controller.signal : undefined,
+      headers: { 'Accept': 'application/json' }
+    })
+      .then(function (res) {
+        if (!res.ok) return null;
+        return res.json();
+      })
+      .then(function (data) {
+        if (data && data.syncedLyrics) return data;
+        var searchParams = new URLSearchParams({
+          track_name: cleanTitle,
+          artist_name: cleanArtist
+        });
+        return fetch(LRCLIB_BASE_URL + '/search?' + searchParams.toString(), {
+          signal: controller ? controller.signal : undefined,
+          headers: { 'Accept': 'application/json' }
+        })
+          .then(function (sRes) { return sRes.ok ? sRes.json() : null; })
+          .then(function (sList) {
+            if (Array.isArray(sList) && sList.length > 0) {
+              return sList.find(function (item) { return item.syncedLyrics; }) || sList[0];
+            }
+            return data;
+          });
+      })
+      .then(function (item) {
+        clearTimeout(timeoutId);
+        var result = null;
+        if (item && item.syncedLyrics) {
+          var parsedLrc = parseLrc(item.syncedLyrics);
+          if (parsedLrc.length > 0) {
+            result = { synced: true, lines: parsedLrc, source: 'lrclib' };
+          }
+        }
+        if (!result && item && item.plainLyrics) {
+          var plainLines = parsePlainLyrics(item.plainLyrics, durSecs);
+          if (plainLines.length > 0) {
+            result = { synced: false, lines: plainLines, source: 'lrclib-plain' };
+          }
+        }
+        if (!result && curatedLines) {
+          result = { synced: true, lines: curatedLines, source: 'curated' };
+        }
+        if (!result && cleanTitle.toLowerCase().indexOf('somewhere i belong') !== -1) {
+          result = { synced: true, lines: SOMEWHERE_I_BELONG_LYRICS, source: 'hardcoded' };
+        }
+
+        if (result) {
+          lyricsMemoryCache.set(cacheKey, result);
+          try {
+            sessionStorage.setItem('bz_lyrics_' + cacheKey, JSON.stringify(result));
+          } catch (e) {}
+        }
+        if (typeof callback === 'function') callback(result);
+      })
+      .catch(function () {
+        clearTimeout(timeoutId);
+        var fallback = null;
+        if (curatedLines) {
+          fallback = { synced: true, lines: curatedLines, source: 'curated' };
+        } else if (cleanTitle.toLowerCase().indexOf('somewhere i belong') !== -1) {
+          fallback = { synced: true, lines: SOMEWHERE_I_BELONG_LYRICS, source: 'hardcoded' };
+        }
+        if (fallback) {
+          lyricsMemoryCache.set(cacheKey, fallback);
+        }
+        if (typeof callback === 'function') callback(fallback);
+      });
+
+    if (curatedLines) {
+      return { synced: true, lines: curatedLines, source: 'curated' };
     }
-    if (durSecs < 45) durSecs = 180;
+    return null;
+  }
 
-    var title = track.title || 'Esta melodía';
-    var artist = track.artist || 'Bitszone';
-    var album = track.albumTitle || 'Álbum oficial';
-    var step = Math.max(8, Math.floor(durSecs / 12));
-
-    return [
-      { time: 0, text: '♪ (Introducción instrumental y ritmo envolvente) ♪' },
-      { time: Math.min(10, Math.floor(step * 0.7)), text: 'Sintiendo el compás vibrar en el aire con ' + title },
-      { time: step * 1, text: 'Cada acorde marca un nuevo latido bajo la firma de ' + artist },
-      { time: step * 2, text: 'Las luces tenues se encienden al compás del sintetizador' },
-      { time: step * 3, text: 'No hay marcha atrás cuando la melodía toma el control total' },
-      { time: step * 4, text: 'Esta es la energía de ' + title + ', vívela al máximo' },
-      { time: step * 5, text: '♪ (Coro principal elevándose en alta definición) ♪' },
-      { time: step * 6, text: 'Siente la voz y la armonía recorriendo tu espacio' },
-      { time: step * 7, text: 'Desde ' + album + ' sonando fuerte en Bitszone' },
-      { time: step * 8, text: 'El tiempo se detiene mientras la música sigue fluyendo' },
-      { time: step * 9, text: '♪ (Puente instrumental con matices dinámicos) ♪' },
-      { time: step * 10, text: 'La última nota resuena con ' + artist + ' en primer plano' },
-      { time: step * 11, text: '♪ (Outro melódico y fade out con armonía vocal) ♪' }
-    ];
+  function getTrackLyrics(track) {
+    if (!track) return [];
+    var cleanTitle = cleanTrackTitle(track.title);
+    var cleanArtist = cleanArtistName(track.artist);
+    var cacheKey = (cleanArtist.toLowerCase() + ':::' + cleanTitle.toLowerCase()).trim();
+    if (lyricsMemoryCache.has(cacheKey)) {
+      return lyricsMemoryCache.get(cacheKey).lines || [];
+    }
+    try {
+      var stored = sessionStorage.getItem('bz_lyrics_' + cacheKey);
+      if (stored) {
+        var parsed = JSON.parse(stored);
+        if (parsed && parsed.lines) return parsed.lines;
+      }
+    } catch (e) {}
+    var curKey = cleanTitle.toLowerCase();
+    if (CURATED_LYRICS[curKey]) return CURATED_LYRICS[curKey];
+    var curKeys = Object.keys(CURATED_LYRICS);
+    for (var i = 0; i < curKeys.length; i++) {
+      if (curKey.indexOf(curKeys[i]) !== -1) {
+        return CURATED_LYRICS[curKeys[i]];
+      }
+    }
+    if (cleanTitle.toLowerCase().indexOf('somewhere i belong') !== -1) {
+      return SOMEWHERE_I_BELONG_LYRICS;
+    }
+    return [];
   }
 
   function getLyricsGuestHtml() {
     return (
-      '<div class="bz-lyrics-guest-hero d-flex flex-column align-items-center justify-content-center text-center px-4 py-5 my-auto w-100" style="min-height: 280px;">' +
-        '<h2 class="display-6 fw-bold mb-3" style="max-width: 360px; letter-spacing: -0.02em; line-height: 1.25; opacity: 0.72; color: #ffffff;">' +
+      '<div class="bz-lyrics-guest-hero d-flex flex-column align-items-center justify-content-center text-center px-4 py-5 w-100 flex-grow-1 my-auto">' +
+        '<h2 class="display-6 fw-bold mb-3" style="max-width: 380px; letter-spacing: -0.02em; line-height: 1.25; opacity: 0.75; color: #ffffff;">' +
           'Es necesario iniciar sesión para disfrutar de las letras' +
         '</h2>' +
         '<a href="./login.html" class="btn bz-btn-hero btn-sm px-4 py-2 fw-semibold rounded-pill mt-2 shadow-sm">' +
@@ -1226,6 +1481,39 @@
         '</a>' +
       '</div>'
     );
+  }
+
+  function renderLyricsLinesToContainer(container, lines, trackIdStr, isExp) {
+    var stageId = isExp ? 'bzLyricsStage' : 'bzSideLyricsStage';
+    var linesHtml = lines.map(function (item, idx) {
+      return '<div class="bz-lyric-line" data-lyric-idx="' + idx + '" data-lyric-time="' + item.time + '">' + esc(item.text) + '</div>';
+    }).join('');
+
+    container.innerHTML =
+      '<div class="bz-lyrics-stage" id="' + stageId + '" data-stage-track-id="' + trackIdStr + '">' +
+        linesHtml +
+      '</div>';
+
+    container.querySelectorAll('.bz-lyric-line').forEach(function (lineEl) {
+      lineEl.addEventListener('click', function () {
+        var t = parseFloat(lineEl.getAttribute('data-lyric-time'));
+        if (!isNaN(t)) {
+          audioEl.currentTime = t;
+          if (!appState.isPlaying) {
+            audioEl.play().catch(function () {});
+            appState.isPlaying = true;
+            updatePlayerBarsUI();
+          }
+          lastActiveLyricIndex = -1;
+          lastActiveSideLyricIndex = -1;
+          updateLyricsHighlight(t);
+        }
+      });
+    });
+
+    lastActiveLyricIndex = -1;
+    lastActiveSideLyricIndex = -1;
+    updateLyricsHighlight(audioEl.currentTime);
   }
 
   function updateLyricsHighlight(currentSecs) {
@@ -1253,11 +1541,14 @@
             if (idx === activeIndexExp) {
               l.classList.add('is-active');
               l.classList.remove('is-past');
+              l.setAttribute('data-active-lyric', 'true');
             } else if (idx < activeIndexExp) {
               l.classList.remove('is-active');
               l.classList.add('is-past');
+              l.removeAttribute('data-active-lyric');
             } else {
               l.classList.remove('is-active', 'is-past');
+              l.removeAttribute('data-active-lyric');
             }
           });
 
@@ -1267,7 +1558,7 @@
             if (activeLine) {
               var containerRect = expContainer.getBoundingClientRect();
               var lineRect = activeLine.getBoundingClientRect();
-              var targetScroll = expContainer.scrollTop + (lineRect.top - containerRect.top) - (expContainer.clientHeight / 2) + (lineRect.height / 2);
+              var targetScroll = expContainer.scrollTop + (lineRect.top - containerRect.top) - (containerRect.height * 0.36) + (lineRect.height / 2);
               expContainer.scrollTo({
                 top: Math.max(0, targetScroll),
                 behavior: 'smooth'
@@ -1302,11 +1593,14 @@
             if (idx === activeIndexSide) {
               l.classList.add('is-active');
               l.classList.remove('is-past');
+              l.setAttribute('data-active-lyric', 'true');
             } else if (idx < activeIndexSide) {
               l.classList.remove('is-active');
               l.classList.add('is-past');
+              l.removeAttribute('data-active-lyric');
             } else {
               l.classList.remove('is-active', 'is-past');
+              l.removeAttribute('data-active-lyric');
             }
           });
 
@@ -1316,7 +1610,7 @@
             if (activeSideLine) {
               var sContainerRect = sideContainer.getBoundingClientRect();
               var sLineRect = activeSideLine.getBoundingClientRect();
-              var sTargetScroll = sideContainer.scrollTop + (sLineRect.top - sContainerRect.top) - (sideContainer.clientHeight / 2) + (sLineRect.height / 2);
+              var sTargetScroll = sideContainer.scrollTop + (sLineRect.top - sContainerRect.top) - (sContainerRect.height * 0.36) + (sLineRect.height / 2);
               sideContainer.scrollTo({
                 top: Math.max(0, sTargetScroll),
                 behavior: 'smooth'
@@ -1368,39 +1662,34 @@
     var needsRebuild = !currentStage || currentStage.getAttribute('data-stage-track-id') !== trackIdStr;
 
     if (needsRebuild) {
-      var lyrics = getTrackLyrics(track);
-      var linesHtml = lyrics.map(function (item, idx) {
-        return '<div class="bz-lyric-line" data-lyric-idx="' + idx + '" data-lyric-time="' + item.time + '">' + esc(item.text) + '</div>';
-      }).join('');
+      var albumTitle = (appState.nowPlayingAlbum && appState.nowPlayingAlbum.title) || track.albumTitle;
+      var cached = fetchLyricsLrclib(track.title, track.artist, albumTitle, track.duration);
+      if (cached && cached.lines && cached.lines.length > 0) {
+        renderLyricsLinesToContainer(container, cached.lines, trackIdStr, false);
+      } else {
+        container.innerHTML =
+          '<div class="bz-lyrics-loading-skeleton d-flex flex-column gap-3 pt-3 px-1 w-100">' +
+            '<div class="bz-skeleton-line rounded-3 bg-white bg-opacity-10" style="height: 38px; width: 80%;"></div>' +
+            '<div class="bz-skeleton-line rounded-3 bg-white bg-opacity-20" style="height: 44px; width: 55%;"></div>' +
+            '<div class="bz-skeleton-line rounded-3 bg-white bg-opacity-10" style="height: 38px; width: 90%;"></div>' +
+            '<div class="bz-skeleton-line rounded-3 bg-white bg-opacity-10" style="height: 38px; width: 70%;"></div>' +
+          '</div>';
 
-      container.innerHTML =
-        '<div class="bz-lyrics-stage" id="bzSideLyricsStage" data-stage-track-id="' + trackIdStr + '">' +
-          '<div class="text-white-50 text-uppercase fw-bold px-2 mb-2 d-flex align-items-center justify-content-between" style="font-size:0.68rem; letter-spacing:0.18em;">' +
-            '<span><i class="bi bi-mic-fill me-1" style="color:var(--bz-lavender, #c084fc);"></i> Letra en vivo</span>' +
-            '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 fw-normal">Sincronizada</span>' +
-          '</div>' +
-          linesHtml +
-        '</div>';
-
-      container.querySelectorAll('.bz-lyric-line').forEach(function (lineEl) {
-        lineEl.addEventListener('click', function () {
-          var t = parseFloat(lineEl.getAttribute('data-lyric-time'));
-          if (!isNaN(t)) {
-            audioEl.currentTime = t;
-            if (!appState.isPlaying) {
-              audioEl.play().catch(function () {});
-              appState.isPlaying = true;
-              updatePlayerBarsUI();
-            }
-            lastActiveLyricIndex = -1;
-            lastActiveSideLyricIndex = -1;
-            updateLyricsHighlight(t);
+        fetchLyricsLrclib(track.title, track.artist, albumTitle, track.duration, function (res) {
+          if (!panel.classList.contains('is-open')) return;
+          if (String(appState.nowPlayingTrack && appState.nowPlayingTrack.id) !== trackIdStr) return;
+          if (res && res.lines && res.lines.length > 0) {
+            renderLyricsLinesToContainer(container, res.lines, trackIdStr, false);
+          } else {
+            container.innerHTML =
+              '<div class="d-flex flex-column align-items-center justify-content-center py-5 text-center px-3 flex-grow-1 my-auto">' +
+                '<i class="bi bi-mic text-white-50 fs-2 mb-2"></i>' +
+                '<p class="text-white fw-bold small mb-1">Letra no disponible</p>' +
+                '<p class="text-white-50 small mb-0">No se encontró letra sincronizada.</p>' +
+              '</div>';
           }
         });
-      });
-
-      lastActiveSideLyricIndex = -1;
-      updateLyricsHighlight(audioEl.currentTime);
+      }
     } else {
       updateLyricsHighlight(audioEl.currentTime);
     }
@@ -1611,6 +1900,10 @@
       var saveQueueBtn = document.getElementById('btnExpCreateQueuePl');
       if (saveQueueBtn) {
         saveQueueBtn.addEventListener('click', function () {
+          if (!isUserAuthenticated()) {
+            openAuthRequiredModal('playlists');
+            return;
+          }
           if (!appState.queue.length) return;
           openCreatePlaylistModal(appState.queue, 'Cola · ' + (album.title || track.title));
         });
@@ -1619,6 +1912,10 @@
       var clearNextBtn = document.getElementById('btnExpClearNext');
       if (clearNextBtn) {
         clearNextBtn.addEventListener('click', function () {
+          if (!isUserAuthenticated()) {
+            openAuthRequiredModal('queue');
+            return;
+          }
           appState.queue = appState.queue.slice(0, appState.queueIndex + 1);
           showToast('Se limpiaron las siguientes pistas de la cola');
           renderExpRightPanel();
@@ -1636,18 +1933,30 @@
       container.querySelectorAll('[data-exp-q-up]').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
+          if (!isUserAuthenticated()) {
+            openAuthRequiredModal('queue');
+            return;
+          }
           moveQueueItem(Number(btn.getAttribute('data-exp-q-up')), -1);
         });
       });
       container.querySelectorAll('[data-exp-q-down]').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
+          if (!isUserAuthenticated()) {
+            openAuthRequiredModal('queue');
+            return;
+          }
           moveQueueItem(Number(btn.getAttribute('data-exp-q-down')), 1);
         });
       });
       container.querySelectorAll('[data-exp-q-pl]').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
+          if (!isUserAuthenticated()) {
+            openAuthRequiredModal('playlists');
+            return;
+          }
           var qi = Number(btn.getAttribute('data-exp-q-pl'));
           if (appState.queue[qi]) openAddToPlaylistModal(appState.queue[qi]);
         });
@@ -1655,6 +1964,10 @@
       container.querySelectorAll('[data-exp-q-rm]').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
+          if (!isUserAuthenticated()) {
+            openAuthRequiredModal('queue');
+            return;
+          }
           removeFromQueueAt(Number(btn.getAttribute('data-exp-q-rm')));
         });
       });
@@ -1672,39 +1985,36 @@
         var needsRebuild = !currentStage || currentStage.getAttribute('data-stage-track-id') !== trackIdStr;
 
         if (needsRebuild) {
-          var lyrics = getTrackLyrics(track);
-          var linesHtml = lyrics.map(function (item, idx) {
-            return '<div class="bz-lyric-line" data-lyric-idx="' + idx + '" data-lyric-time="' + item.time + '">' + esc(item.text) + '</div>';
-          }).join('');
+          var albumTitle = (album && album.title) || track.albumTitle;
+          var cached = fetchLyricsLrclib(track.title, track.artist, albumTitle, track.duration);
+          if (cached && cached.lines && cached.lines.length > 0) {
+            renderLyricsLinesToContainer(container, cached.lines, trackIdStr, true);
+          } else {
+            container.innerHTML =
+              '<div class="bz-lyrics-loading-skeleton d-flex flex-column gap-4 pt-4 px-2 w-100">' +
+                '<div class="bz-skeleton-line rounded-4 bg-white bg-opacity-10" style="height: 48px; width: 75%; filter: blur(2px);"></div>' +
+                '<div class="bz-skeleton-line rounded-4 bg-white bg-opacity-20" style="height: 54px; width: 50%;"></div>' +
+                '<div class="bz-skeleton-line rounded-4 bg-white bg-opacity-10" style="height: 48px; width: 85%; filter: blur(2px);"></div>' +
+                '<div class="bz-skeleton-line rounded-4 bg-white bg-opacity-10" style="height: 48px; width: 65%; filter: blur(2px);"></div>' +
+              '</div>';
 
-          container.innerHTML =
-            '<div class="bz-lyrics-stage" id="bzLyricsStage" data-stage-track-id="' + trackIdStr + '">' +
-              '<div class="text-white-50 text-uppercase fw-bold px-2 mb-2 d-flex align-items-center justify-content-between" style="font-size:0.72rem; letter-spacing:0.18em;">' +
-                '<span><i class="bi bi-mic-fill me-1" style="color:var(--bz-lavender, #c084fc);"></i> Letra en vivo</span>' +
-                '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 fw-normal">Sincronizada</span>' +
-              '</div>' +
-              linesHtml +
-            '</div>';
-
-          container.querySelectorAll('.bz-lyric-line').forEach(function (lineEl) {
-            lineEl.addEventListener('click', function () {
-              var t = parseFloat(lineEl.getAttribute('data-lyric-time'));
-              if (!isNaN(t)) {
-                audioEl.currentTime = t;
-                if (!appState.isPlaying) {
-                  audioEl.play().catch(function () {});
-                  appState.isPlaying = true;
-                  updatePlayerBarsUI();
-                }
-                lastActiveLyricIndex = -1;
-                lastActiveSideLyricIndex = -1;
-                updateLyricsHighlight(t);
+            fetchLyricsLrclib(track.title, track.artist, albumTitle, track.duration, function (res) {
+              if (appState.expTab !== 'letras' && appState.expTab !== 'letra') return;
+              if (String(appState.nowPlayingTrack && appState.nowPlayingTrack.id) !== trackIdStr) return;
+              if (res && res.lines && res.lines.length > 0) {
+                renderLyricsLinesToContainer(container, res.lines, trackIdStr, true);
+              } else {
+                container.innerHTML =
+                  '<div class="d-flex flex-column align-items-center justify-content-center py-5 text-center px-4 flex-grow-1 my-auto">' +
+                    '<div class="rounded-4 bg-white bg-opacity-10 d-flex align-items-center justify-content-center text-white-50 mb-3 shadow-sm" style="width: 64px; height: 64px;">' +
+                      '<i class="bi bi-mic fs-2 text-white-50"></i>' +
+                    '</div>' +
+                    '<p class="text-white fw-bold fs-5 mb-1">Letra no disponible</p>' +
+                    '<p class="text-white-50 small mb-0" style="max-width: 320px;">No encontramos la letra sincronizada para esta canción.</p>' +
+                  '</div>';
               }
             });
-          });
-
-          lastActiveLyricIndex = -1;
-          updateLyricsHighlight(audioEl.currentTime);
+          }
         } else {
           updateLyricsHighlight(audioEl.currentTime);
         }

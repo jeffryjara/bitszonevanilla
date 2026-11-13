@@ -2779,30 +2779,63 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
 .bz-cover-vinyl-stage {
   position: relative;
   display: inline-block;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
 }
 
 @media (min-width: 992px) {
   .bz-cover-vinyl-stage {
-    margin-right: 110px;
+    margin-right: clamp(120px, 12vw, 190px);
   }
 }
 
 .bz-exp-cover-frame {
   position: relative;
   z-index: 2;
-  width: clamp(210px, 26vw, 315px);
+  width: min(calc(100vw - 48px), 44dvh);
+  height: min(calc(100vw - 48px), 44dvh);
   aspect-ratio: 1 / 1;
-  border-radius: 1.45rem;
+  border-radius: 22px;
   overflow: hidden;
-  box-shadow: 0 28px 65px rgba(0, 0, 0, 0.78);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+@media (min-width: 992px) {
+  .bz-exp-cover-frame {
+    width: clamp(320px, 28vw, 440px);
+    height: clamp(320px, 28vw, 440px);
+  }
 }
 
 .bz-exp-cover-frame img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.bz-exp-cover-sheen {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(115deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.08) 22%, transparent 40%, transparent 70%, rgba(255, 255, 255, 0.10) 100%);
+  pointer-events: none;
+}
+
+.bz-exp-cover-grad {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.25), transparent);
+  pointer-events: none;
+}
+
+.bz-exp-cover-border {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+  pointer-events: none;
 }
 
 .bz-exp-vinyl-peek {
@@ -2827,10 +2860,11 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  box-shadow: 0 20px 52px rgba(0, 0, 0, 0.72);
-  background: radial-gradient(circle, #18181c 0%, #0d0d10 42%, #1d1d22 43%, #09090b 65%, #19191e 66%, #09090b 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  animation: bz-spin 7s linear infinite;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65);
+  background: radial-gradient(circle, transparent 0 31%, rgba(255, 255, 255, 0.05) 31.5% 32%, transparent 32.5%),
+              repeating-radial-gradient(circle, #0c0c0e 0 2px, #17171a 2.5px 3.5px),
+              #111111;
+  animation: bz-spin 6s linear infinite;
   animation-play-state: paused;
 }
 
@@ -2842,7 +2876,7 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background: conic-gradient(from 0deg, transparent 0deg, rgba(255, 255, 255, 0.08) 45deg, transparent 95deg, rgba(255, 255, 255, 0.06) 215deg, transparent 275deg);
+  background: conic-gradient(from 30deg, transparent 0deg, rgba(255, 255, 255, 0.10) 40deg, transparent 80deg, transparent 180deg, rgba(255, 255, 255, 0.07) 220deg, transparent 260deg);
   pointer-events: none;
 }
 
@@ -2850,13 +2884,12 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 34%;
-  height: 34%;
+  width: 32%;
+  height: 32%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
   overflow: hidden;
-  border: 2px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.6);
 }
 
 .bz-exp-vinyl-label img {
@@ -2869,12 +2902,12 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 14px;
-  height: 14px;
+  width: 3.5%;
+  height: 3.5%;
   transform: translate(-50%, -50%);
   border-radius: 50%;
-  background: #08080a;
-  border: 2px solid rgba(255, 255, 255, 0.25);
+  background: #0a0a0a;
+  border: none;
 }
 
 /* Dock flotante de reacciones en la esquina inferior derecha de la carátula */
@@ -2895,13 +2928,23 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   box-shadow: 0 12px 30px rgba(0, 0, 0, 0.58);
 }
 
+.bz-exp-right-col {
+  height: clamp(540px, calc(100dvh - 120px), 760px);
+  min-height: 500px;
+  max-height: calc(100dvh - 80px);
+  justify-content: flex-start;
+}
+
 .bz-exp-right-scroll {
   overflow-y: auto;
-  max-height: calc(100dvh - 150px);
+  flex: 1 1 0;
+  min-height: 0;
   padding-right: 0.5rem;
   scrollbar-width: none;
-  mask-image: linear-gradient(to bottom, transparent 0px, black 18px, black calc(100% - 28px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 18px, black calc(100% - 28px), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 78%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 14%, black 78%, transparent 100%);
+  display: flex;
+  flex-direction: column;
 }
 .bz-exp-right-scroll::-webkit-scrollbar {
   display: none;
@@ -2973,54 +3016,100 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   background: rgba(255, 255, 255, 0.06);
 }
 
-/* Escenario de Letras Sincronizadas y Vista Restringida */
+/* Escenario de Letras Sincronizadas (Fiel a ImmersivePlayer.tsx / Bitszone original) */
 .bz-lyrics-stage {
   display: flex;
   flex-direction: column;
-  gap: 0.85rem;
-  padding: 1.25rem 0.5rem 4rem;
+  gap: clamp(1.6rem, 3.2vh, 2.8rem);
+  padding: 3rem 0.5rem 45vh;
   scroll-behavior: smooth;
-}
-.bz-lyric-line {
-  font-size: 1.15rem;
-  font-weight: 600;
-  line-height: 1.45;
-  color: rgba(255, 255, 255, 0.38);
-  padding: 0.6rem 0.95rem;
-  border-radius: 0.85rem;
-  cursor: pointer;
-  transition: color 0.22s ease, opacity 0.22s ease, transform 0.22s ease, background-color 0.22s ease, text-shadow 0.22s ease;
-  user-select: none;
-}
-.bz-lyric-line:hover {
-  color: rgba(255, 255, 255, 0.88);
-  background: rgba(255, 255, 255, 0.05);
-}
-.bz-lyric-line.is-past {
-  color: rgba(255, 255, 255, 0.28);
-}
-.bz-lyric-line.is-active {
-  color: #ffffff;
-  font-size: 1.32rem;
-  font-weight: 700;
-  transform: translateX(4px) scale(1.015);
-  background: linear-gradient(90deg, rgba(168, 85, 247, 0.24), rgba(168, 85, 247, 0.02));
-  border-left: 3px solid var(--bz-lavender, #c084fc);
-  text-shadow: 0 0 16px rgba(192, 132, 252, 0.45);
-}
-@media (max-width: 768px) {
-  .bz-lyric-line {
-    font-size: 1.02rem;
-    padding: 0.5rem 0.75rem;
-  }
-  .bz-lyric-line.is-active {
-    font-size: 1.18rem;
-  }
+  width: 100%;
 }
 
-/* Vista Restringida de Letras (Minimalista y Editorial) */
+.bz-lyric-line {
+  font-size: clamp(1.45rem, 2.6vw, 2.45rem);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.35);
+  filter: blur(1.2px);
+  -webkit-filter: blur(1.2px);
+  transform: scale(0.98);
+  transform-origin: left center;
+  cursor: pointer;
+  user-select: none;
+  text-align: left;
+  border-radius: 0.5rem;
+  padding: 0.2rem 0.4rem;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  transition: all 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bz-lyric-line:hover {
+  color: rgba(255, 255, 255, 0.8);
+  filter: blur(0px);
+  -webkit-filter: blur(0px);
+  transform: scale(1.0);
+}
+
+.bz-lyric-line.is-active,
+.bz-lyric-line[data-active-lyric="true"] {
+  color: #ffffff !important;
+  font-weight: 800;
+  font-size: clamp(1.55rem, 2.75vw, 2.65rem);
+  filter: blur(0px) !important;
+  -webkit-filter: blur(0px) !important;
+  transform: scale(1.03);
+  opacity: 1;
+  text-shadow: 0 2px 16px rgba(255, 255, 255, 0.4);
+}
+
+.bz-lyric-line.is-past {
+  color: rgba(255, 255, 255, 0.28);
+  filter: blur(1.2px);
+  -webkit-filter: blur(1.2px);
+  transform: scale(0.98);
+}
+
+/* Skeleton loader animado para letras */
+.bz-lyrics-loading-skeleton {
+  padding-top: 3rem;
+  padding-bottom: 20vh;
+}
+.bz-skeleton-line {
+  animation: bzSkeletonPulse 1.8s ease-in-out infinite;
+}
+@keyframes bzSkeletonPulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.85; }
+}
+
+/* Panel lateral derecho (drawer) */
+.bz-side-lyrics-scroll .bz-lyrics-stage {
+  gap: 1.25rem;
+  padding: 1.5rem 0.5rem 25vh;
+}
+.bz-side-lyrics-scroll .bz-lyric-line {
+  font-size: 1.15rem;
+  line-height: 1.35;
+  filter: blur(0.8px);
+  -webkit-filter: blur(0.8px);
+}
+.bz-side-lyrics-scroll .bz-lyric-line.is-active {
+  font-size: 1.28rem;
+  text-shadow: 0 2px 12px rgba(255, 255, 255, 0.35);
+}
+
+/* Vista Restringida de Letras (Centrada elegantemente) */
 .bz-lyrics-guest-hero {
   min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
   animation: bzFadeIn 0.3s ease;
 }
 .bz-lyrics-guest-hero h2 {

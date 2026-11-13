@@ -316,7 +316,7 @@
         <!-- Contenido Fullscreen de dos columnas -->
         <div class="modal-body p-0 position-relative z-2 d-flex align-items-stretch" style="min-height: 100dvh;">
           <div class="container-fluid px-3 px-md-5 py-4 d-flex align-items-center">
-            <div class="row g-4 g-lg-5 w-100 align-items-center justify-content-center my-auto">
+            <div class="row g-4 g-lg-5 w-100 align-items-stretch justify-content-center my-auto">
 
               <!-- COLUMNA IZQUIERDA: Volumen vertical + Carátula con Vinilo + WavyProgress + Orbe Giratorio -->
               <div class="col-12 col-lg-6 position-relative d-flex flex-column align-items-center justify-content-center pt-4 pt-lg-0">
@@ -349,6 +349,9 @@
 
                   <div class="bz-exp-cover-frame">
                     <img id="expCoverImg" src="./assets/img/bitszone-icon.png" alt="Carátula" />
+                    <div class="bz-exp-cover-sheen" aria-hidden="true"></div>
+                    <div class="bz-exp-cover-grad" aria-hidden="true"></div>
+                    <div class="bz-exp-cover-border" aria-hidden="true"></div>
                   </div>
 
                   <!-- Dock Liquid Glass flotante sobre la esquina inferior derecha de la carátula -->
@@ -413,9 +416,9 @@
                 </div>
               </div>
 
-              <!-- COLUMNA DERECHA: Tabs Liquid Glass Pistas / Letra / Cola -->
-              <div class="col-12 col-lg-6 d-flex flex-column" style="max-height: calc(100dvh - 80px);">
-                <div class="mb-3 d-flex align-items-center justify-content-between gap-2">
+              <!-- COLUMNA DERECHA: Tabs Liquid Glass Pistas / Letras / Cola -->
+              <div class="col-12 col-lg-6 d-flex flex-column bz-exp-right-col" style="max-height: calc(100dvh - 80px);">
+                <div class="mb-3 d-flex align-items-center justify-content-between gap-2 flex-shrink-0">
                   <div class="bz-segmented-pill" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16); height: 42px;">
                     <button type="button" class="bz-segmented-btn is-active" data-exp-tab="pistas">
                       <i class="bi bi-music-note-list"></i><span>Pistas</span>
