@@ -3991,7 +3991,7 @@ body.bz-has-miniplayer .bz-detail-viewport {
 
 .bz-album-cover-wrap {
   position: relative;
-  width: clamp(255px, min(28vw, 46dvh), 430px);
+  width: clamp(255px, min(30vw, 50dvh), 500px);
   aspect-ratio: 1 / 1;
   margin-bottom: 1.65rem;
 }
@@ -4124,13 +4124,11 @@ body.bz-has-miniplayer .bz-detail-viewport {
 
 .bz-album-track-row:hover {
   background: rgba(255, 255, 255, 0.065);
-  backdrop-filter: blur(18px);
 }
 
 .bz-album-track-row.is-playing {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(20px);
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.28);
 }
 
 .bz-row-idx-wrap {
@@ -5924,4 +5922,37 @@ html, body {
     -webkit-backdrop-filter: blur(28px) saturate(180%);
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
   }
+}
+
+/* Menús: cristal muy difuminado que toma el color del álbum / fondo ambiental de detrás */
+.bz-library-popover-menu,
+.dropdown-menu.bz-library-popover-menu {
+  background: rgba(14, 10, 24, 0.34) !important;
+  backdrop-filter: blur(44px) saturate(210%) brightness(0.9) !important;
+  -webkit-backdrop-filter: blur(44px) saturate(210%) brightness(0.9) !important;
+}
+
+/* Vista de álbum en escritorio: disco de vinilo, filas más amplias como el original */
+@media (min-width: 992px) {
+  .bz-album-cover-wrap::before {
+    content: "";
+    position: absolute;
+    top: 5%;
+    left: 28%;
+    width: 90%;
+    height: 90%;
+    border-radius: 50%;
+    z-index: -1;
+    background:
+      radial-gradient(circle, #050505 0 11%, transparent 11.5%),
+      repeating-radial-gradient(circle, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0.9) 2px 5px),
+      #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  }
+  .bz-album-track-row { padding: 1rem 1.6rem; gap: 1.1rem; }
+  .bz-album-track-row + .bz-album-track-row { margin-top: 0.15rem; }
+  .bz-album-track-row .fw-semibold.text-white { font-size: 1.1rem !important; }
+  .bz-album-track-row .text-white-50.text-truncate { font-size: 0.875rem !important; }
+  .bz-album-track-row > .d-flex > .font-mono-bz { font-family: inherit; font-size: 0.9rem !important; }
 }

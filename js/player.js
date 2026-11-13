@@ -3029,7 +3029,7 @@
                 var fav = Storage.isFavorite(t.id);
                 var dl = Storage.isDownloaded(t.id);
                 var lic = Storage.isLicensed(t.id);
-                var timeDisplay = isAuth ? formatDurationMs(t.duration) : _t('album.preview30s', '30s preview');
+                var timeDisplay = (isAuth || t.duration) ? formatDurationMs(t.duration) : _t('album.preview30s', '30s preview');
                 return (
                   '<div class="bz-album-track-row ' + (playing ? 'is-playing' : '') + '" data-row-play-idx="' + i + '">' +
                     '<div class="bz-row-idx-wrap text-white-50 font-mono-bz small">' +
