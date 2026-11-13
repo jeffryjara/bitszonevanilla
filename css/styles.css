@@ -2460,19 +2460,28 @@ body.bz-ad-locked #expandedPlayerModal {
 
 /* Modal Intersticial de Anuncios (Liquid Glass Ad Player) */
 .bz-ad-modal {
-  z-index: 1090 !important;
-  overflow: hidden !important;
-  touch-action: none !important;
+  z-index: 1095 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  touch-action: none;
 }
 
-/* Fondo / Backdrop impenetrable con desenfoque extremo */
-.modal-backdrop.bz-ad-backdrop,
-.bz-ad-modal ~ .modal-backdrop {
-  z-index: 1085 !important;
-  background-color: rgba(6, 2, 14, 0.9) !important;
-  backdrop-filter: blur(32px) !important;
-  -webkit-backdrop-filter: blur(32px) !important;
+/* Fondo / Backdrop específico de anuncios con desenfoque extremo */
+.modal-backdrop.bz-ad-backdrop {
+  z-index: 1090 !important;
+  background-color: rgba(6, 2, 14, 0.92) !important;
+  backdrop-filter: blur(28px) !important;
+  -webkit-backdrop-filter: blur(28px) !important;
+  transition: opacity 0.25s ease-out;
+}
+
+.modal-backdrop.bz-ad-backdrop.show {
   opacity: 1 !important;
+}
+
+.modal-backdrop.bz-ad-backdrop:not(.show) {
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .bz-ad-modal .modal-content {

@@ -115,6 +115,13 @@
   function blockAdScroll(e) {
     if (!adState.isActive) return;
     var modal = document.getElementById('adInterstitialModal');
+    // Auto-recuperación: si el modal no existe o no tiene clase 'show', desbloquear estado
+    if (!modal || !modal.classList.contains('show')) {
+      adState.isActive = false;
+      document.documentElement.classList.remove('bz-ad-locked');
+      document.body.classList.remove('bz-ad-locked');
+      return;
+    }
     // Permitir interacción solo dentro del modal si es clickeable
     if (!modal || !modal.contains(e.target)) {
       e.preventDefault();
@@ -126,6 +133,13 @@
   // Bloqueo estricto de atajos de teclado y teclas que muevan el scroll (Space, Flechas, etc.)
   function blockAdKeys(e) {
     if (!adState.isActive) return;
+    var modal = document.getElementById('adInterstitialModal');
+    if (!modal || !modal.classList.contains('show')) {
+      adState.isActive = false;
+      document.documentElement.classList.remove('bz-ad-locked');
+      document.body.classList.remove('bz-ad-locked');
+      return;
+    }
     var blocked = [
       'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
       'PageUp', 'PageDown', 'Home', 'End', 'Tab', 'KeyF', 'KeyM', 'KeyA', 'KeyR', 'KeyS'
@@ -166,7 +180,7 @@
     adState.currentSponsorIdx += 1;
 
     var modalEl = document.getElementById('adInterstitialModal');
-    if (!modalEl) {
+    if (!modalEl || !window.bootstrap || !window.bootstrap.Modal) {
       finishAdFlow();
       return;
     }
@@ -203,13 +217,13 @@
     var bsModal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
     bsModal.show();
 
-    // Asegurar fondo difuminado y oscuro impenetrable
+    // Etiquetar el backdrop con clase bz-ad-backdrop
     setTimeout(function () {
       var backdrops = document.querySelectorAll('.modal-backdrop');
       backdrops.forEach(function (b) {
         b.classList.add('bz-ad-backdrop');
       });
-    }, 10);
+    }, 20);
 
     if (adState.intervalId) clearInterval(adState.intervalId);
     adState.intervalId = setInterval(function () {
@@ -235,16 +249,33 @@
       adState.intervalId = null;
     }
 
+    adState.isActive = false;
+
     // Desbloquear scroll e interacción
     document.documentElement.classList.remove('bz-ad-locked');
     document.body.classList.remove('bz-ad-locked');
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('padding-right');
 
     var modalEl = document.getElementById('adInterstitialModal');
     if (modalEl) {
-      var bsModal = window.bootstrap.Modal.getInstance(modalEl);
-      if (bsModal) bsModal.hide();
+      modalEl.classList.remove('show');
+      modalEl.style.display = 'none';
+      modalEl.setAttribute('aria-hidden', 'true');
+      modalEl.removeAttribute('aria-modal');
+      var bsModal = window.bootstrap && window.bootstrap.Modal ? window.bootstrap.Modal.getInstance(modalEl) : null;
+      if (bsModal) {
+        try {
+          bsModal.hide();
+        } catch (e) {}
+      }
     }
-    adState.isActive = false;
+
+    // Limpieza explícita de backdrop para evitar pantallas oscuras residuales
+    document.querySelectorAll('.modal-backdrop.bz-ad-backdrop').forEach(function (b) {
+      b.remove();
+    });
 
     var cb = adState.onComplete;
     adState.onComplete = null;
@@ -568,6 +599,20 @@
 
   function togglePlay() {
     if (!audioEl || !appState.nowPlayingTrack) return;
+
+    var isGuest = !isUserAuthenticated();
+    // Si es invitado y la canción ya culminó los 30s de previsualización, reiniciar desde 0:00 al presionar Play
+    if (isGuest && (audioEl.currentTime >= 30 || appState.currentSecs >= 30)) {
+      audioEl.currentTime = 0;
+      appState.currentSecs = 0;
+      appState.progress = 0;
+      audioEl.play().catch(function () {});
+      appState.isPlaying = true;
+      updatePlayerBarsUI();
+      renderCurrentView();
+      return;
+    }
+
     if (audioEl.paused) {
       audioEl.play().catch(function () {});
       appState.isPlaying = true;
@@ -579,7 +624,7 @@
     renderCurrentView();
   }
 
-  function nextTrack() {
+  function nextTrack(bypassAd) {
     if (!appState.queue.length) return;
     var nextIdx;
     if (appState.shuffle && appState.queue.length > 1) {
@@ -597,10 +642,10 @@
         }
       }
     }
-    playTrack(appState.queue[nextIdx], appState.nowPlayingAlbum, appState.queue, nextIdx);
+    playTrack(appState.queue[nextIdx], appState.nowPlayingAlbum, appState.queue, nextIdx, bypassAd === true);
   }
 
-  function prevTrack() {
+  function prevTrack(bypassAd) {
     if (!appState.queue.length) return;
     if (audioEl && audioEl.currentTime > 4) {
       audioEl.currentTime = 0;
@@ -608,7 +653,7 @@
     }
     var prevIdx = appState.queueIndex - 1;
     if (prevIdx < 0) prevIdx = appState.queue.length - 1;
-    playTrack(appState.queue[prevIdx], appState.nowPlayingAlbum, appState.queue, prevIdx);
+    playTrack(appState.queue[prevIdx], appState.nowPlayingAlbum, appState.queue, prevIdx, bypassAd === true);
   }
 
   function seekToProgress(p) {
@@ -2791,6 +2836,16 @@
 
   // ---- Inicialización Global en player.html ----
   document.addEventListener('DOMContentLoaded', function () {
+    // Limpieza preventiva de bloqueos o backdrops residuales si la página se recargó a medio anuncio
+    document.documentElement.classList.remove('bz-ad-locked');
+    document.body.classList.remove('bz-ad-locked');
+    document.body.classList.remove('modal-open');
+    document.body.style.removeProperty('overflow');
+    document.body.style.removeProperty('padding-right');
+    document.querySelectorAll('.modal-backdrop').forEach(function (b) {
+      b.remove();
+    });
+
     audioEl = document.getElementById('bzAudioPlayer');
     if (!audioEl) return;
 
@@ -2843,7 +2898,7 @@
             appState.isPlaying = true;
             updatePlayerBarsUI();
           } else {
-            nextTrack();
+            nextTrack(true);
           }
         });
         return;
@@ -2889,7 +2944,7 @@
             appState.isPlaying = true;
             updatePlayerBarsUI();
           } else {
-            nextTrack();
+            nextTrack(true);
           }
         });
         return;
@@ -3276,6 +3331,17 @@
 
     // Cargar catálogo inicial desde Supabase REST (con respaldo local automático)
     var catalogStartMs = Date.now();
+    function hideLoadingScreen() {
+      var loadingEl = document.getElementById('bzPlayerLoadingScreen');
+      if (loadingEl && !loadingEl.classList.contains('is-done')) {
+        loadingEl.classList.add('is-done');
+        loadingEl.setAttribute('aria-hidden', 'true');
+      }
+    }
+
+    // Timeout de seguridad: jamás dejar la pantalla negra pegada más de 1.2 segundos
+    setTimeout(hideLoadingScreen, 1200);
+
     CatalogApi.loadCatalog().then(function (data) {
       appState.albums = data.albums;
       appState.artists = data.artists;
@@ -3285,15 +3351,12 @@
       appState.loading = false;
       renderCurrentView();
 
-      var loadingEl = document.getElementById('bzPlayerLoadingScreen');
-      if (loadingEl) {
-        var elapsed = Date.now() - catalogStartMs;
-        var waitMs = appState.reduceMotion ? 0 : Math.max(0, 520 - elapsed);
-        setTimeout(function () {
-          loadingEl.classList.add('is-done');
-          loadingEl.setAttribute('aria-hidden', 'true');
-        }, waitMs);
-      }
+      var elapsed = Date.now() - catalogStartMs;
+      var waitMs = appState.reduceMotion ? 0 : Math.max(0, 520 - elapsed);
+      setTimeout(hideLoadingScreen, waitMs);
+    }).catch(function (err) {
+      console.warn('Error al cargar catálogo inicial:', err);
+      hideLoadingScreen();
     });
   });
 
