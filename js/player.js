@@ -64,7 +64,7 @@
   var isScrubbing = false;
   var volBubbleTimer = null;
 
-  // ---- Sistema de Publicidad Intersticial (15s para usuarios sin sesión) ----
+  // ---- Sistema de Publicidad Intersticial (8s para usuarios sin sesión) ----
   var AD_SPONSORS = [
     {
       badge: 'Bitszone Premium',
@@ -159,7 +159,7 @@
     if (adState.isActive) return;
     adState.isActive = true;
     adState.onComplete = onComplete;
-    adState.secondsLeft = 15;
+    adState.secondsLeft = 8;
 
     // Bloquear scroll e interacción exterior
     document.documentElement.classList.add('bz-ad-locked');
@@ -198,11 +198,11 @@
       };
       imgEl.src = sponsor.image || './assets/img/bitszone-icon.png';
     }
-    var AD_DURATION_MS = 15000;
+    var AD_DURATION_MS = 8000;
     adState.startTime = Date.now();
     adState.totalDurationMs = AD_DURATION_MS;
 
-    if (secLeftEl) secLeftEl.textContent = '15s';
+    if (secLeftEl) secLeftEl.textContent = '8s';
     if (barEl) {
       barEl.style.transition = 'none';
       barEl.style.width = '100%';
@@ -244,8 +244,8 @@
         barEl.style.width = pct.toFixed(2) + '%';
       }
 
-      // Habilitar omitir cuando queden 5s o menos (a los 10s de anuncio)
-      if (remainingSecs <= 5 && skipBtn && skipBtn.classList.contains('d-none')) {
+      // Habilitar omitir cuando queden 4s o menos (a la mitad del anuncio de 8s)
+      if (remainingSecs <= 4 && skipBtn && skipBtn.classList.contains('d-none')) {
         skipBtn.classList.remove('d-none');
       }
 
@@ -338,11 +338,17 @@
       title: 'Canta con las letras en tiempo real',
       desc: 'Inicia sesión gratis para seguir la letra de tus canciones favoritas sincronizada verso a verso y saltar a cualquier estrofa.'
     },
+    queue: {
+      badge: 'COLA DE REPRODUCCIÓN',
+      icon: 'bi-list-ol',
+      title: 'Personaliza tu cola de reproducción',
+      desc: 'Inicia sesión gratis para agregar canciones a tu cola, decidir qué suena a continuación y armar tus sesiones musicales sin interrupciones.'
+    },
     default: {
       badge: 'FUNCIÓN EXCLUSIVA',
       icon: 'bi-person-lock',
       title: 'Inicia sesión para disfrutar de todo Bitszone',
-      desc: 'Crea tu cuenta o inicia sesión gratis para habilitar descargas, listas de reproducción personalizadas, favoritos y licencias exclusivas.'
+      desc: 'Crea tu cuenta o inicia sesión gratis para habilitar descargas, añadir a la cola, listas de reproducción personalizadas, favoritos y licencias exclusivas.'
     }
   };
 
@@ -769,25 +775,29 @@
 
   function playTrackNext(track, album) {
     if (!track) return;
-    if (!appState.nowPlayingTrack) {
-      playTrack(track, album || findAlbumById(track.albumId));
-      return;
-    }
-    var insertAt = Math.max(0, appState.queueIndex + 1);
-    appState.queue.splice(insertAt, 0, Object.assign({}, track));
-    showToast('\'' + track.title + '\' sonará a continuación');
-    renderExpRightPanel();
+    requireAuth('queue', function () {
+      if (!appState.nowPlayingTrack) {
+        playTrack(track, album || findAlbumById(track.albumId));
+        return;
+      }
+      var insertAt = Math.max(0, appState.queueIndex + 1);
+      appState.queue.splice(insertAt, 0, Object.assign({}, track));
+      showToast('\'' + track.title + '\' sonará a continuación');
+      renderExpRightPanel();
+    });
   }
 
   function addTrackToQueue(track, album) {
     if (!track) return;
-    if (!appState.nowPlayingTrack) {
-      playTrack(track, album || findAlbumById(track.albumId));
-      return;
-    }
-    appState.queue.push(Object.assign({}, track));
-    showToast('\'' + track.title + '\' añadida a la cola');
-    renderExpRightPanel();
+    requireAuth('queue', function () {
+      if (!appState.nowPlayingTrack) {
+        playTrack(track, album || findAlbumById(track.albumId));
+        return;
+      }
+      appState.queue.push(Object.assign({}, track));
+      showToast('\'' + track.title + '\' añadida a la cola');
+      renderExpRightPanel();
+    });
   }
 
   function moveQueueItem(qi, dir) {
@@ -2278,14 +2288,16 @@
     var addQueueBtn = document.getElementById('btnAlbumAddQueue');
     if (addQueueBtn) {
       addQueueBtn.addEventListener('click', function () {
-        if (!tracks.length) return;
-        if (!appState.nowPlayingTrack) {
-          playTrack(tracks[0], albumObj, tracks);
-        } else {
-          appState.queue = appState.queue.concat(tracks);
-          showToast(tracks.length + ' canciones añadidas a la cola');
-          updatePlayerBarsUI();
-        }
+        requireAuth('queue', function () {
+          if (!tracks.length) return;
+          if (!appState.nowPlayingTrack) {
+            playTrack(tracks[0], albumObj, tracks);
+          } else {
+            appState.queue = appState.queue.concat(tracks);
+            showToast(tracks.length + ' canciones añadidas a la cola');
+            updatePlayerBarsUI();
+          }
+        });
       });
     }
 
@@ -3306,7 +3318,7 @@
       var isGuest = !isUserAuthenticated();
       var maxSecs = isGuest ? Math.min(30, Math.floor(audioEl.duration)) : Math.floor(audioEl.duration);
 
-      // Si es usuario invitado (sin cuenta) y llega a 30 segundos, cortar la canción y activar anuncio de 15s
+      // Si es usuario invitado (sin cuenta) y llega a 30 segundos, cortar la canción y activar anuncio de 8s
       if (isGuest && audioEl.currentTime >= 30) {
         audioEl.pause();
         appState.isPlaying = false;

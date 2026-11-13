@@ -146,20 +146,23 @@
           <i class="bi bi-gear fs-6"></i><span class="bz-nav-label">Configuración</span>
         </button>
 
-        <div class="bz-storage-details px-2 pt-2 mt-1 border-top border-white border-opacity-10">
-          <div class="d-flex align-items-center gap-2 mb-1">
-            <i class="bi bi-hdd text-white-50" style="font-size: 0.78rem;"></i>
-            <div>
-              <div class="text-white-50 text-uppercase" style="font-size: 0.62rem; letter-spacing: 0.08em;">Almacenamiento</div>
-              <div id="storageAvailText" style="font-size: 0.72rem; color: rgba(255,255,255,0.65);">
-                <strong class="text-white">5.00GB</strong> de 5.00GB
+        <button id="btnSidebarStorage" type="button" class="bz-storage-btn bz-storage-details w-100 text-start border-0 bg-transparent p-2 mt-1 border-top border-white border-opacity-10" data-nav-view="downloads" title="Mis descargas y almacenamiento">
+          <div class="d-flex align-items-center justify-content-between mb-1">
+            <div class="d-flex align-items-center gap-2">
+              <i class="bi bi-hdd text-white-50" style="font-size: 0.82rem;"></i>
+              <div>
+                <div class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.62rem; letter-spacing: 0.08em;">Almacenamiento</div>
+                <div id="storageAvailText" style="font-size: 0.72rem; color: rgba(255,255,255,0.7);">
+                  <strong class="text-white">5.00GB</strong> de 5.00GB
+                </div>
               </div>
             </div>
+            <i class="bi bi-chevron-right text-white-50 small opacity-50 bz-storage-chevron"></i>
           </div>
-          <div class="progress rounded-pill" style="height: 3px; background: rgba(255,255,255,0.1);">
+          <div class="progress rounded-pill" style="height: 3px; background: rgba(255,255,255,0.12);">
             <div id="storageProgressBar" class="progress-bar rounded-pill" style="width: 2%; background: linear-gradient(90deg, #60a5fa, #a855f7);"></div>
           </div>
-        </div>
+        </button>
       </div>
     </aside>
 
@@ -691,11 +694,11 @@
     </div>
   </div>
 
-  <!-- Modal Intersticial de Anuncios (15s para usuarios sin sesión) -->
+  <!-- Modal Intersticial de Anuncios (8s para usuarios sin sesión) -->
   <div class="modal fade bz-ad-modal" id="adInterstitialModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 470px;">
       <div class="modal-content bz-ad-card position-relative overflow-hidden text-center">
-        <!-- Barra de Progreso Superior del Anuncio (15s) -->
+        <!-- Barra de Progreso Superior del Anuncio (8s) -->
         <div class="bz-ad-progress-track">
           <div id="adProgressBar" class="bz-ad-progress-bar"></div>
         </div>
@@ -708,7 +711,7 @@
             </span>
             <div class="bz-ad-countdown-pill d-inline-flex align-items-center gap-1.5 px-3 py-1 rounded-pill">
               <span class="small font-mono-bz text-white-50" style="font-size: 0.78rem;">Continuará en</span>
-              <strong id="adSecondsLeft" class="font-mono-bz text-white ms-1" style="font-size: 0.82rem;">15s</strong>
+              <strong id="adSecondsLeft" class="font-mono-bz text-white ms-1" style="font-size: 0.82rem;">8s</strong>
             </div>
           </div>
 
