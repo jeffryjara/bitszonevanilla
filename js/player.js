@@ -101,10 +101,31 @@
     isActive: false
   };
 
+  function isUserAdmin() {
+    try {
+      if (typeof Auth !== 'undefined' && Auth && typeof Auth.isAdmin === 'function') {
+        return Auth.isAdmin();
+      }
+      if (typeof window !== 'undefined' && window.BitszoneAuth && typeof window.BitszoneAuth.isAdmin === 'function') {
+        return window.BitszoneAuth.isAdmin();
+      }
+      var s = localStorage.getItem('bz_vanilla_session_v1');
+      if (s) {
+        var parsed = JSON.parse(s);
+        return parsed && (parsed.role === 'admin' || parsed.role === 'superadmin');
+      }
+    } catch (e) {}
+    return false;
+  }
+
   function isUserAuthenticated() {
     try {
-      if (Auth && typeof Auth.getSession === 'function') {
+      if (isUserAdmin()) return true;
+      if (typeof Auth !== 'undefined' && Auth && typeof Auth.getSession === 'function') {
         return !!Auth.getSession();
+      }
+      if (typeof window !== 'undefined' && window.BitszoneAuth && typeof window.BitszoneAuth.getSession === 'function') {
+        return !!window.BitszoneAuth.getSession();
       }
       return !!localStorage.getItem('bz_vanilla_session_v1');
     } catch (e) {
@@ -157,6 +178,12 @@
   window.addEventListener('keydown', blockAdKeys, { capture: true });
 
   function triggerAdFlow(onComplete) {
+    if (isUserAdmin()) {
+      if (typeof onComplete === 'function') {
+        onComplete();
+      }
+      return;
+    }
     if (adState.isActive) return;
     adState.isActive = true;
     adState.onComplete = onComplete;
@@ -365,6 +392,7 @@
   };
 
   function openAuthRequiredModal(actionName) {
+    if (isUserAdmin()) return;
     var modalEl = document.getElementById('authRequiredModal');
     if (!modalEl || !window.bootstrap || !window.bootstrap.Modal) return;
 
@@ -383,7 +411,7 @@
   }
 
   function requireAuth(actionKey, callback) {
-    if (isUserAuthenticated()) {
+    if (isUserAdmin() || isUserAuthenticated()) {
       if (typeof callback === 'function') callback();
       return true;
     }
@@ -652,8 +680,8 @@
 
     var isGuest = !isUserAuthenticated();
 
-    // Si ya estaba reproduciendo otra pista (cambio de canción), mostrar anuncio entre canciones antes de reproducir la nueva
-    if (!bypassAd && appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) !== Number(track.id)) {
+    // Si ya estaba reproduciendo otra pista (cambio de canción), mostrar anuncio entre canciones antes de reproducir la nueva (excepto administradores)
+    if (!isUserAdmin() && !bypassAd && appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) !== Number(track.id)) {
       triggerAdFlow(function () {
         playTrack(track, albumOrQueueList, queueList, forceIdx, true);
       });
@@ -4059,8 +4087,8 @@
         }
       }
 
-      // Anuncio entre canciones tanto para invitados como para usuarios con sesión
-      triggerAdFlow(function () {
+      // Anuncio entre canciones tanto para invitados como para usuarios con sesión (excepto administradores)
+      if (isUserAdmin()) {
         if (appState.repeatMode === 'one') {
           audioEl.currentTime = 0;
           audioEl.play().catch(function () {});
@@ -4069,7 +4097,18 @@
         } else {
           nextTrack(true);
         }
-      });
+      } else {
+        triggerAdFlow(function () {
+          if (appState.repeatMode === 'one') {
+            audioEl.currentTime = 0;
+            audioEl.play().catch(function () {});
+            appState.isPlaying = true;
+            updatePlayerBarsUI();
+          } else {
+            nextTrack(true);
+          }
+        });
+      }
     });
 
     // Botones de navegación (Sidebar, Offcanvas, Mobile TabBar)
