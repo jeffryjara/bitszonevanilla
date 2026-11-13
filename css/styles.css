@@ -5995,8 +5995,10 @@ html, body {
 
 /* Reproductor expandido en móvil: una sola pantalla como el original (sin volumen ni dock, controles a lo ancho) */
 @media (max-width: 991.98px) {
-  #expandedPlayerModal .modal-body > .container-fluid { padding-left: 34px !important; padding-right: 34px !important; }
-  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { min-height: calc(100dvh - 2rem); position: relative; padding-bottom: 34px; justify-content: center; }
+  #expandedPlayerModal .modal-dialog { margin: 0 !important; width: 100% !important; max-width: none !important; }
+  #expandedPlayerModal .modal-body .row { margin-left: 0; margin-right: 0; --bs-gutter-x: 0; }
+  #expandedPlayerModal .modal-body > .container-fluid { padding-left: 20px !important; padding-right: 20px !important; }
+  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { min-height: calc(100dvh - 2rem); position: relative; padding-top: 52px; padding-bottom: 44px; justify-content: space-evenly; }
   .bz-cover-vinyl-stage { display: block; margin: 2.75rem auto 1.25rem; }
   .bz-exp-cover-frame { margin: 0 auto; }
 }
@@ -6254,14 +6256,10 @@ html, body {
 
 /* Reproductor expandido en móvil: una sola pantalla como el original (sin volumen ni dock, controles a lo ancho) */
 @media (max-width: 991.98px) {
-  #expandedPlayerModal .modal-body > .container-fluid { padding-left: 34px !important; padding-right: 34px !important; }
-  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { min-height: calc(100dvh - 2rem); position: relative; padding-bottom: 34px; justify-content: center; }
-  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child::after {
-    content: ""; position: absolute; left: 50%; bottom: 10px; width: 44px; height: 5px;
-    margin-left: -22px; border-radius: 999px; background: rgba(255, 255, 255, 0.35);
-  }
-  .bz-cover-vinyl-stage { display: block; width: 100%; margin: 0 0 1.1rem; }
-  .bz-exp-cover-frame { width: 100%; height: auto; max-height: 46dvh; margin: 0 auto; aspect-ratio: 1 / 1; }
+  #expandedPlayerModal .modal-body > .container-fluid { padding-left: 20px !important; padding-right: 20px !important; }
+  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { min-height: calc(100dvh - 2rem); position: relative; padding-top: 52px; padding-bottom: 44px; justify-content: space-evenly; }
+  .bz-cover-vinyl-stage { display: block; width: 100%; margin: 0; }
+  .bz-exp-cover-frame { width: 100%; height: auto; max-height: 52dvh; margin: 0 auto; aspect-ratio: 1 / 1; }
   .bz-exp-cover-dock, .bz-exp-vinyl-peek, #expandedPlayerModal .d-lg-none.align-items-center.gap-2 { display: none !important; }
   #expDurationTime .badge { display: none; }
   /* Barra con los tiempos a los lados */
@@ -6295,5 +6293,5 @@ html, body {
   }
   .bz-exp-modal.is-sheet-open .bz-exp-right-col { transform: none; }
   .bz-exp-right-col .bz-exp-right-scroll { touch-action: pan-y; }
-  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { padding-bottom: 48px; }
+  
 }
