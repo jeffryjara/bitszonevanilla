@@ -3051,6 +3051,15 @@
                         '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-row-fav="' + t.id + '" title="' + _t('catalog.favorite', 'Favorito') + '"><i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '"></i></button>' +
                         (isPlaylist ? '<button type="button" class="bz-icon-action text-danger" data-row-rmpl="' + t.id + '" title="' + _t('album.removeFromPlaylist', 'Quitar de playlist') + '"><i class="bi bi-x-circle"></i></button>' : '') +
                       '</div>' +
+                      '<div class="dropdown bz-row-more d-md-none">' +
+                        '<button type="button" class="bz-icon-action" data-bs-toggle="dropdown" aria-expanded="false" title="' + _t('player.moreOptions', 'Más opciones') + '"><i class="bi bi-three-dots"></i></button>' +
+                        '<ul class="dropdown-menu dropdown-menu-end bz-library-popover-menu">' +
+                          '<li><button type="button" class="dropdown-item" data-row-menu-act="addpl"><span>' + _t('album.addToPlaylist', 'Agregar a playlist') + '</span><i class="bi bi-plus-circle"></i></button></li>' +
+                          '<li><button type="button" class="dropdown-item" data-row-menu-act="dl"><span>' + _t('album.saveToDownloads', 'Guardar en descargas') + '</span><i class="bi ' + (dl ? 'bi-check-circle-fill' : 'bi-download') + '"></i></button></li>' +
+                          '<li><button type="button" class="dropdown-item" data-row-menu-act="fav"><span>' + _t('catalog.favorite', 'Favorito') + '</span><i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '"></i></button></li>' +
+                          (isPlaylist ? '<li><button type="button" class="dropdown-item text-danger" data-row-menu-act="rmpl"><span>' + _t('album.removeFromPlaylist', 'Quitar de playlist') + '</span><i class="bi bi-x-circle"></i></button></li>' : '') +
+                        '</ul>' +
+                      '</div>' +
                       '<span class="font-mono-bz small text-white-50 text-end text-nowrap" style="min-width:' + (isAuth ? '42px' : '78px') + ';">' + timeDisplay + '</span>' +
                     '</div>' +
                   '</div>'
@@ -3196,6 +3205,19 @@
       row.addEventListener('click', function () {
         var i = Number(row.getAttribute('data-row-play-idx'));
         if (tracks[i]) playTrack(tracks[i], albumObj, tracks);
+      });
+    });
+
+    // Menú "..." de cada fila (móvil): ejecuta la misma acción que el botón oculto de la fila
+    container.querySelectorAll('.bz-row-more').forEach(function (wrap) {
+      wrap.addEventListener('click', function (e) { e.stopPropagation(); });
+    });
+    container.querySelectorAll('[data-row-menu-act]').forEach(function (item) {
+      item.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var row = item.closest('.bz-album-track-row');
+        var target = row && row.querySelector('[data-row-' + item.getAttribute('data-row-menu-act') + ']');
+        if (target) target.click();
       });
     });
 

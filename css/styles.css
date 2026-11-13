@@ -5473,7 +5473,7 @@ html, body {
 
 @media (max-width: 767.98px) {
   .bz-main-scroll {
-    padding: 0.75rem 0.9rem 140px !important;
+    padding: 0.75rem calc(2.38vw + 3px) 140px !important;
   }
   .bz-miniplayer {
     position: relative;
@@ -5825,4 +5825,67 @@ html, body {
   .bz-artist-card { width: calc(17.86vw + 83px); }
   .bz-main-scroll #bzMainStage > section.mb-5,
   .bz-main-scroll #bzMainStage section.mb-5 { margin-bottom: 2.1rem !important; }
+}
+
+
+/* ==========================================================================
+   Vista de álbum en móvil — medidas del Bitszone original (561px y 375px)
+   ========================================================================== */
+@media (max-width: 767.98px) {
+  /* Filas a 16px de cada borde, sin importar el margen del escenario */
+  .bz-detail-viewport {
+    margin-left: calc(9px - 2.38vw);
+    margin-right: calc(9px - 2.38vw);
+    padding: 29px 0 1rem;
+    min-height: 0;
+  }
+  .bz-detail-split { padding: 0; }
+  /* Botón atrás flotando sobre la esquina, la portada sube */
+  .bz-detail-back-pin { position: absolute; top: 13px; left: 11px; margin: 0; z-index: 25; }
+  .bz-detail-back-pin button { width: 40px; height: 40px; }
+  .bz-album-cover-wrap { margin-bottom: 16px; }
+  .bz-album-cover-box { width: min(63.5vw, 260px); }
+  /* Dock de cristal: 62px de alto, botones de 48px, ancho según su contenido */
+  .bz-album-action-dock {
+    display: flex;
+    width: fit-content;
+    margin: 20px auto 0;
+    padding: 7px;
+    gap: 2px;
+  }
+  .bz-album-action-dock .bz-album-play-pill {
+    flex: none;
+    height: 48px;
+    padding: 0 22px 0 18px;
+    font-size: 0.875rem;
+  }
+  .bz-album-dock-btn { width: 48px; height: 48px; }
+  /* Título grande y bloque de datos */
+  .bz-detail-viewport span.text-uppercase.d-block { font-size: 0.75rem !important; letter-spacing: 0.25em !important; margin-bottom: 8px !important; }
+  .bz-detail-viewport h1 { font-size: 2.25rem !important; line-height: 1.2 !important; letter-spacing: -0.025em !important; margin-bottom: 12px !important; }
+  .bz-detail-split > .row > .col-lg-7 { margin-top: 25px; }
+  .bz-album-tracklist-scroll { padding-left: 0; padding-right: 0; }
+  /* Filas de 64px con 4px de separación: número, título/artista y menú "..." */
+  .bz-album-track-row {
+    grid-template-columns: 28px minmax(0, 1fr) 28px;
+    gap: 8px;
+    padding: 9px 8px;
+    min-height: 64px;
+  }
+  .bz-album-track-row + .bz-album-track-row { margin-top: 4px; }
+  .bz-row-idx-wrap { width: 28px; }
+  .bz-row-idx-wrap .bz-row-idx-num { font-size: 1rem; font-weight: 500; color: rgba(255, 255, 255, 0.5); }
+  .bz-album-track-row .fw-semibold.text-white {
+    font-size: 0.9375rem !important;
+    font-weight: 500 !important;
+    line-height: 22px;
+  }
+  .bz-album-track-row .text-white-50.text-truncate {
+    font-size: 0.8125rem !important;
+    line-height: 19px;
+    margin-top: 3px;
+  }
+  .bz-album-track-row .bz-row-hover-actions { display: none !important; }
+  .bz-row-more .bz-icon-action { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.6); font-size: 1.125rem; }
+  .bz-row-more .dropdown-menu { z-index: 1080; }
 }
