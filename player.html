@@ -682,6 +682,49 @@
     </div>
   </div>
 
+  <!-- Modal Intersticial de Anuncios (15s para usuarios sin sesión) -->
+  <div class="modal fade bz-ad-modal" id="adInterstitialModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
+      <div class="modal-content bz-ad-card p-4 position-relative overflow-hidden text-center">
+        <!-- Barra de Progreso Superior del Anuncio (15s) -->
+        <div class="bz-ad-progress-track">
+          <div id="adProgressBar" class="bz-ad-progress-bar"></div>
+        </div>
+
+        <!-- Header / Kicker de Publicidad -->
+        <div class="d-flex align-items-center justify-content-between mb-3 mt-1">
+          <span id="adSponsorBadge" class="badge rounded-pill bz-ad-badge">
+            <i class="bi bi-badge-ad me-1"></i> PUBLICIDAD
+          </span>
+          <span id="adCountdownText" class="font-mono-bz small text-white-50">
+            Tu música continuará en <strong id="adSecondsLeft" class="text-white">15s</strong>
+          </span>
+        </div>
+
+        <!-- Cuerpo del Anuncio: Banner / Arte con efecto Liquid Glass -->
+        <div id="adSponsorCard" class="bz-ad-sponsor-box mb-3">
+          <div id="adSponsorCoverWrap" class="bz-ad-cover-wrap mb-3">
+            <img id="adSponsorImage" src="./assets/img/bitszone-icon.png" alt="Sponsor" class="bz-ad-cover-img" />
+            <div class="bz-ad-cover-sheen"></div>
+          </div>
+          <span id="adSponsorTag" class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz mb-2" style="font-size:0.72rem;">Bitszone Sponsor</span>
+          <h3 id="adSponsorTitle" class="h5 fw-bold text-white mb-2">Bitszone Premium</h3>
+          <p id="adSponsorDesc" class="small text-white-50 mb-0" style="line-height: 1.45;">Escucha todas tus canciones completas sin límites de 30 segundos, sin pausas y con audio Hi-Res.</p>
+        </div>
+
+        <!-- Botones de Acción -->
+        <div class="d-grid gap-2 mt-2">
+          <a href="./login.html" class="btn bz-btn-primary py-2.5 rounded-pill fw-semibold">
+            <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión gratis para omitir anuncios
+          </a>
+          <button id="btnSkipAd" type="button" class="btn bz-btn-subtle py-2 rounded-pill small d-none" style="font-size: 0.82rem;">
+            Omitir anuncio <i class="bi bi-arrow-right ms-1"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts (Orden estricto sin bundlers ni ES modules para compatibilidad universal) -->
   <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
   <script defer src="./js/auth.js"></script>

@@ -64,6 +64,155 @@
   var isScrubbing = false;
   var volBubbleTimer = null;
 
+  // ---- Sistema de Publicidad Intersticial (15s para usuarios sin sesión) ----
+  var AD_SPONSORS = [
+    {
+      badge: 'Bitszone Premium',
+      title: 'Desbloquea Bitszone Premium',
+      desc: 'Escucha todas tus canciones completas sin límites de 30 segundos, sin anuncios y con streaming Hi-Res a 320 kbps.',
+      image: './assets/img/bitszone-icon.png',
+      tag: 'Plan Gratuito · Regístrate en 1 minuto'
+    },
+    {
+      badge: 'Hardware · Audio',
+      title: 'SoundWave Studio Wireless',
+      desc: 'Cancelación activa de ruido híbrida y drivers de titanio de 40mm. Diseñado para audiófilos exigentes.',
+      image: './assets/img/albums/meteora.jpg',
+      tag: 'Patrocinado por SoundWave Audio'
+    },
+    {
+      badge: 'Festival en Vivo',
+      title: 'CyberGroove Fest 2026',
+      desc: 'El festival de música electrónica y synthwave más esperado del año. Más de 40 artistas internacionales en escena.',
+      image: './assets/img/albums/calm.jpg',
+      tag: 'Preventa exclusiva en Bitszone'
+    },
+    {
+      badge: 'Caché Offline',
+      title: 'Toda tu música sin conexión',
+      desc: 'Crea tu cuenta gratis para guardar y descargar canciones directamente en tu navegador y escuchar sin conexión.',
+      image: './assets/img/albums/thriller.jpg',
+      tag: 'Bitszone Offline Player'
+    }
+  ];
+
+  var adState = {
+    intervalId: null,
+    secondsLeft: 15,
+    onComplete: null,
+    currentSponsorIdx: 0,
+    isActive: false
+  };
+
+  function isUserAuthenticated() {
+    try {
+      if (Auth && typeof Auth.getSession === 'function') {
+        return !!Auth.getSession();
+      }
+      return !!localStorage.getItem('bz_vanilla_session_v1');
+    } catch (e) {
+      return false;
+    }
+  }
+
+  function triggerAdFlow(onComplete) {
+    if (isUserAuthenticated()) {
+      if (typeof onComplete === 'function') onComplete();
+      return;
+    }
+
+    if (adState.isActive) return;
+    adState.isActive = true;
+    adState.onComplete = onComplete;
+    adState.secondsLeft = 15;
+
+    if (audioEl) {
+      audioEl.pause();
+      appState.isPlaying = false;
+      updatePlayerBarsUI();
+    }
+
+    var sponsor = AD_SPONSORS[adState.currentSponsorIdx % AD_SPONSORS.length];
+    adState.currentSponsorIdx += 1;
+
+    var modalEl = document.getElementById('adInterstitialModal');
+    if (!modalEl) {
+      adState.isActive = false;
+      if (typeof onComplete === 'function') onComplete();
+      return;
+    }
+
+    var badgeEl = document.getElementById('adSponsorBadge');
+    var titleEl = document.getElementById('adSponsorTitle');
+    var descEl = document.getElementById('adSponsorDesc');
+    var imgEl = document.getElementById('adSponsorImage');
+    var tagEl = document.getElementById('adSponsorTag');
+    var secLeftEl = document.getElementById('adSecondsLeft');
+    var barEl = document.getElementById('adProgressBar');
+    var skipBtn = document.getElementById('btnSkipAd');
+
+    if (badgeEl) badgeEl.innerHTML = '<i class="bi bi-badge-ad me-1"></i> ' + esc(sponsor.badge);
+    if (titleEl) titleEl.textContent = sponsor.title;
+    if (descEl) descEl.textContent = sponsor.desc;
+    if (imgEl) imgEl.src = sponsor.image;
+    if (tagEl) tagEl.textContent = sponsor.tag;
+    if (secLeftEl) secLeftEl.textContent = '15s';
+
+    if (barEl) {
+      barEl.style.transition = 'none';
+      barEl.style.width = '0%';
+      void barEl.offsetWidth;
+      barEl.style.transition = 'width 15s linear';
+      barEl.style.width = '100%';
+    }
+
+    if (skipBtn) {
+      skipBtn.classList.add('d-none');
+      skipBtn.onclick = function () {
+        finishAdFlow();
+      };
+    }
+
+    var bsModal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
+    bsModal.show();
+
+    if (adState.intervalId) clearInterval(adState.intervalId);
+    adState.intervalId = setInterval(function () {
+      adState.secondsLeft -= 1;
+      if (secLeftEl) {
+        secLeftEl.textContent = Math.max(0, adState.secondsLeft) + 's';
+      }
+
+      // Habilitar omitir cuando queden 5s o menos
+      if (adState.secondsLeft <= 5 && skipBtn) {
+        skipBtn.classList.remove('d-none');
+      }
+
+      if (adState.secondsLeft <= 0) {
+        finishAdFlow();
+      }
+    }, 1000);
+  }
+
+  function finishAdFlow() {
+    if (adState.intervalId) {
+      clearInterval(adState.intervalId);
+      adState.intervalId = null;
+    }
+    var modalEl = document.getElementById('adInterstitialModal');
+    if (modalEl) {
+      var bsModal = window.bootstrap.Modal.getInstance(modalEl);
+      if (bsModal) bsModal.hide();
+    }
+    adState.isActive = false;
+
+    var cb = adState.onComplete;
+    adState.onComplete = null;
+    if (typeof cb === 'function') {
+      cb();
+    }
+  }
+
   // ---- Utilidades ----
   function esc(str) {
     return String(str == null ? '' : str).replace(/[&<>"']/g, function (m) {
@@ -215,8 +364,10 @@
       grabAmp += ((held ? 1 : 0) - grabAmp) * Math.min(1, dt / 110);
       if (!reduce) phase += dt * 0.0036;
 
+      var isGuest = !isUserAuthenticated();
+      var effectiveDur = isGuest ? Math.min(30, (audioEl && audioEl.duration) || 30) : (audioEl ? audioEl.duration : 0);
       var liveProgress = (appState.isPlaying && !isScrubbing && audioEl && audioEl.duration && !isNaN(audioEl.duration))
-        ? (audioEl.currentTime / audioEl.duration)
+        ? (effectiveDur > 0 ? Math.min(1, audioEl.currentTime / effectiveDur) : 0)
         : (appState.progress || 0);
 
       var totalWidth = svg.clientWidth || 0;
@@ -312,8 +463,19 @@
   }
 
   // ---- Motor de Audio ----
-  function playTrack(track, albumOrQueueList, queueList, forceIdx) {
+  function playTrack(track, albumOrQueueList, queueList, forceIdx, bypassAd) {
     if (!track) return;
+
+    var isGuest = !isUserAuthenticated();
+
+    // Si es invitado y ya estaba reproduciendo otra pista (cambio de canción), mostrar anuncio antes de reproducir la nueva
+    if (isGuest && !bypassAd && appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) !== Number(track.id)) {
+      triggerAdFlow(function () {
+        playTrack(track, albumOrQueueList, queueList, forceIdx, true);
+      });
+      return;
+    }
+
     var list = Array.isArray(queueList)
       ? queueList
       : (albumOrQueueList && Array.isArray(albumOrQueueList.tracks) ? albumOrQueueList.tracks : [track]);
@@ -340,7 +502,8 @@
     appState.nowPlayingAlbum = refAlbum;
     appState.progress = 0;
     appState.currentSecs = 0;
-    appState.durationSecs = Math.floor((track.duration || 0) / 1000);
+    var rawTrackDur = Math.floor((track.duration || 0) / 1000);
+    appState.durationSecs = isGuest ? Math.min(30, rawTrackDur || 30) : rawTrackDur;
     appState.isAudioLoading = true;
 
     Storage.recordListen(track);
@@ -411,8 +574,10 @@
   function seekToProgress(p) {
     var clamped = Math.max(0, Math.min(1, p));
     appState.progress = clamped;
+    var isGuest = !isUserAuthenticated();
     if (audioEl && audioEl.duration && !isNaN(audioEl.duration)) {
-      audioEl.currentTime = clamped * audioEl.duration;
+      var maxDur = isGuest ? Math.min(30, audioEl.duration) : audioEl.duration;
+      audioEl.currentTime = clamped * maxDur;
       appState.currentSecs = Math.floor(audioEl.currentTime);
     }
     updatePlayerBarsUI();
@@ -991,7 +1156,9 @@
     if (miniTitle) miniTitle.innerHTML = (isLic ? '<i class="bi bi-star-fill text-warning me-1" style="font-size:0.78rem;"></i>' : '') + esc(track.title);
     if (miniArtist) miniArtist.textContent = track.artist;
     if (miniAlbumEl) miniAlbumEl.textContent = track.albumTitle || album.title || '';
-    if (miniTime) miniTime.textContent = formatTime(appState.currentSecs) + ' / ' + formatTime(appState.durationSecs);
+    var isGuest = !isUserAuthenticated();
+    var previewTag = isGuest ? ' <span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz ms-1" style="font-size:0.68rem;">30s Preview</span>' : '';
+    if (miniTime) miniTime.innerHTML = formatTime(appState.currentSecs) + ' / ' + formatTime(appState.durationSecs) + previewTag;
 
     if (miniPlayBtn) {
       miniPlayBtn.classList.toggle('is-playing', appState.isPlaying && !appState.isAudioLoading);
@@ -1045,6 +1212,9 @@
     var expDl = document.getElementById('expDlBtn');
     var expShuffle = document.getElementById('expShuffleBtn');
     var expRepeat = document.getElementById('expRepeatBtn');
+
+    if (expCur) expCur.textContent = formatTime(appState.currentSecs);
+    if (expDur) expDur.innerHTML = formatTime(appState.durationSecs) + (isGuest ? ' <span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz ms-1" style="font-size:0.65rem;">Vista previa 30s</span>' : '');
 
     if (expCover) expCover.src = coverUrl;
     if (expVinylLabelImg) expVinylLabelImg.src = coverUrl;
@@ -2595,11 +2765,53 @@
     bindNestedModalBehavior(document.getElementById('createPlaylistModal'));
 
     // Eventos del elemento <audio>
+    var consecutivePlay = { trackId: null, count: 0 };
+
     audioEl.addEventListener('timeupdate', function () {
       if (isScrubbing || !audioEl.duration || isNaN(audioEl.duration)) return;
-      appState.durationSecs = Math.floor(audioEl.duration);
-      appState.currentSecs = Math.floor(audioEl.currentTime);
-      appState.progress = audioEl.currentTime / audioEl.duration;
+
+      var isGuest = !isUserAuthenticated();
+      var maxSecs = isGuest ? Math.min(30, Math.floor(audioEl.duration)) : Math.floor(audioEl.duration);
+
+      // Si es usuario invitado (sin cuenta) y llega a 30 segundos, cortar la canción y activar anuncio de 15s
+      if (isGuest && audioEl.currentTime >= 30) {
+        audioEl.pause();
+        appState.isPlaying = false;
+        appState.currentSecs = 30;
+        appState.progress = 1;
+        updatePlayerBarsUI();
+
+        // Control de canciones con licencia (5 escuchas consecutivas)
+        var cur = appState.nowPlayingTrack;
+        if (cur && cur.id) {
+          if (consecutivePlay.trackId === cur.id) consecutivePlay.count += 1;
+          else consecutivePlay = { trackId: cur.id, count: 1 };
+
+          if (consecutivePlay.count === 5) {
+            if (Storage.addLicense(cur)) {
+              showToast('La canción "' + cur.title + '" se agregó a Canciones con licencia');
+              updatePlayerBarsUI();
+              renderCurrentView();
+            }
+          }
+        }
+
+        triggerAdFlow(function () {
+          if (appState.repeatMode === 'one') {
+            audioEl.currentTime = 0;
+            audioEl.play().catch(function () {});
+            appState.isPlaying = true;
+            updatePlayerBarsUI();
+          } else {
+            nextTrack();
+          }
+        });
+        return;
+      }
+
+      appState.durationSecs = maxSecs;
+      appState.currentSecs = Math.min(maxSecs, Math.floor(audioEl.currentTime));
+      appState.progress = maxSecs > 0 ? (audioEl.currentTime / maxSecs) : 0;
       updatePlayerBarsUI();
     });
 
@@ -2613,7 +2825,6 @@
       updatePlayerBarsUI();
     });
 
-    var consecutivePlay = { trackId: null, count: 0 };
     audioEl.addEventListener('ended', function () {
       var cur = appState.nowPlayingTrack;
       if (cur && cur.id) {
@@ -2627,6 +2838,21 @@
             renderCurrentView();
           }
         }
+      }
+
+      var isGuest = !isUserAuthenticated();
+      if (isGuest) {
+        triggerAdFlow(function () {
+          if (appState.repeatMode === 'one') {
+            audioEl.currentTime = 0;
+            audioEl.play().catch(function () {});
+            appState.isPlaying = true;
+            updatePlayerBarsUI();
+          } else {
+            nextTrack();
+          }
+        });
+        return;
       }
 
       if (appState.repeatMode === 'one') {
@@ -3029,4 +3255,14 @@
       }
     });
   });
+
+  window.BitszonePlayer = {
+    playTrack: playTrack,
+    triggerAdFlow: triggerAdFlow,
+    finishAdFlow: finishAdFlow,
+    nextTrack: nextTrack,
+    prevTrack: prevTrack,
+    togglePlay: togglePlay,
+    getAppState: function () { return appState; }
+  };
 })(window);
