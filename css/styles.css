@@ -2185,15 +2185,16 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   transform: rotate(180deg);
 }
 
-.bz-library-popover-menu {
+.bz-library-popover-menu,
+.dropdown-menu.bz-library-popover-menu {
   min-width: 220px;
-  padding: 0.45rem;
-  border-radius: 1.35rem;
-  background: rgba(12, 10, 18, 0.72) !important;
-  border: none !important;
-  backdrop-filter: blur(28px) saturate(120%);
-  -webkit-backdrop-filter: blur(28px) saturate(120%);
-  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.65) !important;
+  padding: 0.5rem;
+  border-radius: 1.25rem !important;
+  background: rgba(14, 10, 24, 0.72) !important;
+  border: 1px solid rgba(216, 180, 254, 0.22) !important;
+  backdrop-filter: blur(32px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(160%) !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
 .bz-library-popover-menu .dropdown-item {
@@ -2991,32 +2992,69 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   }
 }
 
-.bz-lyrics-locked {
+/* Vista Restringida de Letras (Minimalista y Editorial) */
+.bz-lyrics-guest-hero {
+  min-height: 320px;
+  animation: bzFadeIn 0.3s ease;
+}
+.bz-lyrics-guest-hero h2 {
+  font-size: clamp(1.4rem, 2.2vw, 1.85rem);
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Panel Lateral Derecho de Letras (fiel a Bitszone original) */
+.bz-side-lyrics-panel {
+  width: 0;
+  min-width: 0;
+  height: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 20;
+  overflow: hidden;
+  transition: width 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+  background: rgba(10, 7, 16, 0.78);
+  backdrop-filter: blur(30px) saturate(140%);
+  -webkit-backdrop-filter: blur(30px) saturate(140%);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+.bz-side-lyrics-panel.is-open {
+  width: 320px;
+  min-width: 320px;
+}
+.bz-side-lyrics-inner {
+  width: 320px;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  min-height: 380px;
-  padding: 2.75rem 1.75rem;
-  background: rgba(18, 14, 28, 0.58);
-  border: 1px solid rgba(216, 180, 254, 0.2);
-  border-radius: 1.5rem;
-  backdrop-filter: blur(28px);
-  -webkit-backdrop-filter: blur(28px);
-  box-shadow: 0 16px 42px rgba(0, 0, 0, 0.42);
 }
-.bz-lyrics-locked-icon {
-  width: 76px;
-  height: 76px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 1.35rem;
-  background: radial-gradient(circle, rgba(168, 85, 247, 0.28) 0%, rgba(168, 85, 247, 0.06) 100%);
-  border: 1px solid rgba(216, 180, 254, 0.32);
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.28);
-  margin-bottom: 1.25rem;
+.bz-side-lyrics-scroll {
+  overflow-y: auto;
+  scrollbar-width: none;
+  mask-image: linear-gradient(to bottom, transparent 0px, black 18px, black calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0px, black 18px, black calc(100% - 24px), transparent 100%);
+}
+.bz-side-lyrics-scroll::-webkit-scrollbar {
+  display: none;
+}
+@media (max-width: 767.98px) {
+  .bz-side-lyrics-panel {
+    position: fixed;
+    top: 56px;
+    right: 0;
+    bottom: 84px;
+    height: auto;
+    width: 0;
+    z-index: 1040;
+    box-shadow: -10px 0 35px rgba(0, 0, 0, 0.65);
+  }
+  .bz-side-lyrics-panel.is-open {
+    width: 100%;
+    max-width: 340px;
+  }
+  .bz-side-lyrics-inner {
+    width: 100%;
+    max-width: 340px;
+  }
 }
 
 /* Modal de Atajos */
@@ -3505,12 +3543,21 @@ body.bz-has-miniplayer .bz-detail-viewport {
   gap: 0.3rem;
   padding: 0.35rem;
   border-radius: 999px;
+  background: transparent;
+  z-index: 4;
+}
+.bz-album-action-dock::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
   background: rgba(255, 255, 255, 0.16);
   border: 1px solid rgba(255, 255, 255, 0.28);
   backdrop-filter: blur(26px) saturate(180%);
   -webkit-backdrop-filter: blur(26px) saturate(180%);
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.4), 0 16px 40px rgba(0, 0, 0, 0.42);
-  z-index: 4;
+  pointer-events: none;
+  z-index: -1;
 }
 
 @media (min-width: 992px) {
