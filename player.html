@@ -149,8 +149,8 @@
         <!-- Separador superior con más espacio antes del almacenamiento -->
         <hr class="border-white border-opacity-10 my-3" />
 
-        <!-- Botón de almacenamiento integrado al sidebar (fiel al Bitszone original pero más alto) -->
-        <button id="btnSidebarStorage" type="button" class="bz-storage-btn bz-storage-details w-100 text-start border-0" data-nav-view="downloads" title="Mis descargas y almacenamiento">
+        <!-- Sección Almacenamiento integrada al sidebar (fiel a Bitszone original: pasa desapercibida, sin fondo gris ni apariencia de botón) -->
+        <div id="btnSidebarStorage" role="button" tabindex="0" class="bz-storage-details w-100 text-start px-2 py-2" title="Mis descargas y almacenamiento">
           <div class="d-flex align-items-center justify-content-between mb-2">
             <div class="d-flex align-items-center gap-2.5 min-w-0">
               <i class="bi bi-hdd text-white-50 fs-5 flex-shrink-0"></i>
@@ -166,7 +166,7 @@
           <div class="progress rounded-pill" style="height: 4px; background: rgba(255,255,255,0.12);">
             <div id="storageProgressBar" class="progress-bar rounded-pill" style="width: 0%; background: linear-gradient(90deg, #60a5fa, #a855f7);"></div>
           </div>
-        </button>
+        </div>
       </div>
     </aside>
 
@@ -631,15 +631,36 @@
     </div>
   </div>
 
-  <!-- Modal: Confirmación Genérica -->
-  <div class="modal fade bz-modal-glass" id="confirmActionModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-      <div class="modal-content p-4">
-        <h5 id="confirmActionTitle" class="fw-bold text-white mb-2">¿Confirmar?</h5>
-        <p id="confirmActionMessage" class="small text-white-50 mb-4"></p>
-        <div class="d-flex justify-content-end gap-2">
-          <button type="button" class="btn bz-btn-subtle btn-sm px-3" data-bs-dismiss="modal">Cancelar</button>
-          <button id="confirmActionOkBtn" type="button" class="btn btn-danger rounded-pill btn-sm px-3">Confirmar</button>
+  <!-- Modal: Confirmación Elegante Liquid Glass (fiel a Interstitial / Auth Modal) -->
+  <div class="modal fade" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+      <div class="modal-content bz-ad-card position-relative overflow-hidden text-center">
+        <!-- Botón cerrar sutil en la esquina -->
+        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+
+        <div class="p-4 p-sm-5 pt-4">
+          <!-- Header: Kicker Badge centrado -->
+          <div class="d-flex align-items-center justify-content-center mb-4 mt-2">
+            <span id="confirmActionBadge" class="badge rounded-pill bz-ad-badge">
+              <i class="bi bi-disc me-1 text-white-50"></i> Confirmación
+            </span>
+          </div>
+
+          <!-- Ícono Central Elegante con marco minimalista -->
+          <div class="bz-ad-cover-wrap mb-4 d-flex align-items-center justify-content-center position-relative" style="background: rgba(255, 255, 255, 0.05); width: 88px; height: 88px; border-radius: 24px; margin: 0 auto;">
+            <i id="confirmActionIcon" class="bi bi-cloud-arrow-down-fill text-white" style="font-size: 2.3rem; filter: drop-shadow(0 4px 14px rgba(168, 85, 247, 0.45));"></i>
+            <div class="bz-ad-cover-sheen"></div>
+          </div>
+
+          <!-- Contenido Esencial, Elegante y de Alto Impacto -->
+          <h3 id="confirmActionTitle" class="bz-ad-title">¿Confirmar acción?</h3>
+          <p id="confirmActionMessage" class="bz-ad-desc"></p>
+
+          <!-- Botones de Acción con separación cómoda y elegante estilo píldora -->
+          <div class="d-flex align-items-center justify-content-center gap-3 pt-2">
+            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal">Cancelar</button>
+            <button id="confirmActionOkBtn" type="button" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill">Confirmar</button>
+          </div>
         </div>
       </div>
     </div>

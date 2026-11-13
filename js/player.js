@@ -2587,7 +2587,9 @@
                 renderCurrentView();
               },
               'Eliminar álbum',
-              'btn btn-danger rounded-pill btn-sm px-3'
+              'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
+              'bi-trash3-fill',
+              'Mis descargas'
             );
           } else {
             var missing = albumTracks.filter(function (t) { return !Storage.isDownloaded(t.id); });
@@ -2605,7 +2607,9 @@
                 renderCurrentView();
               },
               'Descargar álbum',
-              'btn bz-btn-primary rounded-pill btn-sm px-3'
+              'btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill',
+              'bi-cloud-arrow-down-fill',
+              'Descarga de álbum'
             );
           }
         });
@@ -2808,7 +2812,9 @@
                 renderAlbumView(container, albumObj, isPlaylist);
               },
               'Eliminar álbum',
-              'btn btn-danger rounded-pill btn-sm px-3'
+              'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
+              'bi-trash3-fill',
+              'Mis descargas'
             );
           } else {
             var missing = albumTracks.filter(function (t) { return !Storage.isDownloaded(t.id); });
@@ -2826,7 +2832,9 @@
                 renderAlbumView(container, albumObj, isPlaylist);
               },
               'Descargar álbum',
-              'btn bz-btn-primary rounded-pill btn-sm px-3'
+              'btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill',
+              'bi-cloud-arrow-down-fill',
+              'Descarga de álbum'
             );
           }
         });
@@ -3247,12 +3255,20 @@
     var clearDlBtn = document.getElementById('btnColClearDownloads');
     if (clearDlBtn) {
       clearDlBtn.addEventListener('click', function () {
-        openConfirmDialog('¿Vaciar todas tus descargas?', 'Se eliminarán los registros descargados de tu lista local.', function () {
-          Storage.clearDownloads();
-          updateStorageMeterUI();
-          showToast('Lista de descargas vaciada');
-          renderCurrentView();
-        });
+        openConfirmDialog(
+          '¿Vaciar todas tus descargas?',
+          'Se eliminarán todas las canciones descargadas de tu almacenamiento local.',
+          function () {
+            Storage.clearDownloads();
+            updateStorageMeterUI();
+            showToast('Lista de descargas vaciada');
+            renderCurrentView();
+          },
+          'Vaciar descargas',
+          'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
+          'bi-trash3-fill',
+          'Mis descargas'
+        );
       });
     }
 
@@ -3367,7 +3383,10 @@
               updatePlayerBarsUI();
               renderCurrentView();
             },
-            'Quitar'
+            'Quitar licencia',
+            'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
+            'bi-shield-x',
+            'Licencias'
           );
           return;
         } else {
@@ -3604,24 +3623,39 @@
     }
   }
 
-  function openConfirmDialog(title, message, onConfirm, confirmLabel, btnClass) {
-    document.getElementById('confirmActionTitle').textContent = title;
-    document.getElementById('confirmActionMessage').textContent = message;
+  function openConfirmDialog(title, message, onConfirm, confirmLabel, btnClass, iconClass, badgeText) {
+    var titleEl = document.getElementById('confirmActionTitle');
+    var msgEl = document.getElementById('confirmActionMessage');
+    var badgeEl = document.getElementById('confirmActionBadge');
+    var iconEl = document.getElementById('confirmActionIcon');
     var okBtn = document.getElementById('confirmActionOkBtn');
-    okBtn.textContent = confirmLabel || 'Confirmar';
-    okBtn.className = btnClass || 'btn btn-danger rounded-pill btn-sm px-3';
 
-    var cloned = okBtn.cloneNode(true);
-    okBtn.parentNode.replaceChild(cloned, okBtn);
-    cloned.addEventListener('click', function () {
-      var modalEl = document.getElementById('confirmActionModal');
-      var inst = window.bootstrap ? window.bootstrap.Modal.getInstance(modalEl) : null;
-      if (inst) inst.hide();
-      if (onConfirm) onConfirm();
-    });
+    if (titleEl) titleEl.textContent = title;
+    if (msgEl) msgEl.textContent = message;
+    if (badgeEl) {
+      badgeEl.innerHTML = '<i class="bi bi-stars me-1 text-white-50"></i> ' + esc(badgeText || 'Confirmación');
+    }
+    if (iconEl) {
+      iconEl.className = 'bi ' + (iconClass || 'bi-cloud-arrow-down-fill') + ' text-white';
+    }
 
-    if (window.bootstrap) {
-      window.bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmActionModal')).show();
+    if (okBtn) {
+      okBtn.textContent = confirmLabel || 'Confirmar';
+      okBtn.className = btnClass || 'btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill';
+
+      var cloned = okBtn.cloneNode(true);
+      okBtn.parentNode.replaceChild(cloned, okBtn);
+      cloned.addEventListener('click', function () {
+        var modalEl = document.getElementById('confirmActionModal');
+        var inst = window.bootstrap ? window.bootstrap.Modal.getInstance(modalEl) : null;
+        if (inst) inst.hide();
+        if (onConfirm) onConfirm();
+      });
+    }
+
+    var modalEl = document.getElementById('confirmActionModal');
+    if (modalEl && window.bootstrap) {
+      window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
     }
   }
 
@@ -3959,6 +3993,20 @@
         navigate(btn.getAttribute('data-nav-view'));
       });
     });
+
+    // Widget de Almacenamiento en Sidebar (navega a descargas sin parecer botón ni tener fondo gris)
+    var storageWidgetEl = document.getElementById('btnSidebarStorage');
+    if (storageWidgetEl) {
+      storageWidgetEl.addEventListener('click', function () {
+        navigate('downloads');
+      });
+      storageWidgetEl.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          navigate('downloads');
+        }
+      });
+    }
 
     // Colapsar Sidebar desktop
     var toggleSidebarBtn = document.getElementById('btnToggleDesktopSidebar');
