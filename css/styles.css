@@ -1074,7 +1074,7 @@ h1, h2, h3, h4, h5, h6 {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  font-size: 0.62rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   color: #fff;
   background:
@@ -1087,7 +1087,7 @@ h1, h2, h3, h4, h5, h6 {
 .bz-queue-row { display: flex; align-items: center; gap: 0.85rem; }
 .bz-queue-row img { border-radius: 6px; object-fit: cover; flex: none; }
 .bz-queue-row b span { color: rgba(255, 255, 255, 0.45); font-weight: 500; }
-.bz-queue-pct { font-family: var(--bz-font-mono, monospace); font-size: 0.66rem; color: rgba(255, 255, 255, 0.5); }
+.bz-queue-pct { font-family: var(--bz-font-mono, monospace); font-size: 0.6875rem; color: rgba(255, 255, 255, 0.5); }
 .bz-queue-bar { height: 3px; margin-top: 0.45rem; border-radius: 3px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
 .bz-queue-bar i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #a855f7, #f0abfc); transition: width 0.3s linear; }
 
@@ -2060,7 +2060,7 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
 }
 
 .bz-admin-badge {
-  font-size: 0.62rem;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -4422,8 +4422,7 @@ body.bz-reduce-motion .bz-loading-logo {
   transition: background-color 0.25s ease;
 }
 
-/* ==========================================================================
-   CONTROLES SEGMENTADOS (Idioma y Tema en Configuración)
+/* ===================================================================   CONTROLES SEGMENTADOS (Idioma y Tema en Configuración)
    ========================================================================== */
 .bz-segmented-pill {
   display: inline-flex;
@@ -5543,3 +5542,236 @@ html, body {
   }
 }
 
+
+/* ==========================================================================
+   PLAYER RESPONSIVE (< 992px) — igual a la referencia móvil
+   ========================================================================== */
+@media (max-width: 991.98px) {
+  /* Menú lateral como cajón desde la derecha */
+  .bz-sidebar {
+    display: flex;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(299px, 82vw);
+    z-index: 2;
+    transform: translateX(100%);
+    transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+    border-right: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.065);
+    background: rgba(10, 8, 16, 0.97);
+    padding-top: max(1rem, env(safe-area-inset-top));
+  }
+  .bz-sidebar.is-collapsed { width: min(299px, 82vw); }
+  .bz-sidebar.is-collapsed .bz-nav-label,
+  .bz-sidebar.is-collapsed .bz-brand-group,
+  .bz-sidebar.is-collapsed .bz-storage-details { opacity: 1; width: auto; pointer-events: auto; }
+  body.bz-drawer-open .bz-sidebar { transform: none; box-shadow: -20px 0 60px rgba(0, 0, 0, 0.6); }
+  body.bz-drawer-open .bz-app-frame { z-index: 1050; }
+  .bz-drawer-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.55);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+  body.bz-drawer-open .bz-drawer-backdrop { opacity: 1; pointer-events: auto; }
+  .bz-sidebar .bz-nav-btn { height: 46px; font-size: 0.95rem; }
+
+  /* Barra inferior flotante en píldora */
+  .bz-mobile-tabbar {
+    display: flex;
+    background: transparent;
+    border-top: 0;
+    backdrop-filter: none;
+    padding: 0.4rem 1rem calc(0.7rem + env(safe-area-inset-bottom));
+  }
+  .bz-tabbar-pill {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    gap: 0.2rem;
+    padding: 0.35rem;
+    border-radius: 999px;
+    background: rgba(20, 17, 28, 0.86);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  }
+  .bz-tab-btn {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.1rem;
+    padding: 0.45rem 0.2rem;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .bz-tab-btn i { font-size: 1.2rem; line-height: 1; }
+  .bz-tab-btn.is-active {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: #fff;
+  }
+  .bz-tab-btn.is-active i { color: #c4b5fd; }
+
+  /* Mini reproductor flotante encima de la barra */
+  .bz-miniplayer {
+    background: transparent !important;
+    border-top: 0 !important;
+    backdrop-filter: none !important;
+    padding: 0 0.75rem;
+  }
+  #mobMiniCard {
+    border-radius: 18px;
+    overflow: hidden;
+    background: rgba(24, 19, 34, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+  }
+  #mobMiniFavBtn.is-favorited { color: #c084fc !important; }
+
+  /* Vista de álbum: portada, acciones y título sin encimarse */
+  .bz-album-cover-wrap {
+    width: 100%;
+    max-width: 360px;
+    aspect-ratio: auto;
+    margin: 0 auto 1rem;
+  }
+  .bz-album-cover-box {
+    width: min(238px, 64vw);
+    height: auto;
+    aspect-ratio: 1 / 1;
+    margin: 0 auto;
+  }
+  .bz-album-action-dock { display: flex; width: 100%; margin-top: 1.25rem; }
+  .bz-album-action-dock .bz-album-play-pill { flex: 1; justify-content: center; }
+  .bz-album-tracklist-scroll {
+    max-height: none;
+    overflow: visible;
+    mask-image: none;
+    -webkit-mask-image: none;
+    padding-bottom: 1rem;
+  }
+
+  /* Reproductor expandido: el botón de cerrar no tapa el contenido al bajar */
+  .bz-exp-modal .modal-content > .position-fixed { position: absolute !important; }
+  .bz-exp-right-scroll .btn-sm { white-space: nowrap; }
+}
+
+@media (max-width: 767.98px) {
+  /* Inicio: títulos de sección en una línea */
+  .bz-main-scroll section h2.h4 { font-size: 1.1rem; white-space: nowrap; letter-spacing: -0.01em; }
+  .bz-main-scroll [data-expand-sec] { white-space: nowrap; font-size: 0.8rem !important; }
+  .bz-catalog-card { width: 172px; }
+  .bz-artist-card { width: 150px; }
+
+  /* Filas de canciones del álbum: solo número, título y corazón (como la referencia) */
+  .bz-album-track-row { grid-template-columns: 28px minmax(0, 1fr) auto; gap: 0.6rem; padding: 0.6rem 0.75rem; }
+  .bz-album-track-row [data-row-addpl],
+  .bz-album-track-row [data-row-dl],
+  .bz-album-track-row .font-mono-bz.text-end { display: none !important; }
+  .bz-row-hover-actions { opacity: 1; }
+
+  /* Pistas y cola del reproductor expandido: más espacio para el título */
+  .bz-exp-track-item [data-exp-q-pl],
+  .bz-exp-track-item > .font-mono-bz { display: none !important; }
+}
+@media (max-width: 767.98px) {
+  /* Filas del álbum a todo el ancho como en la referencia */
+  .bz-detail-split { padding: 0; }
+  .bz-detail-split > .row { --bs-gutter-x: 0; }
+}
+@media (max-width: 767.98px) {
+  /* Reproductor expandido: portada grande casi a todo el ancho, como la referencia */
+  .bz-exp-cover-frame { width: min(calc(100vw - 48px), 340px); }
+}
+@media (max-width: 767.98px) {
+  .bz-cover-vinyl-stage { display: block; margin: 2.75rem auto 1.25rem; }
+  .bz-exp-cover-frame { margin: 0 auto; }
+}
+@media (max-width: 767.98px) {
+  /* Cola: botones más compactos para dejar espacio al título */
+  .bz-exp-track-item .bz-exp-row-actions { gap: 0 !important; }
+  .bz-exp-track-item .bz-exp-row-actions .bz-icon-action { width: 28px; height: 28px; padding: 0; }
+}
+@media (max-width: 767.98px) {
+  /* Biblioteca / Descargas: cabecera alineada a la izquierda y barra compacta, como la referencia */
+  .bz-library-dropdown-btn { text-align: left; }
+  .bz-hero-stat-pill { font-size: 0.7rem; padding: 0.24rem 0.6rem; }
+  .bz-toolbar-row .bz-segmented-pill { height: 34px; }
+  .bz-toolbar-row .bz-segmented-btn { font-size: 0.6875rem; padding: 0 0.85rem; }
+  .bz-search-pill-wrap { width: 100%; }
+  .bz-search-pill-wrap > .bi-search { z-index: 2; }
+  .bz-section-empty h3 { font-size: 1.1rem; }
+}
+@media (max-width: 767.98px) {
+  /* Inicio igual a la referencia: márgenes que crecen con el ancho (16px a 375px, 37px a 560px),
+     tarjetas al 40% de la fila, artistas al 34% y separación de 11px */
+  .bz-main-scroll {
+    padding-left: clamp(12px, calc(11.35vw - 30.6px), 40px);
+    padding-right: clamp(12px, calc(11.35vw - 30.6px), 40px);
+  }
+  .bz-horiz-row { gap: 11px; }
+  .bz-catalog-card { width: 40%; }
+  .bz-artist-card { width: 34%; }
+  .bz-main-scroll section h2.h4 { font-size: 1.0625rem; }
+}
+@media (max-width: 767.98px) {
+  /* Ajuste fino: 180px a 375px y 193px a 560px (tarjetas); 150px y 165px (artistas), igual que la referencia */
+  .bz-catalog-card { width: calc(7vw + 154px); }
+  .bz-artist-card { width: calc(8.1vw + 120px); }
+}
+@media (max-width: 575.98px) {
+  /* Biblioteca / Descargas como la referencia: pestañas y "Ordenar" compactos a la izquierda, solo el buscador a todo el ancho */
+  .bz-toolbar-row { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .bz-toolbar-row .bz-segmented-pill { width: auto; justify-content: flex-start; }
+  .bz-toolbar-row .bz-segmented-btn { flex: 0 0 auto; }
+  .bz-toolbar-row > .dropdown { flex: 0 0 auto; }
+  .bz-toolbar-row .bz-sort-pill { width: auto; justify-content: flex-start; }
+  .bz-toolbar-row .bz-search-pill-wrap { flex: 1 0 100%; }
+  .bz-section-hero { flex-direction: row; align-items: center; }
+}
+
+/* Modo claro (agregado por el equipo): versiones claras de la barra inferior y el mini reproductor móviles */
+@media (max-width: 991.98px) {
+  /* El cajón cerrado no deja ver su sombra/borde en el filo derecho */
+  .bz-sidebar { visibility: hidden; transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), visibility 0s linear 0.32s; }
+  body.bz-drawer-open .bz-sidebar { visibility: visible; transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), visibility 0s; }
+
+  body.bz-theme-light .bz-tabbar-pill {
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(15, 10, 30, 0.1);
+    box-shadow: 0 12px 30px rgba(15, 10, 30, 0.14);
+  }
+  body.bz-theme-light .bz-tab-btn { color: rgba(15, 10, 30, 0.6); }
+  body.bz-theme-light .bz-tab-btn.is-active {
+    background: rgba(124, 58, 237, 0.1);
+    border-color: rgba(124, 58, 237, 0.22);
+    color: #1a1033;
+  }
+  body.bz-theme-light .bz-tab-btn.is-active i { color: #6d28d9; }
+  body.bz-theme-light #mobMiniCard {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(15, 10, 30, 0.1);
+    box-shadow: 0 12px 30px rgba(15, 10, 30, 0.14);
+  }
+  body.bz-theme-light #mobMiniCard .text-white,
+  body.bz-theme-light #mobMiniFavBtn,
+  body.bz-theme-light #mobMiniNextBtn { color: #1a1033 !important; }
+  body.bz-theme-light #mobMiniCard .text-white-50 { color: rgba(15, 10, 30, 0.6) !important; }
+  body.bz-theme-light #mobMiniPlayBtn { background: #1a1033; color: #fff; border-color: #1a1033; }
+}

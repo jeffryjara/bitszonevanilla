@@ -34,6 +34,8 @@
       'nav.back': 'Atrás',
       'nav.toggleSidebar': 'Contraer/Expandir menú',
       'nav.openMenu': 'Abrir menú',
+      'nav.downloadsShort': 'Descargas',
+      'nav.menu': 'Menú',
       'nav.close': 'Cerrar',
 
       // Modal de Configuración
@@ -537,6 +539,8 @@
       'nav.back': 'Back',
       'nav.toggleSidebar': 'Collapse/Expand menu',
       'nav.openMenu': 'Open menu',
+      'nav.downloadsShort': 'Downloads',
+      'nav.menu': 'Menu',
       'nav.close': 'Close',
 
       // Settings Modal

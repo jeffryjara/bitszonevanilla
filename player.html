@@ -42,7 +42,7 @@
   <div id="bzToastContainer" class="bz-toast-stage" role="status" aria-live="polite"></div>
 
   <!-- Encabezado Móvil / Tablet (visible < 992px) -->
-  <header class="bz-mobile-topbar d-flex d-lg-none align-items-center justify-content-between px-3 py-2 border-bottom border-white border-opacity-10 position-relative z-3">
+  <header class="bz-mobile-topbar d-none align-items-center justify-content-between px-3 py-2 border-bottom border-white border-opacity-10 position-relative z-3">
     <div class="d-flex align-items-center gap-2">
       <button type="button" class="btn btn-link text-white p-1" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-label="Abrir menú" data-i18n-aria="nav.openMenu">
         <i class="bi bi-list fs-4"></i>
@@ -93,7 +93,9 @@
 
   <!-- Contenedor Principal (Sidebar Desktop + Escenario Scrollable) -->
   <div class="bz-app-frame">
-    <!-- Sidebar Desktop -->
+    <!-- Fondo del menú cajón en móvil -->
+    <div id="bzDrawerBackdrop" class="bz-drawer-backdrop" aria-hidden="true"></div>
+    <!-- Sidebar Desktop (en móvil/tablet se abre como cajón desde la derecha) -->
     <aside id="bzDesktopSidebar" class="bz-sidebar">
       <div class="d-flex align-items-center justify-content-between mb-3 px-2 bz-sidebar-header" style="height: 44px;">
         <div class="bz-brand-group d-flex align-items-center gap-2 overflow-hidden">
@@ -154,7 +156,7 @@
             <div class="d-flex align-items-center min-w-0">
               <i class="bi bi-hdd text-white-50 fs-5 flex-shrink-0 bz-storage-icon" style="width: 24px; text-align: center;"></i>
               <div class="min-w-0 bz-storage-text-wrap">
-                <div class="text-white-50 text-uppercase fw-semibold" data-i18n="nav.storage" style="font-size: 0.65rem; letter-spacing: 0.08em;">Almacenamiento</div>
+                <div class="text-white-50 text-uppercase fw-semibold" data-i18n="nav.storage" style="font-size: 0.6875rem; letter-spacing: 0.08em;">Almacenamiento</div>
                 <div id="storageAvailText" style="font-size: 0.76rem; color: rgba(255,255,255,0.7);">
                   <strong class="text-white">5.00 GB</strong> de 5.00 GB
                 </div>
@@ -267,27 +269,34 @@
           <div id="mobMiniTitle" class="small fw-bold text-white text-truncate" data-i18n="player.defaultSong">Canción</div>
           <div id="mobMiniArtist" class="text-white-50 text-truncate" style="font-size: 0.75rem;" data-i18n="player.defaultArtist">Artista</div>
         </div>
-        <button id="mobMiniPlayBtn" type="button" class="btn btn-light rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" title="Reproducir / Pausar (Espacio)" data-i18n-title="player.playPause">
+        <button id="mobMiniFavBtn" type="button" class="bz-icon-action text-white fs-5" aria-label="Favorito"><i class="bi bi-heart"></i></button>
+        <button id="mobMiniPlayBtn" type="button" class="btn btn-light rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 40px; height: 40px;" title="Reproducir / Pausar (Espacio)" data-i18n-title="player.playPause">
           <i class="bi bi-play-fill fs-5"></i>
         </button>
+        <button id="mobMiniNextBtn" type="button" class="bz-icon-action text-white fs-4" aria-label="Siguiente"><i class="bi bi-skip-end-fill"></i></button>
       </div>
     </div>
   </section>
 
-  <!-- Barra Inferior Móvil / Tablet (< 992px) -->
-  <nav class="bz-mobile-tabbar justify-content-around align-items-center py-2 px-2">
-    <button type="button" class="btn btn-link text-white-50 text-decoration-none d-flex flex-column align-items-center p-1 is-active" data-nav-view="catalog" style="font-size: 0.72rem;">
-      <i class="bi bi-house-door fs-5"></i><span data-i18n="nav.home">Inicio</span>
-    </button>
-    <button type="button" class="btn btn-link text-white-50 text-decoration-none d-flex flex-column align-items-center p-1" data-nav-view="library-favorites" style="font-size: 0.72rem;">
-      <i class="bi bi-collection fs-5"></i><span data-i18n="nav.library">Biblioteca</span>
-    </button>
-    <button type="button" class="btn btn-link text-white-50 text-decoration-none d-flex flex-column align-items-center p-1" data-nav-view="downloads" style="font-size: 0.72rem;">
-      <i class="bi bi-cloud-arrow-down fs-5"></i><span data-i18n="nav.downloads">Descargas</span>
-    </button>
-    <button type="button" class="btn btn-link text-decoration-none d-none flex-column align-items-center p-1" style="color: var(--bz-soft); font-size: 0.72rem;" data-nav-view="dashboard" data-admin-only>
-      <i class="bi bi-speedometer2 fs-5"></i><span data-i18n="nav.dashboard">Dashboard</span>
-    </button>
+  <!-- Barra Inferior Móvil / Tablet (< 992px): píldora flotante -->
+  <nav class="bz-mobile-tabbar">
+    <div class="bz-tabbar-pill">
+      <button type="button" class="bz-tab-btn is-active" data-nav-view="catalog">
+        <i class="bi bi-house-door"></i><span data-i18n="nav.home">Inicio</span>
+      </button>
+      <button type="button" class="bz-tab-btn" data-nav-view="library-favorites">
+        <i class="bi bi-collection"></i><span data-i18n="nav.library">Biblioteca</span>
+      </button>
+      <button type="button" class="bz-tab-btn" data-nav-view="downloads">
+        <i class="bi bi-cloud-arrow-down"></i><span data-i18n="nav.downloadsShort">Descargas</span>
+      </button>
+      <button type="button" class="bz-tab-btn d-none" data-nav-view="dashboard" data-admin-only>
+        <i class="bi bi-speedometer2"></i><span data-i18n="nav.dashboard">Dashboard</span>
+      </button>
+      <button type="button" id="btnMobileMenu" class="bz-tab-btn" aria-label="Abrir menú" data-i18n-aria="nav.openMenu">
+        <i class="bi bi-list"></i><span data-i18n="nav.menu">Menú</span>
+      </button>
+    </div>
   </nav>
 
   <!-- ======================================================================

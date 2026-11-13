@@ -2541,6 +2541,8 @@
     } else {
       updateDownloadsBadgeUI();
     }
+    // Cerrar el menú cajón móvil si estaba abierto
+    document.body.classList.remove('bz-drawer-open');
 
     // Cerrar offcanvas móvil si estaba abierto
     var offcanvasEl = document.getElementById('mobileOffcanvas');
@@ -4429,6 +4431,10 @@
     var desktopSidebar = document.getElementById('bzDesktopSidebar');
     if (toggleSidebarBtn && desktopSidebar) {
       toggleSidebarBtn.addEventListener('click', function () {
+        if (window.innerWidth < 992) {
+          document.body.classList.remove('bz-drawer-open');
+          return;
+        }
         desktopSidebar.classList.toggle('is-collapsed');
         var icon = toggleSidebarBtn.querySelector('i');
         if (icon) {
@@ -4437,6 +4443,48 @@
             : 'bi bi-layout-sidebar';
         }
       });
+    }
+
+    // Menú cajón móvil (botón "Menú" de la barra inferior)
+    var mobileMenuBtn = document.getElementById('btnMobileMenu');
+    var drawerBackdrop = document.getElementById('bzDrawerBackdrop');
+    if (mobileMenuBtn) {
+      mobileMenuBtn.addEventListener('click', function () {
+        document.body.classList.add('bz-drawer-open');
+      });
+    }
+    if (drawerBackdrop) {
+      drawerBackdrop.addEventListener('click', function () {
+        document.body.classList.remove('bz-drawer-open');
+      });
+    }
+    if (desktopSidebar) {
+      desktopSidebar.addEventListener('click', function (e) {
+        if (window.innerWidth < 992 && e.target.closest('button, a')) {
+          document.body.classList.remove('bz-drawer-open');
+        }
+      });
+    }
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') document.body.classList.remove('bz-drawer-open');
+    });
+
+    // Mini reproductor móvil: corazón y siguiente reutilizan los botones de la barra de escritorio
+    var mobFav = document.getElementById('mobMiniFavBtn');
+    var mobNext = document.getElementById('mobMiniNextBtn');
+    var deskFav = document.getElementById('miniFavBtn');
+    var deskNext = document.getElementById('miniNextBtn');
+    if (mobFav && deskFav) {
+      mobFav.addEventListener('click', function (e) { e.stopPropagation(); deskFav.click(); });
+      var syncFav = function () {
+        mobFav.innerHTML = deskFav.innerHTML;
+        mobFav.classList.toggle('is-favorited', deskFav.classList.contains('is-favorited'));
+      };
+      new MutationObserver(syncFav).observe(deskFav, { childList: true, subtree: true, attributes: true });
+      syncFav();
+    }
+    if (mobNext && deskNext) {
+      mobNext.addEventListener('click', function (e) { e.stopPropagation(); deskNext.click(); });
     }
 
     // Perfil & Config & Atajos & SignOut
