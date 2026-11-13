@@ -386,7 +386,7 @@
                 </div>
 
                 <!-- WavyProgress Interactiva del Reproductor Gigante -->
-                <div class="w-100 mb-3" style="max-width: 440px;">
+                <div class="w-100 mb-3 bz-exp-seekwrap" style="max-width: 440px;">
                   <div id="expSeekArea" class="bz-seek-bar-area" style="height: 26px; margin-top: 0;" title="Arrastra o haz clic para adelantar" data-i18n-title="player.seekHint">
                     <svg id="expWavySvg" class="w-100 h-100" style="overflow: visible;">
                       <path id="expWavyUnplayed" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -394,14 +394,14 @@
                       <circle id="expWavyDot" r="6" fill="#ffffff"></circle>
                     </svg>
                   </div>
-                  <div class="d-flex justify-content-between font-mono-bz small text-white-50 mt-1">
+                  <div class="d-flex justify-content-between font-mono-bz small text-white-50 mt-1 bz-exp-times">
                     <span id="expCurrentTime">0:00</span>
                     <span id="expDurationTime">0:00</span>
                   </div>
                 </div>
 
                 <!-- Botones de Control con Orbe Central de Vinilo Giratorio -->
-                <div class="d-flex align-items-center justify-content-center gap-3 gap-md-4 mb-2">
+                <div class="d-flex align-items-center justify-content-center gap-3 gap-md-4 mb-2 bz-exp-controls">
                   <button id="expShuffleBtn" type="button" class="bz-icon-action fs-5" title="Aleatorio (A)" data-i18n-title="player.shuffle"><i class="bi bi-shuffle"></i></button>
                   <button id="expPrevBtn" type="button" class="bz-icon-action fs-3 text-white" title="Anterior (←)" data-i18n-title="player.prev"><i class="bi bi-skip-start-fill"></i></button>
                   <button id="expPlayBtn" type="button" class="bz-vinyl-play-btn is-lg" title="Reproducir / Pausar (Espacio)" data-i18n-title="player.playPause">

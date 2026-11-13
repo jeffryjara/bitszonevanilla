@@ -5992,3 +5992,25 @@ html, body {
   .bz-catalog-card { width: clamp(214px, 13.35vw, 256px); }
   .bz-artist-card { width: clamp(204px, 11.68vw, 224px); }
 }
+
+/* Reproductor expandido en móvil: una sola pantalla como el original (sin volumen ni dock, controles a lo ancho) */
+@media (max-width: 991.98px) {
+  #expandedPlayerModal .modal-body > .container-fluid { padding-left: 34px !important; padding-right: 34px !important; }
+  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { min-height: calc(100dvh - 2rem); position: relative; padding-bottom: 34px; justify-content: center; }
+  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child::after {
+    content: ""; position: absolute; left: 50%; bottom: 10px; width: 44px; height: 5px;
+    margin-left: -22px; border-radius: 999px; background: rgba(255, 255, 255, 0.35);
+  }
+  .bz-cover-vinyl-stage { display: block; width: 100%; margin: 0 0 1.1rem; }
+  .bz-exp-cover-frame { width: 100%; height: auto; max-height: 46dvh; margin: 0 auto; aspect-ratio: 1 / 1; }
+  .bz-exp-cover-dock, .bz-exp-vinyl-peek, #expandedPlayerModal .d-lg-none.align-items-center.gap-2 { display: none !important; }
+  #expDurationTime .badge { display: none; }
+  /* Barra con los tiempos a los lados */
+  .bz-exp-seekwrap { display: grid; grid-template-columns: auto 1fr auto; align-items: center; column-gap: 12px; max-width: none !important; }
+  .bz-exp-seekwrap .bz-exp-times { display: contents; }
+  .bz-exp-seekwrap #expCurrentTime { order: 1; }
+  .bz-exp-seekwrap #expSeekArea { order: 2; margin: 0 !important; }
+  .bz-exp-seekwrap #expDurationTime { order: 3; }
+  .bz-exp-seekwrap .bz-exp-times span { font-family: inherit; font-size: 0.8125rem; font-weight: 600; margin: 0; }
+  .bz-exp-controls { width: 100%; justify-content: space-between !important; }
+}
