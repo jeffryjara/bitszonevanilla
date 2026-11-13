@@ -42,9 +42,9 @@
   <div id="bzToastContainer" class="bz-toast-stage" role="status" aria-live="polite"></div>
 
   <!-- Encabezado Móvil / Tablet (visible < 992px) -->
-  <header class="d-flex d-lg-none align-items-center justify-content-between px-3 py-2 border-bottom border-white border-opacity-10 position-relative z-3" style="background: rgba(8,6,14,0.75); backdrop-filter: blur(20px);">
+  <header class="bz-mobile-topbar d-flex d-lg-none align-items-center justify-content-between px-3 py-2 border-bottom border-white border-opacity-10 position-relative z-3">
     <div class="d-flex align-items-center gap-2">
-      <button type="button" class="btn btn-link text-white p-1" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-label="Abrir menú">
+      <button type="button" class="btn btn-link text-white p-1" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-label="Abrir menú" data-i18n-aria="nav.openMenu">
         <i class="bi bi-list fs-4"></i>
       </button>
       <a href="./index.html" class="d-flex align-items-center gap-2 text-decoration-none">
@@ -53,17 +53,17 @@
       </a>
     </div>
     <a id="topAuthBtn" href="./login.html" class="btn bz-btn-subtle btn-sm px-3 py-1">
-      <i class="bi bi-person me-1"></i> Acceder
+      <i class="bi bi-person me-1"></i> <span data-i18n="nav.signIn">Acceder</span>
     </a>
   </header>
 
   <!-- Offcanvas Móvil Bootstrap (Sidebar Drawer) -->
-  <div class="offcanvas offcanvas-start text-white border-end border-white border-opacity-10" tabindex="-1" id="mobileOffcanvas" style="background: rgba(11, 7, 18, 0.96); backdrop-filter: blur(24px); max-width: 280px;">
+  <div class="offcanvas offcanvas-start text-white border-end border-white border-opacity-10" tabindex="-1" id="mobileOffcanvas" style="max-width: 280px;">
     <div class="offcanvas-header border-bottom border-white border-opacity-10">
       <a href="./index.html" class="text-decoration-none">
         <span class="fw-bold fs-4 text-white">Bits<span style="color: rgba(255,255,255,0.52);">zone</span></span>
       </a>
-      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar" data-i18n-aria="nav.close"></button>
     </div>
     <div class="offcanvas-body d-flex flex-column gap-2">
       <button type="button" class="bz-nav-btn is-active" data-nav-view="catalog">
@@ -76,7 +76,7 @@
         <i class="bi bi-cloud-arrow-down fs-5"></i><span data-i18n="nav.downloads">Mis descargas</span>
       </button>
       <button type="button" class="bz-nav-btn bz-nav-btn--admin d-none" data-nav-view="dashboard" data-admin-only>
-        <i class="bi bi-speedometer2 fs-5"></i><span>Dashboard</span>
+        <i class="bi bi-speedometer2 fs-5"></i><span data-i18n="nav.dashboard">Dashboard</span>
       </button>
       <hr class="border-white border-opacity-10 my-2" />
       <button type="button" class="bz-nav-btn" data-open-shortcuts>
@@ -86,7 +86,7 @@
         <i class="bi bi-gear fs-5"></i><span data-i18n="nav.settings">Configuración</span>
       </button>
       <a href="./index.html" class="bz-nav-btn text-decoration-none">
-        <i class="bi bi-globe2 fs-5"></i><span>Landing</span>
+        <i class="bi bi-globe2 fs-5"></i><span data-i18n="nav.landing">Landing</span>
       </a>
     </div>
   </div>
@@ -102,7 +102,7 @@
           </a>
           <span id="sidebarAdminBadge" class="bz-admin-badge d-none">ADMIN</span>
         </div>
-        <button id="btnToggleDesktopSidebar" type="button" class="btn btn-sm rounded-circle flex-shrink-0 text-white-50 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);" title="Contraer/Expandir menú">
+        <button id="btnToggleDesktopSidebar" type="button" class="btn btn-sm rounded-circle flex-shrink-0 text-white-50 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);" title="Contraer/Expandir menú" data-i18n-title="nav.toggleSidebar">
           <i class="bi bi-layout-sidebar"></i>
         </button>
       </div>
@@ -119,8 +119,8 @@
           <span class="bz-nav-label flex-grow-1 text-start" data-i18n="nav.downloads">Mis descargas</span>
           <span id="downloadsCountBadge" class="badge rounded-pill d-none bz-nav-label ms-auto" style="background: rgba(96,165,250,0.22); color: #93c5fd;">0</span>
         </button>
-        <button type="button" class="bz-nav-btn bz-nav-btn--admin d-none mt-1" data-nav-view="dashboard" data-admin-only title="Dashboard Demo">
-          <i class="bi bi-speedometer2 fs-6"></i><span class="bz-nav-label">Dashboard</span>
+        <button type="button" class="bz-nav-btn bz-nav-btn--admin d-none mt-1" data-nav-view="dashboard" data-admin-only title="Dashboard Demo" data-i18n-title="nav.dashboard">
+          <i class="bi bi-speedometer2 fs-6"></i><span class="bz-nav-label" data-i18n="nav.dashboard">Dashboard</span>
         </button>
       </nav>
 
@@ -175,14 +175,14 @@
     </main>
 
     <!-- Panel Lateral Derecho de Letras (Expandible desde la derecha fiel a Bitszone original) -->
-    <aside id="bzSideLyricsPanel" class="bz-side-lyrics-panel" aria-label="Letras de la canción">
+    <aside id="bzSideLyricsPanel" class="bz-side-lyrics-panel" aria-label="Letras de la canción" data-i18n-aria="lyrics.title">
       <div class="bz-side-lyrics-inner">
         <div id="sideLyricsHeader" class="d-flex align-items-center justify-content-between px-3 py-3 flex-shrink-0">
           <div class="d-flex align-items-center gap-2 min-w-0 me-2">
             <i id="sideLyricsIcon" class="bi bi-mic text-white-50 opacity-50"></i>
-            <span id="sideLyricsTitle" class="text-white-50 small text-truncate" style="font-weight: 500;">Letra</span>
+            <span id="sideLyricsTitle" class="text-white-50 small text-truncate" style="font-weight: 500;" data-i18n="lyrics.title">Letra</span>
           </div>
-          <button id="btnCloseSideLyrics" type="button" class="btn btn-sm text-white-50 bz-hover-white p-1 rounded-circle border-0 bg-transparent flex-shrink-0" title="Cerrar letras (L)">
+          <button id="btnCloseSideLyrics" type="button" class="btn btn-sm text-white-50 bz-hover-white p-1 rounded-circle border-0 bg-transparent flex-shrink-0" title="Cerrar letras (L)" data-i18n-title="lyrics.close">
             <i class="bi bi-x-lg fs-6"></i>
           </button>
         </div>
@@ -200,7 +200,7 @@
       </div>
 
       <!-- Onda Senoidal SVG Interactiva (WavyProgress) -->
-      <div id="bzSeekArea" class="bz-seek-bar-area" title="Arrastra o haz clic para adelantar">
+      <div id="bzSeekArea" class="bz-seek-bar-area" title="Arrastra o haz clic para adelantar" data-i18n-title="player.seekHint">
         <svg id="bzWavySvg" class="w-100 h-100" style="overflow: visible;">
           <path id="bzWavyUnplayed" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
           <path id="bzWavyPlayed" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -211,27 +211,27 @@
       <div class="container-fluid px-4 py-2 d-flex align-items-center justify-content-between gap-3 position-relative z-2">
         <!-- Izquierda: Info Pista -->
         <div class="d-flex align-items-center gap-3" style="width: 32%; min-width: 220px;">
-          <div id="miniCoverClick" role="button" tabindex="0" class="bz-mini-cover-wrap position-relative rounded-3 overflow-hidden flex-shrink-0 shadow" style="width: 54px; height: 54px; cursor: pointer;" title="Expandir reproductor (F)" aria-label="Expandir reproductor a pantalla completa">
+          <div id="miniCoverClick" role="button" tabindex="0" class="bz-mini-cover-wrap position-relative rounded-3 overflow-hidden flex-shrink-0 shadow" style="width: 54px; height: 54px; cursor: pointer;" title="Expandir reproductor (F)" data-i18n-title="player.expand" aria-label="Expandir reproductor a pantalla completa" data-i18n-aria="player.expand">
             <img id="miniCoverImg" src="./assets/img/bitszone-icon.png" alt="Portada" class="w-100 h-100 object-fit-cover" />
             <span class="bz-mini-cover-expand-overlay" aria-hidden="true">
               <i class="bi bi-arrows-angle-expand fs-5 text-white"></i>
             </span>
           </div>
           <div class="min-w-0">
-            <div id="miniTrackTitle" class="fw-bold text-white text-truncate bz-hover-underline" style="cursor:pointer; font-size: 0.98rem;" title="Expandir reproductor">Canción</div>
+            <div id="miniTrackTitle" class="fw-bold text-white text-truncate bz-hover-underline" style="cursor:pointer; font-size: 0.98rem;" title="Expandir reproductor" data-i18n-title="player.expandHint" data-i18n="player.defaultSong">Canción</div>
             <div class="text-white-50 text-truncate" style="font-size: 0.82rem;">
-              <span id="miniTrackArtist" class="bz-hover-white" style="cursor:pointer;">Artista</span>
+              <span id="miniTrackArtist" class="bz-hover-white" style="cursor:pointer;" data-i18n="player.defaultArtist">Artista</span>
               <span class="mx-1 opacity-50">•</span>
-              <span id="miniTrackAlbum" class="bz-hover-white" style="cursor:pointer;">Álbum</span>
+              <span id="miniTrackAlbum" class="bz-hover-white" style="cursor:pointer;" data-i18n="player.defaultAlbum">Álbum</span>
             </div>
           </div>
         </div>
 
         <!-- Centro: Controles con Orbe Vinilo Giratorio -->
         <div class="d-flex align-items-center gap-2 gap-lg-3">
-          <button id="miniShuffleBtn" type="button" class="bz-icon-action fs-5" title="Aleatorio (A)"><i class="bi bi-shuffle"></i></button>
-          <button id="miniPrevBtn" type="button" class="bz-icon-action fs-4 text-white" title="Anterior (←)"><i class="bi bi-skip-start-fill"></i></button>
-          <button id="miniPlayBtn" type="button" class="bz-vinyl-play-btn" title="Reproducir / Pausar (Espacio)" aria-label="Reproducir o pausar">
+          <button id="miniShuffleBtn" type="button" class="bz-icon-action fs-5" title="Aleatorio (A)" data-i18n-title="player.shuffle"><i class="bi bi-shuffle"></i></button>
+          <button id="miniPrevBtn" type="button" class="bz-icon-action fs-4 text-white" title="Anterior (←)" data-i18n-title="player.prev"><i class="bi bi-skip-start-fill"></i></button>
+          <button id="miniPlayBtn" type="button" class="bz-vinyl-play-btn" title="Reproducir / Pausar (Espacio)" data-i18n-title="player.playPause" aria-label="Reproducir o pausar" data-i18n-aria="player.playPause">
             <span class="bz-vinyl-play-art"><img id="miniVinylArtImg" src="./assets/img/bitszone-icon.png" alt="" /></span>
             <span class="bz-vinyl-play-frost"></span>
             <span class="bz-vinyl-play-groove-1"></span>
@@ -239,18 +239,18 @@
             <span class="bz-vinyl-play-center-cap"></span>
             <span id="miniPlayIconWrap" class="bz-vinyl-play-icon"><i class="bi bi-play-fill fs-4 ms-1"></i></span>
           </button>
-          <button id="miniNextBtn" type="button" class="bz-icon-action fs-4 text-white" title="Siguiente (→)"><i class="bi bi-skip-end-fill"></i></button>
-          <button id="miniRepeatBtn" type="button" class="bz-icon-action fs-5" title="Repetir (R)"><i class="bi bi-repeat"></i></button>
-          <button id="miniFavBtn" type="button" class="bz-icon-action fs-5 ms-1" title="Favorito (S)"><i class="bi bi-heart"></i></button>
+          <button id="miniNextBtn" type="button" class="bz-icon-action fs-4 text-white" title="Siguiente (→)" data-i18n-title="player.next"><i class="bi bi-skip-end-fill"></i></button>
+          <button id="miniRepeatBtn" type="button" class="bz-icon-action fs-5" title="Repetir (R)" data-i18n-title="player.repeat"><i class="bi bi-repeat"></i></button>
+          <button id="miniFavBtn" type="button" class="bz-icon-action fs-5 ms-1" title="Favorito (S)" data-i18n-title="player.favorite"><i class="bi bi-heart"></i></button>
         </div>
 
         <!-- Derecha: Tiempo y Volumen -->
         <div class="d-flex align-items-center justify-content-end gap-3" style="width: 30%; min-width: 220px;">
           <span id="miniTimeText" class="font-mono-bz small text-white-50">0:00 / 0:00</span>
           <div class="d-flex align-items-center gap-1">
-            <button id="miniLyricsBtn" type="button" class="bz-icon-action text-white-50" title="Ver Letras (L)"><i class="bi bi-mic fs-5"></i></button>
-            <button id="miniMuteBtn" type="button" class="bz-icon-action text-white-50" title="Silenciar (M)"><i class="bi bi-volume-up-fill fs-5"></i></button>
-            <input id="miniVolumeRange" type="range" min="0" max="100" value="100" class="bz-volume-range" aria-label="Volumen" />
+            <button id="miniLyricsBtn" type="button" class="bz-icon-action text-white-50" title="Ver Letras (L)" data-i18n-title="player.lyrics"><i class="bi bi-mic fs-5"></i></button>
+            <button id="miniMuteBtn" type="button" class="bz-icon-action text-white-50" title="Silenciar (M)" data-i18n-title="player.mute"><i class="bi bi-volume-up-fill fs-5"></i></button>
+            <input id="miniVolumeRange" type="range" min="0" max="100" value="100" class="bz-volume-range" aria-label="Volumen" data-i18n-aria="player.volume" />
           </div>
         </div>
       </div>
@@ -264,10 +264,10 @@
       <div class="d-flex align-items-center gap-2 px-3 py-2">
         <img id="mobMiniCover" src="./assets/img/bitszone-icon.png" width="42" height="42" class="rounded-2 object-fit-cover flex-shrink-0" alt="" />
         <div class="flex-grow-1 min-w-0">
-          <div id="mobMiniTitle" class="small fw-bold text-white text-truncate">Canción</div>
-          <div id="mobMiniArtist" class="text-white-50 text-truncate" style="font-size: 0.75rem;">Artista</div>
+          <div id="mobMiniTitle" class="small fw-bold text-white text-truncate" data-i18n="player.defaultSong">Canción</div>
+          <div id="mobMiniArtist" class="text-white-50 text-truncate" style="font-size: 0.75rem;" data-i18n="player.defaultArtist">Artista</div>
         </div>
-        <button id="mobMiniPlayBtn" type="button" class="btn btn-light rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+        <button id="mobMiniPlayBtn" type="button" class="btn btn-light rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;" title="Reproducir / Pausar (Espacio)" data-i18n-title="player.playPause">
           <i class="bi bi-play-fill fs-5"></i>
         </button>
       </div>
@@ -277,16 +277,16 @@
   <!-- Barra Inferior Móvil / Tablet (< 992px) -->
   <nav class="bz-mobile-tabbar justify-content-around align-items-center py-2 px-2">
     <button type="button" class="btn btn-link text-white-50 text-decoration-none d-flex flex-column align-items-center p-1 is-active" data-nav-view="catalog" style="font-size: 0.72rem;">
-      <i class="bi bi-house-door fs-5"></i><span>Inicio</span>
+      <i class="bi bi-house-door fs-5"></i><span data-i18n="nav.home">Inicio</span>
     </button>
     <button type="button" class="btn btn-link text-white-50 text-decoration-none d-flex flex-column align-items-center p-1" data-nav-view="library-favorites" style="font-size: 0.72rem;">
-      <i class="bi bi-collection fs-5"></i><span>Biblioteca</span>
+      <i class="bi bi-collection fs-5"></i><span data-i18n="nav.library">Biblioteca</span>
     </button>
     <button type="button" class="btn btn-link text-white-50 text-decoration-none d-flex flex-column align-items-center p-1" data-nav-view="downloads" style="font-size: 0.72rem;">
-      <i class="bi bi-cloud-arrow-down fs-5"></i><span>Descargas</span>
+      <i class="bi bi-cloud-arrow-down fs-5"></i><span data-i18n="nav.downloads">Descargas</span>
     </button>
     <button type="button" class="btn btn-link text-decoration-none d-none flex-column align-items-center p-1" style="color: var(--bz-soft); font-size: 0.72rem;" data-nav-view="dashboard" data-admin-only>
-      <i class="bi bi-speedometer2 fs-5"></i><span>Dashboard</span>
+      <i class="bi bi-speedometer2 fs-5"></i><span data-i18n="nav.dashboard">Dashboard</span>
     </button>
   </nav>
 
@@ -305,7 +305,7 @@
 
         <!-- Barra superior flotante -->
         <div class="position-fixed top-0 start-0 end-0 p-3 p-md-4 d-flex align-items-center justify-content-between z-3 pe-none">
-          <button type="button" class="bz-exp-close-btn pe-auto" data-bs-dismiss="modal" title="Minimizar reproductor (Esc)" aria-label="Minimizar reproductor">
+          <button type="button" class="bz-exp-close-btn pe-auto" data-bs-dismiss="modal" title="Minimizar reproductor (Esc)" data-i18n-title="player.minimize" aria-label="Minimizar reproductor" data-i18n-aria="player.minimize">
             <i class="bi bi-chevron-down fs-5"></i>
           </button>
         </div>
@@ -320,14 +320,14 @@
 
                 <!-- Control vertical de volumen de 20 barras (Solo desktop >= lg) -->
                 <div class="d-none d-lg-flex flex-column align-items-center position-absolute start-0 top-50 translate-middle-y ms-1" style="z-index: 15;">
-                  <button type="button" id="expVolMaxBtn" class="bz-icon-action text-white-50 mb-1" title="Volumen 100%">
+                  <button type="button" id="expVolMaxBtn" class="bz-icon-action text-white-50 mb-1" title="Volumen 100%" data-i18n-title="player.volMax">
                     <i class="bi bi-volume-up fs-5"></i>
                   </button>
                   <div id="expVolBarsWrap" class="bz-vol-bars-wrap">
                     <div id="expVolBubble" class="bz-vol-bubble">100%</div>
                     <!-- 20 barras generadas por player.js o inline -->
                   </div>
-                  <button type="button" id="expVolMuteBtn" class="bz-icon-action text-white-50 mt-1" title="Silenciar (M)">
+                  <button type="button" id="expVolMuteBtn" class="bz-icon-action text-white-50 mt-1" title="Silenciar (M)" data-i18n-title="player.mute">
                     <i class="bi bi-volume-mute fs-5"></i>
                   </button>
                 </div>
@@ -353,13 +353,13 @@
 
                   <!-- Dock Liquid Glass flotante sobre la esquina inferior derecha de la carátula -->
                   <div class="bz-exp-cover-dock">
-                    <button id="expFavBtn" type="button" class="bz-icon-action text-white" title="Favorito (S)">
+                    <button id="expFavBtn" type="button" class="bz-icon-action text-white" title="Favorito (S)" data-i18n-title="player.favorite">
                       <i class="bi bi-heart fs-5"></i>
                     </button>
-                    <button id="expDlBtn" type="button" class="bz-icon-action text-white" title="Descargar MP3">
+                    <button id="expDlBtn" type="button" class="bz-icon-action text-white" title="Descargar MP3" data-i18n-title="player.downloadMp3">
                       <i class="bi bi-download fs-5"></i>
                     </button>
-                    <button id="expMoreBtn" type="button" class="bz-icon-action text-white" aria-expanded="false" title="Más opciones (Cola / Playlist)">
+                    <button id="expMoreBtn" type="button" class="bz-icon-action text-white" aria-expanded="false" title="Más opciones (Cola / Playlist)" data-i18n-title="player.moreOptions">
                       <i class="bi bi-three-dots fs-5"></i>
                     </button>
                   </div>
@@ -367,17 +367,17 @@
 
                 <!-- Título, Artista • Álbum -->
                 <div class="text-center w-100 mt-2 mb-3" style="max-width: 460px;">
-                  <h2 id="expTrackTitle" class="fw-bold text-white mb-1 text-truncate" style="font-size: clamp(1.35rem, 2.3vw, 2rem);">Canción</h2>
+                  <h2 id="expTrackTitle" class="fw-bold text-white mb-1 text-truncate" style="font-size: clamp(1.35rem, 2.3vw, 2rem);" data-i18n="player.defaultSong">Canción</h2>
                   <div class="text-white-50 text-truncate" style="font-size: 0.96rem;">
-                    <button type="button" id="expTrackArtist" class="btn btn-link p-0 text-white fw-medium text-decoration-none">Artista</button>
+                    <button type="button" id="expTrackArtist" class="btn btn-link p-0 text-white fw-medium text-decoration-none" data-i18n="player.defaultArtist">Artista</button>
                     <span class="mx-1 opacity-50">•</span>
-                    <button type="button" id="expAlbumName" class="btn btn-link p-0 text-white-50 text-decoration-none">Álbum</button>
+                    <button type="button" id="expAlbumName" class="btn btn-link p-0 text-white-50 text-decoration-none" data-i18n="player.defaultAlbum">Álbum</button>
                   </div>
                 </div>
 
                 <!-- WavyProgress Interactiva del Reproductor Gigante -->
                 <div class="w-100 mb-3" style="max-width: 440px;">
-                  <div id="expSeekArea" class="bz-seek-bar-area" style="height: 26px; margin-top: 0;" title="Arrastra o haz clic para adelantar">
+                  <div id="expSeekArea" class="bz-seek-bar-area" style="height: 26px; margin-top: 0;" title="Arrastra o haz clic para adelantar" data-i18n-title="player.seekHint">
                     <svg id="expWavySvg" class="w-100 h-100" style="overflow: visible;">
                       <path id="expWavyUnplayed" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
                       <path id="expWavyPlayed" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
@@ -392,9 +392,9 @@
 
                 <!-- Botones de Control con Orbe Central de Vinilo Giratorio -->
                 <div class="d-flex align-items-center justify-content-center gap-3 gap-md-4 mb-2">
-                  <button id="expShuffleBtn" type="button" class="bz-icon-action fs-5" title="Aleatorio (A)"><i class="bi bi-shuffle"></i></button>
-                  <button id="expPrevBtn" type="button" class="bz-icon-action fs-3 text-white" title="Anterior (←)"><i class="bi bi-skip-start-fill"></i></button>
-                  <button id="expPlayBtn" type="button" class="bz-vinyl-play-btn is-lg" title="Reproducir / Pausar (Espacio)">
+                  <button id="expShuffleBtn" type="button" class="bz-icon-action fs-5" title="Aleatorio (A)" data-i18n-title="player.shuffle"><i class="bi bi-shuffle"></i></button>
+                  <button id="expPrevBtn" type="button" class="bz-icon-action fs-3 text-white" title="Anterior (←)" data-i18n-title="player.prev"><i class="bi bi-skip-start-fill"></i></button>
+                  <button id="expPlayBtn" type="button" class="bz-vinyl-play-btn is-lg" title="Reproducir / Pausar (Espacio)" data-i18n-title="player.playPause">
                     <span class="bz-vinyl-play-art"><img id="expVinylOrbImg" src="./assets/img/bitszone-icon.png" alt="" /></span>
                     <span class="bz-vinyl-play-frost"></span>
                     <span class="bz-vinyl-play-groove-1"></span>
@@ -402,14 +402,14 @@
                     <span class="bz-vinyl-play-center-cap"></span>
                     <span id="expPlayIconWrap" class="bz-vinyl-play-icon"><i class="bi bi-play-fill fs-2 ms-1"></i></span>
                   </button>
-                  <button id="expNextBtn" type="button" class="bz-icon-action fs-3 text-white" title="Siguiente (→)"><i class="bi bi-skip-end-fill"></i></button>
-                  <button id="expRepeatBtn" type="button" class="bz-icon-action fs-5" title="Repetir (R)"><i class="bi bi-repeat"></i></button>
+                  <button id="expNextBtn" type="button" class="bz-icon-action fs-3 text-white" title="Siguiente (→)" data-i18n-title="player.next"><i class="bi bi-skip-end-fill"></i></button>
+                  <button id="expRepeatBtn" type="button" class="bz-icon-action fs-5" title="Repetir (R)" data-i18n-title="player.repeat"><i class="bi bi-repeat"></i></button>
                 </div>
 
                 <!-- Volumen compacto móvil/tablet (< lg) -->
                 <div class="d-flex d-lg-none align-items-center gap-2 mt-2">
                   <i class="bi bi-volume-up text-white-50"></i>
-                  <input id="expVolRange" type="range" min="0" max="100" value="100" class="bz-volume-range" />
+                  <input id="expVolRange" type="range" min="0" max="100" value="100" class="bz-volume-range" data-i18n-aria="player.volume" />
                 </div>
               </div>
 
@@ -418,13 +418,13 @@
                 <div class="mb-3 d-flex align-items-center justify-content-between gap-2 flex-shrink-0">
                   <div class="bz-segmented-pill" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16); height: 42px;">
                     <button type="button" class="bz-segmented-btn is-active" data-exp-tab="pistas">
-                      <i class="bi bi-music-note-list"></i><span>Pistas</span>
+                      <i class="bi bi-music-note-list"></i><span data-i18n="tabs.tracks">Pistas</span>
                     </button>
                     <button type="button" class="bz-segmented-btn" data-exp-tab="letras">
-                      <i class="bi bi-mic"></i><span>Letras</span>
+                      <i class="bi bi-mic"></i><span data-i18n="tabs.lyrics">Letras</span>
                     </button>
                     <button type="button" class="bz-segmented-btn" data-exp-tab="cola">
-                      <i class="bi bi-list-ol"></i><span>Cola</span>
+                      <i class="bi bi-list-ol"></i><span data-i18n="tabs.queue">Cola</span>
                     </button>
                   </div>
                 </div>
@@ -443,61 +443,61 @@
   <div class="modal fade" id="shortcutsModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
       <div class="modal-content bz-ad-card position-relative overflow-hidden p-4 p-md-5">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar" data-i18n-aria="nav.close">
           <i class="bi bi-x-lg"></i>
         </button>
         <div class="text-center mb-3">
-          <span class="badge rounded-pill bz-ad-badge mb-2"><i class="bi bi-keyboard me-1.5"></i> Atajos de Teclado</span>
+          <span class="badge rounded-pill bz-ad-badge mb-2"><i class="bi bi-keyboard me-1.5"></i> <span data-i18n="shortcuts.badge">Atajos de Teclado</span></span>
           <div class="d-flex align-items-center justify-content-center gap-2">
-            <h3 class="font-serif-italic text-white mb-0">Controles Rápidos</h3>
-            <button type="button" id="btnShortcutsToSettings" class="bz-icon-action text-white-50" title="Ir a configuración">
+            <h3 class="font-serif-italic text-white mb-0" data-i18n="shortcuts.title">Controles Rápidos</h3>
+            <button type="button" id="btnShortcutsToSettings" class="bz-icon-action text-white-50" title="Ir a configuración" data-i18n-title="shortcuts.toSettings">
               <i class="bi bi-sliders"></i>
             </button>
           </div>
         </div>
         <div class="d-grid gap-2 small">
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Reproducir / Pausar</span>
-            <span class="bz-kbd">Espacio</span>
+            <span class="text-white-50" data-i18n="shortcuts.playPause">Reproducir / Pausar</span>
+            <span class="bz-kbd" data-i18n="shortcuts.space">Espacio</span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Canción anterior / siguiente</span>
+            <span class="text-white-50" data-i18n="shortcuts.prevNext">Canción anterior / siguiente</span>
             <span class="d-flex gap-1"><span class="bz-kbd">←</span><span class="bz-kbd">→</span></span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Subir / Bajar volumen</span>
+            <span class="text-white-50" data-i18n="shortcuts.volUpDown">Subir / Bajar volumen</span>
             <span class="d-flex gap-1"><span class="bz-kbd">↑</span><span class="bz-kbd">↓</span></span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Abrir / minimizar reproductor gigante</span>
+            <span class="text-white-50" data-i18n="shortcuts.fullscreen">Abrir / minimizar reproductor gigante</span>
             <span class="bz-kbd">F</span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Pestaña Pistas (en reproductor gigante)</span>
+            <span class="text-white-50" data-i18n="shortcuts.tracksTab">Pestaña Pistas (en reproductor gigante)</span>
             <span class="bz-kbd">P</span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Mostrar letra (o alternar panel lateral de letras)</span>
+            <span class="text-white-50" data-i18n="shortcuts.lyricsTab">Mostrar letra (o alternar panel lateral de letras)</span>
             <span class="bz-kbd">L</span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Pestaña Cola (en reproductor gigante)</span>
+            <span class="text-white-50" data-i18n="shortcuts.queueTab">Pestaña Cola (en reproductor gigante)</span>
             <span class="bz-kbd">C</span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Agregar o quitar de favoritos</span>
+            <span class="text-white-50" data-i18n="shortcuts.favorite">Agregar o quitar de favoritos</span>
             <span class="bz-kbd">S</span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Alternar repetición</span>
+            <span class="text-white-50" data-i18n="shortcuts.repeat">Alternar repetición</span>
             <span class="bz-kbd">R</span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
-            <span class="text-white-50">Alternar aleatorio</span>
+            <span class="text-white-50" data-i18n="shortcuts.shuffle">Alternar aleatorio</span>
             <span class="bz-kbd">A</span>
           </div>
           <div class="d-flex align-items-center justify-content-between py-2">
-            <span class="text-white-50">Silenciar / Activar sonido</span>
+            <span class="text-white-50" data-i18n="shortcuts.mute">Silenciar / Activar sonido</span>
             <span class="bz-kbd">M</span>
           </div>
         </div>
@@ -509,14 +509,14 @@
   <div class="modal fade bz-modal-glass" id="profileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
       <div class="modal-content position-relative">
-        <button id="btnProfileCloseGuard" type="button" class="bz-modal-close-float" aria-label="Cerrar">
+        <button id="btnProfileCloseGuard" type="button" class="bz-modal-close-float" aria-label="Cerrar" data-i18n-aria="nav.close">
           <i class="bi bi-x-lg"></i>
         </button>
 
         <div class="row g-0">
           <!-- Sidebar Izquierda -->
           <div class="col-12 col-md-5 p-4 text-center bz-col-divider-md d-flex flex-column align-items-center" style="background: rgba(255,255,255,0.03);">
-            <label for="profileAvatarInput" class="position-relative d-inline-block mb-3" style="cursor: pointer;" title="Cambiar foto de perfil">
+            <label for="profileAvatarInput" class="position-relative d-inline-block mb-3" style="cursor: pointer;" title="Cambiar foto de perfil" data-i18n-title="profile.changePhoto">
               <div id="profileAvatarPreview" class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center border border-white border-opacity-25 shadow" style="width: 104px; height: 104px; background: rgba(0,0,0,0.35);">
                 <i class="bi bi-person-fill fs-1 text-white-50"></i>
               </div>
@@ -526,22 +526,22 @@
             </label>
             <input id="profileAvatarInput" type="file" accept="image/*" hidden />
 
-            <h3 id="profileHeaderName" class="font-serif-italic h2 text-white mb-1">Usuario</h3>
+            <h3 id="profileHeaderName" class="font-serif-italic h2 text-white mb-1" data-i18n="profile.user">Usuario</h3>
             <p id="profileEmailText" class="small text-white-50 mb-2">correo@bitszone.app</p>
             <span id="profileRoleBadge" class="bz-admin-badge mb-3">USER</span>
 
             <div class="w-100 text-start mt-2">
-              <label class="form-label small text-uppercase text-white-50" style="letter-spacing: 0.1em;">Nombre de usuario</label>
+              <label class="form-label small text-uppercase text-white-50" style="letter-spacing: 0.1em;" data-i18n="profile.username">Nombre de usuario</label>
               <input id="profileNameInput" type="text" class="form-control bz-input-dark mb-3" />
-              <button id="btnProfileSave" type="button" class="btn bz-btn-primary w-100 py-2 mb-2" disabled>Guardar cambios</button>
-              <button id="btnProfileSignOut" type="button" class="btn btn-outline-danger rounded-pill w-100 py-2 btn-sm">Cerrar sesión</button>
+              <button id="btnProfileSave" type="button" class="btn bz-btn-primary w-100 py-2 mb-2" data-i18n="profile.save" disabled>Guardar cambios</button>
+              <button id="btnProfileSignOut" type="button" class="btn btn-outline-danger rounded-pill w-100 py-2 btn-sm" data-i18n="profile.signOut">Cerrar sesión</button>
             </div>
           </div>
 
           <!-- Cuerpo Derecho: Estadísticas Reales -->
           <div class="col-12 col-md-7 p-4 p-md-5">
-            <h4 class="font-serif-italic h3 text-white mb-1">Tu actividad</h4>
-            <p class="small text-white-50 mb-4">Resumen calculado desde tu historial de reproducción.</p>
+            <h4 class="font-serif-italic h3 text-white mb-1" data-i18n="profile.activity">Tu actividad</h4>
+            <p class="small text-white-50 mb-4" data-i18n="profile.activityDesc">Resumen calculado desde tu historial de reproducción.</p>
             <div id="profileStatsArea"></div>
           </div>
         </div>
@@ -684,16 +684,16 @@
     <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
       <div class="modal-content bz-ad-card position-relative overflow-hidden text-center p-4 p-md-5">
         <div class="d-flex justify-content-center mb-3">
-          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-exclamation-circle me-1.5 text-warning"></i> Atención</span>
+          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-exclamation-circle me-1.5 text-warning"></i> <span data-i18n="guard.attention">Atención</span></span>
         </div>
         <div class="bz-ad-cover-wrap mb-3 d-flex align-items-center justify-content-center">
           <i class="bi bi-exclamation-triangle-fill text-warning fs-1" style="filter: drop-shadow(0 0 14px rgba(234, 179, 8, 0.45));"></i>
         </div>
-        <h3 class="font-serif-italic text-white mb-2">Cambios sin guardar</h3>
-        <p id="unsavedModalPrompt" class="text-white-50 small mb-4">Tienes cambios pendientes en tu perfil.</p>
+        <h3 class="font-serif-italic text-white mb-2" data-i18n="guard.title">Cambios sin guardar</h3>
+        <p id="unsavedModalPrompt" class="text-white-50 small mb-4" data-i18n="guard.profilePrompt">Tienes cambios pendientes en tu perfil.</p>
         <div class="d-flex align-items-center justify-content-center gap-3">
-          <button id="btnUnsavedDiscardExit" type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill">Salir sin guardar</button>
-          <button id="btnUnsavedSaveExit" type="button" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill">Guardar y salir</button>
+          <button id="btnUnsavedDiscardExit" type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-i18n="guard.discard">Salir sin guardar</button>
+          <button id="btnUnsavedSaveExit" type="button" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill" data-i18n="guard.saveAndExit">Guardar y salir</button>
         </div>
       </div>
     </div>
@@ -704,13 +704,13 @@
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
       <div class="modal-content bz-ad-card position-relative overflow-hidden text-center">
         <!-- Botón cerrar sutil en la esquina -->
-        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Cerrar" data-i18n-aria="nav.close"></button>
 
         <div class="p-4 p-sm-5 pt-4">
           <!-- Header: Kicker Badge centrado -->
           <div class="d-flex align-items-center justify-content-center mb-4 mt-2">
             <span id="confirmActionBadge" class="badge rounded-pill bz-ad-badge">
-              <i class="bi bi-disc me-1 text-white-50"></i> Confirmación
+              <i class="bi bi-disc me-1 text-white-50"></i> <span data-i18n="confirm.badge">Confirmación</span>
             </span>
           </div>
 
@@ -721,13 +721,13 @@
           </div>
 
           <!-- Contenido Esencial, Elegante y de Alto Impacto -->
-          <h3 id="confirmActionTitle" class="bz-ad-title">¿Confirmar acción?</h3>
+          <h3 id="confirmActionTitle" class="bz-ad-title" data-i18n="confirm.title">¿Confirmar acción?</h3>
           <p id="confirmActionMessage" class="bz-ad-desc"></p>
 
           <!-- Botones de Acción con separación cómoda y elegante estilo píldora -->
           <div class="d-flex align-items-center justify-content-center gap-3 pt-2">
-            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal">Cancelar</button>
-            <button id="confirmActionOkBtn" type="button" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill">Confirmar</button>
+            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal" data-i18n="confirm.cancel">Cancelar</button>
+            <button id="confirmActionOkBtn" type="button" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill" data-i18n="confirm.ok">Confirmar</button>
           </div>
         </div>
       </div>
@@ -738,20 +738,20 @@
   <div class="modal fade" id="createPlaylistModal" data-bs-backdrop="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
       <div class="modal-content bz-ad-card position-relative overflow-hidden text-center p-4 p-md-5">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar" data-i18n-aria="nav.close"><i class="bi bi-x-lg"></i></button>
         <div class="d-flex justify-content-center mb-3">
-          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-folder-plus me-1.5"></i> Nueva Lista</span>
+          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-folder-plus me-1.5"></i> <span data-i18n="createPl.badge">Nueva Lista</span></span>
         </div>
         <div class="bz-ad-cover-wrap mb-3 d-flex align-items-center justify-content-center">
           <i class="bi bi-music-note-list text-white fs-1" style="filter: drop-shadow(0 0 12px rgba(192, 132, 252, 0.45));"></i>
         </div>
-        <h3 class="font-serif-italic text-white mb-2">Crear Playlist</h3>
-        <p class="text-white-50 small mb-4">Dale un nombre a tu lista para organizar tus canciones favoritas.</p>
+        <h3 class="font-serif-italic text-white mb-2" data-i18n="createPl.title">Crear Playlist</h3>
+        <p class="text-white-50 small mb-4" data-i18n="createPl.desc">Dale un nombre a tu lista para organizar tus canciones favoritas.</p>
         <form id="formCreatePlaylist">
-          <input id="inputNewPlaylistName" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 mb-3 text-center" placeholder="Ej. Favoritas de viaje" />
+          <input id="inputNewPlaylistName" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 mb-3 text-center" placeholder="Ej. Favoritas de viaje" data-i18n-placeholder="createPl.placeholder" />
           <div class="d-flex align-items-center justify-content-center gap-3 pt-1">
-            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill">Crear lista</button>
+            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal" data-i18n="createPl.cancel">Cancelar</button>
+            <button type="submit" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill" data-i18n="createPl.submit">Crear lista</button>
           </div>
         </form>
       </div>
@@ -762,16 +762,16 @@
   <div class="modal fade" id="addToPlaylistModal" data-bs-backdrop="false" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
       <div class="modal-content bz-ad-card position-relative overflow-hidden p-4 p-md-5">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar" data-i18n-aria="nav.close"><i class="bi bi-x-lg"></i></button>
         <div class="text-center mb-3">
-          <span class="badge rounded-pill bz-ad-badge mb-2"><i class="bi bi-music-note-list me-1.5"></i> Playlists</span>
-          <h3 class="font-serif-italic text-white mb-1">Añadir a Playlist</h3>
-          <p class="text-white-50 small mb-0">Elige una lista o crea una nueva al instante.</p>
+          <span class="badge rounded-pill bz-ad-badge mb-2"><i class="bi bi-music-note-list me-1.5"></i> <span data-i18n="addPl.badge">Playlists</span></span>
+          <h3 class="font-serif-italic text-white mb-1" data-i18n="addPl.title">Añadir a Playlist</h3>
+          <p class="text-white-50 small mb-0" data-i18n="addPl.desc">Elige una lista o crea una nueva al instante.</p>
         </div>
         <div id="addToPlaylistBody" class="my-3" style="max-height: 220px; overflow-y: auto;"></div>
         <form id="formQuickCreatePlaylist" class="border-top border-white border-opacity-10 pt-3 d-flex gap-2 align-items-center">
-          <input id="inputQuickPlaylistName" type="text" required class="form-control bz-input-dark rounded-pill px-3 py-2 text-start flex-grow-1" placeholder="Nueva playlist..." style="font-size: 0.88rem;" />
-          <button type="submit" class="btn bz-ad-btn-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 40px; height: 40px; padding: 0;" title="Crear y añadir"><i class="bi bi-plus-lg"></i></button>
+          <input id="inputQuickPlaylistName" type="text" required class="form-control bz-input-dark rounded-pill px-3 py-2 text-start flex-grow-1" placeholder="Nueva playlist..." data-i18n-placeholder="addPl.quickPlaceholder" style="font-size: 0.88rem;" />
+          <button type="submit" class="btn bz-ad-btn-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 40px; height: 40px; padding: 0;" title="Crear y añadir" data-i18n-title="addPl.quickCreateBtn"><i class="bi bi-plus-lg"></i></button>
         </form>
       </div>
     </div>
@@ -781,17 +781,17 @@
   <div class="modal fade" id="addAdminModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
       <div class="modal-content bz-ad-card position-relative overflow-hidden text-center p-4 p-md-5">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar" data-i18n-aria="nav.close"><i class="bi bi-x-lg"></i></button>
         <div class="d-flex justify-content-center mb-3">
-          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-shield-lock me-1.5"></i> Administrador Demo</span>
+          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-shield-lock me-1.5"></i> <span data-i18n="admin.addBadge">Administrador Demo</span></span>
         </div>
-        <h3 class="font-serif-italic text-white mb-2">Agregar Administrador</h3>
-        <p class="small text-white-50 mb-4">Añade una cuenta administrativa dentro de la tabla demostrativa.</p>
+        <h3 class="font-serif-italic text-white mb-2" data-i18n="admin.addTitle">Agregar Administrador</h3>
+        <p class="small text-white-50 mb-4" data-i18n="admin.addDesc">Añade una cuenta administrativa dentro de la tabla demostrativa.</p>
         <form id="formAddDemoAdmin" class="d-grid gap-3">
-          <input id="inputAddAdminEmail" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 text-center" placeholder="ej. colaborador@bitszone.app" />
+          <input id="inputAddAdminEmail" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 text-center" placeholder="ej. colaborador@bitszone.app" data-i18n-placeholder="admin.addPlaceholder" />
           <div class="d-flex align-items-center justify-content-center gap-3 pt-1">
-            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill">Asignar Admin</button>
+            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal" data-i18n="confirm.cancel">Cancelar</button>
+            <button type="submit" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill" data-i18n="admin.assignBtn">Asignar Admin</button>
           </div>
         </form>
       </div>
@@ -801,18 +801,18 @@
   <div class="modal fade" id="releaseDemoModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
       <div class="modal-content bz-ad-card position-relative overflow-hidden text-center p-4 p-md-5">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar" data-i18n-aria="nav.close"><i class="bi bi-x-lg"></i></button>
         <div class="d-flex justify-content-center mb-3">
-          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-disc me-1.5"></i> Catálogo Demo</span>
+          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-disc me-1.5"></i> <span data-i18n="admin.releaseBadge">Catálogo Demo</span></span>
         </div>
-        <h3 class="font-serif-italic text-white mb-2">Registrar Lanzamiento</h3>
-        <p class="small text-white-50 mb-4">Agrega un álbum demostrativo temporal al catálogo actual.</p>
+        <h3 class="font-serif-italic text-white mb-2" data-i18n="admin.releaseTitle">Registrar Lanzamiento</h3>
+        <p class="small text-white-50 mb-4" data-i18n="admin.releaseDesc">Agrega un álbum demostrativo temporal al catálogo actual.</p>
         <form id="formReleaseDemo" class="d-grid gap-3">
-          <input id="relTitleInput" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 text-center" placeholder="Título del álbum o pista" />
-          <input id="relArtistInput" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 text-center" placeholder="Artista o grupo" />
+          <input id="relTitleInput" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 text-center" placeholder="Título del álbum o pista" data-i18n-placeholder="admin.relTitlePlaceholder" />
+          <input id="relArtistInput" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 text-center" placeholder="Artista o grupo" data-i18n-placeholder="admin.relArtistPlaceholder" />
           <div class="d-flex align-items-center justify-content-center gap-3 pt-1">
-            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal">Cancelar</button>
-            <button type="submit" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill">Agregar</button>
+            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal" data-i18n="confirm.cancel">Cancelar</button>
+            <button type="submit" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill" data-i18n="admin.addBtn">Agregar</button>
           </div>
         </form>
       </div>
@@ -822,14 +822,14 @@
   <div class="modal fade" id="catalogDiagModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
       <div class="modal-content bz-ad-card position-relative overflow-hidden p-4 p-md-5">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar" data-i18n-aria="nav.close"><i class="bi bi-x-lg"></i></button>
         <div class="text-center mb-3">
-          <span class="badge rounded-pill bz-ad-badge mb-2"><i class="bi bi-activity me-1.5"></i> Diagnóstico</span>
-          <h3 class="font-serif-italic text-white mb-1">Estado del Catálogo</h3>
+          <span class="badge rounded-pill bz-ad-badge mb-2"><i class="bi bi-activity me-1.5"></i> <span data-i18n="admin.diagBadge">Diagnóstico</span></span>
+          <h3 class="font-serif-italic text-white mb-1" data-i18n="admin.diagTitle">Estado del Catálogo</h3>
         </div>
         <div id="catalogDiagBody" class="mb-4"></div>
         <div class="text-center">
-          <button type="button" class="btn bz-ad-btn-primary rounded-pill px-5 py-2.5 shadow-sm" data-bs-dismiss="modal">Entendido</button>
+          <button type="button" class="btn bz-ad-btn-primary rounded-pill px-5 py-2.5 shadow-sm" data-bs-dismiss="modal" data-i18n="admin.diagUnderstood">Entendido</button>
         </div>
       </div>
     </div>
@@ -848,10 +848,10 @@
           <!-- Header: Kicker a la izquierda y Cuenta Regresiva a la derecha -->
           <div class="d-flex align-items-center justify-content-between mb-4 mt-2">
             <span id="adSponsorBadge" class="badge rounded-pill bz-ad-badge">
-              <i class="bi bi-stars me-1 text-white-50"></i> Publicidad
+              <i class="bi bi-stars me-1 text-white-50"></i> <span data-i18n="ad.sponsorBadge">Publicidad</span>
             </span>
             <div class="bz-ad-countdown-pill d-inline-flex align-items-center gap-1.5 px-3 py-1 rounded-pill">
-              <span class="small font-mono-bz text-white-50" style="font-size: 0.78rem;">Continuará en</span>
+              <span class="small font-mono-bz text-white-50" style="font-size: 0.78rem;" data-i18n="ad.willContinueIn">Continuará en</span>
               <strong id="adSecondsLeft" class="font-mono-bz text-white ms-1" style="font-size: 0.82rem;">8s</strong>
             </div>
           </div>
@@ -863,16 +863,16 @@
           </div>
 
           <!-- Contenido Esencial, Elegante y de Alto Impacto -->
-          <h3 id="adSponsorTitle" class="bz-ad-title">Desbloquea Bitszone Premium</h3>
-          <p id="adSponsorDesc" class="bz-ad-desc">Escucha canciones completas sin límites de 30 segundos, sin pausas publicitarias y con audio de máxima calidad.</p>
+          <h3 id="adSponsorTitle" class="bz-ad-title" data-i18n="ad.title">Desbloquea Bitszone Premium</h3>
+          <p id="adSponsorDesc" class="bz-ad-desc" data-i18n="ad.desc">Escucha canciones completas sin límites de 30 segundos, sin pausas publicitarias y con audio de máxima calidad.</p>
 
           <!-- Botones de Acción con separación cómoda y elegante -->
           <div class="bz-ad-actions pt-2">
             <a href="./login.html" class="btn bz-ad-btn-primary py-2.5 rounded-pill shadow-sm">
-              <i class="bi bi-box-arrow-in-right me-1.5"></i> Iniciar sesión gratis
+              <i class="bi bi-box-arrow-in-right me-1.5"></i> <span data-i18n="ad.signInFree">Iniciar sesión gratis</span>
             </a>
             <button id="btnSkipAd" type="button" class="btn bz-ad-btn-skip py-2.5 rounded-pill d-none">
-              Omitir anuncio <i class="bi bi-arrow-right ms-1"></i>
+              <span data-i18n="ad.skip">Omitir anuncio</span> <i class="bi bi-arrow-right ms-1"></i>
             </button>
           </div>
         </div>
@@ -885,13 +885,13 @@
     <div class="modal-dialog modal-dialog-centered" style="max-width: 470px;">
       <div class="modal-content bz-ad-card position-relative overflow-hidden text-center">
         <!-- Botón cerrar sutil en la esquina -->
-        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        <button type="button" class="btn-close btn-close-white position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal" aria-label="Cerrar" data-i18n-aria="nav.close"></button>
 
         <div class="p-4 p-sm-5 pt-4">
           <!-- Header: Kicker Badge centrado -->
           <div class="d-flex align-items-center justify-content-center mb-4 mt-2">
             <span id="authModalBadge" class="badge rounded-pill bz-ad-badge">
-              <i class="bi bi-stars me-1 text-white-50"></i> Función exclusiva
+              <i class="bi bi-stars me-1 text-white-50"></i> <span data-i18n="authModal.badge">Función exclusiva</span>
             </span>
           </div>
 
@@ -902,15 +902,15 @@
           </div>
 
           <!-- Contenido Esencial, Elegante y de Alto Impacto -->
-          <h3 id="authModalTitle" class="bz-ad-title">Inicia sesión para continuar</h3>
-          <p id="authModalDesc" class="bz-ad-desc">Crea tu cuenta o inicia sesión gratis para desbloquear descargas sin conexión, guardar favoritos, crear tus listas y licenciar música.</p>
+          <h3 id="authModalTitle" class="bz-ad-title" data-i18n="authModal.title">Inicia sesión para continuar</h3>
+          <p id="authModalDesc" class="bz-ad-desc" data-i18n="authModal.desc">Crea tu cuenta o inicia sesión gratis para desbloquear descargas sin conexión, guardar favoritos, crear tus listas y licenciar música.</p>
 
           <!-- Botones de Acción con separación cómoda y elegante -->
           <div class="bz-ad-actions pt-2">
             <a href="./login.html" class="btn bz-ad-btn-primary py-2.5 rounded-pill shadow-sm">
-              <i class="bi bi-box-arrow-in-right me-1.5"></i> Iniciar sesión gratis
+              <i class="bi bi-box-arrow-in-right me-1.5"></i> <span data-i18n="ad.signInFree">Iniciar sesión gratis</span>
             </a>
-            <button type="button" class="btn bz-ad-btn-skip py-2.5 rounded-pill" data-bs-dismiss="modal">
+            <button type="button" class="btn bz-ad-btn-skip py-2.5 rounded-pill" data-bs-dismiss="modal" data-i18n="authModal.continueExploring">
               Continuar explorando
             </button>
           </div>

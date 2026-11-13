@@ -270,11 +270,20 @@
   // ---- Preferencias Simplificadas ----
   function getSettings() {
     var saved = readJson('bz_v_settings', null);
+    if (!saved) {
+      try {
+        var rawGuest = localStorage.getItem('bz_v_settings_guest');
+        if (rawGuest) saved = JSON.parse(rawGuest);
+      } catch (e) {}
+    }
     return Object.assign({}, DEFAULT_SETTINGS, saved || {});
   }
   function saveSettings(settings) {
     var clean = Object.assign({}, DEFAULT_SETTINGS, settings);
     writeJson('bz_v_settings', clean);
+    try {
+      localStorage.setItem('bz_v_settings_guest', JSON.stringify(clean));
+    } catch (e) {}
     applySettingsToDOM(clean);
     return clean;
   }
@@ -323,6 +332,17 @@
         }
       });
     } catch (e) {}
+  }
+
+  // Aplicar tema y preferencias guardadas automáticamente al inicializar
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        applySettingsToDOM();
+      });
+    } else {
+      applySettingsToDOM();
+    }
   }
 
   window.BitszoneStorage = {

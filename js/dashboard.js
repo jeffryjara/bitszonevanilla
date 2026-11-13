@@ -5,6 +5,19 @@
 (function (window) {
   'use strict';
 
+  function _t(key, fallback, params) {
+    if (window.BitszoneI18n && typeof window.BitszoneI18n.t === 'function') {
+      return window.BitszoneI18n.t(key, fallback, params);
+    }
+    var str = (fallback !== undefined) ? fallback : key;
+    if (params && typeof params === 'object') {
+      Object.keys(params).forEach(function (p) {
+        str = str.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]);
+      });
+    }
+    return str;
+  }
+
   var STORAGE_DEMO_USERS = 'bz_vanilla_demo_admins_v1';
 
   var INITIAL_DEMO_USERS = [
@@ -83,43 +96,45 @@
     { name: 'Salsa & Tropical', percent: 6, count: '17,110', color: '#34d399' }
   ];
 
-  var SYSTEM_ACTIVITY_EVENTS = [
-    {
-      title: 'Sincronización de Catálogo',
-      detail: 'Pistas de Supabase REST API verificadas correctamente con 24 álbumes.',
-      time: 'Hace 2 min',
-      icon: 'bi-check2-circle',
-      color: '#34d399'
-    },
-    {
-      title: 'Hito de Reproducción',
-      detail: '"Billie Jean" de Michael Jackson superó las 48,000 escuchas activas.',
-      time: 'Hace 18 min',
-      icon: 'bi-fire',
-      color: '#f472b6'
-    },
-    {
-      title: 'Almacenamiento Offline',
-      detail: 'Caché de descargas IndexedDB optimizado al 100% en clientes activos.',
-      time: 'Hace 45 min',
-      icon: 'bi-cloud-check',
-      color: '#818cf8'
-    },
-    {
-      title: 'Seguridad y Acceso',
-      detail: 'Sesión de Administrador autorizada y enlazada al panel de control.',
-      time: 'Hace 1 hora',
-      icon: 'bi-shield-check',
-      color: '#c084fc'
-    },
-    {
-      title: 'Monitoreo de Infraestructura',
-      detail: 'Latencia constante de 24ms sin pérdida de paquetes en streaming.',
-      time: 'Hace 2 horas',
-      icon: 'bi-activity',
-      color: '#38bdf8'
-    }
-  ];
+  function getSystemActivityEvents() {
+    return [
+      {
+        title: _t('admin.event1Title', 'Sincronización de Catálogo'),
+        detail: _t('admin.diagTracksDetail', 'Pistas de Supabase REST API verificadas correctamente con 24 álbumes.'),
+        time: _t('toast.timeMinAgo', 'Hace {n} min', { n: 2 }),
+        icon: 'bi-check2-circle',
+        color: '#34d399'
+      },
+      {
+        title: _t('admin.event2Title', 'Hito de Reproducción'),
+        detail: _t('admin.event2Detail', '"Billie Jean" de Michael Jackson superó las 48,000 escuchas activas.'),
+        time: _t('toast.timeMinAgo', 'Hace {n} min', { n: 18 }),
+        icon: 'bi-fire',
+        color: '#f472b6'
+      },
+      {
+        title: _t('admin.event3Title', 'Almacenamiento Offline'),
+        detail: _t('admin.diagCacheDetail', 'Caché de descargas IndexedDB optimizado al 100% en clientes activos.'),
+        time: _t('toast.timeMinAgo', 'Hace {n} min', { n: 45 }),
+        icon: 'bi-cloud-check',
+        color: '#818cf8'
+      },
+      {
+        title: _t('admin.event4Title', 'Seguridad y Acceso'),
+        detail: _t('admin.diagAuthDetail', 'Sesión de Administrador autorizada y enlazada al panel de control.'),
+        time: _t('toast.timeHourAgo', 'Hace {n} h', { n: 1 }),
+        icon: 'bi-shield-check',
+        color: '#c084fc'
+      },
+      {
+        title: _t('admin.event5Title', 'Monitoreo de Infraestructura'),
+        detail: _t('admin.event5Detail', 'Latencia constante de 24ms sin pérdida de paquetes en streaming.'),
+        time: _t('toast.timeHourAgo', 'Hace {n} h', { n: 2 }),
+        icon: 'bi-activity',
+        color: '#38bdf8'
+      }
+    ];
+  }
 
   var state = {
     activeTab: 'overview',
@@ -241,11 +256,11 @@
     var headerHtml =
       '<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">' +
         '<div>' +
-          '<h1 class="display-6 fw-bold text-white mb-0">Dashboard de Administración</h1>' +
+          '<h1 class="display-6 fw-bold text-white mb-0">' + esc(_t('admin.dashboardTitle', 'Dashboard de Administración')) + '</h1>' +
         '</div>' +
         '<div class="d-flex flex-wrap gap-2">' +
           '<button id="btnDashBack" type="button" class="btn bz-btn-subtle btn-sm px-3 py-2">' +
-            '<i class="bi bi-arrow-left me-1"></i> Volver al Catálogo' +
+            '<i class="bi bi-arrow-left me-1"></i> ' + esc(_t('dashboard.backToCatalog', 'Volver al Catálogo')) +
           '</button>' +
         '</div>' +
       '</div>';
@@ -254,9 +269,9 @@
     var tabsHtml =
       '<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">' +
         '<div class="bz-dock-pills nav nav-pills overflow-auto" role="tablist">' +
-          '<button class="nav-link ' + (state.activeTab === 'overview' ? 'active' : '') + '" data-dash-tab="overview"><i class="bi bi-activity me-1"></i>Visión General</button>' +
-          '<button class="nav-link ' + (state.activeTab === 'users' ? 'active' : '') + '" data-dash-tab="users"><i class="bi bi-shield-check me-1"></i>Admins (' + state.users.length + ')</button>' +
-          '<button class="nav-link ' + (state.activeTab === 'music' ? 'active' : '') + '" data-dash-tab="music"><i class="bi bi-music-note-beamed me-1"></i>Música (380)</button>' +
+          '<button class="nav-link ' + (state.activeTab === 'overview' ? 'active' : '') + '" data-dash-tab="overview"><i class="bi bi-activity me-1"></i>' + esc(_t('dashboard.overview', 'Visión General')) + '</button>' +
+          '<button class="nav-link ' + (state.activeTab === 'users' ? 'active' : '') + '" data-dash-tab="users"><i class="bi bi-shield-check me-1"></i>' + esc(_t('dashboard.admins', 'Admins')) + ' (' + state.users.length + ')</button>' +
+          '<button class="nav-link ' + (state.activeTab === 'music' ? 'active' : '') + '" data-dash-tab="music"><i class="bi bi-music-note-beamed me-1"></i>' + esc(_t('dashboard.music', 'Música')) + ' (380)</button>' +
         '</div>' +
       '</div>';
 
@@ -269,41 +284,41 @@
           '<div class="col-12 col-sm-6 col-xl-3">' +
             '<div class="bz-glass-card p-4 h-100">' +
               '<div class="d-flex justify-content-between align-items-center mb-2">' +
-                '<span class="small text-uppercase text-white-50 fw-semibold">Administradores</span>' +
+                '<span class="small text-uppercase text-white-50 fw-semibold">' + esc(_t('admin.thAdmin', 'Administradores')) + '</span>' +
                 '<span class="p-2 rounded-3 bg-white bg-opacity-10" style="color:var(--bz-lavender);"><i class="bi bi-shield-check"></i></span>' +
               '</div>' +
               '<div class="display-6 fw-bold text-white mb-1">' + adminCount + '</div>' +
-              '<div class="small" style="color:var(--bz-soft);">' + adminCount + ' Administradores activos</div>' +
+              '<div class="small" style="color:var(--bz-soft);">' + adminCount + ' ' + esc(_t('admin.statActiveAdmins', 'Administradores activos')) + '</div>' +
             '</div>' +
           '</div>' +
           '<div class="col-12 col-sm-6 col-xl-3">' +
             '<div class="bz-glass-card p-4 h-100">' +
               '<div class="d-flex justify-content-between align-items-center mb-2">' +
-                '<span class="small text-uppercase text-white-50 fw-semibold">Reproducciones</span>' +
+                '<span class="small text-uppercase text-white-50 fw-semibold">' + esc(_t('admin.plays', 'Reproducciones')) + '</span>' +
                 '<span class="p-2 rounded-3 bg-white bg-opacity-10" style="color:var(--bz-lavender);"><i class="bi bi-headphones"></i></span>' +
               '</div>' +
               '<div class="display-6 fw-bold text-white mb-1">284,910</div>' +
-              '<div class="small text-success"><i class="bi bi-arrow-up-right me-1"></i>+28.4% este mes</div>' +
+              '<div class="small text-success"><i class="bi bi-arrow-up-right me-1"></i>+28.4% ' + esc(_t('admin.thisMonth', 'este mes')) + '</div>' +
             '</div>' +
           '</div>' +
           '<div class="col-12 col-sm-6 col-xl-3">' +
             '<div class="bz-glass-card p-4 h-100">' +
               '<div class="d-flex justify-content-between align-items-center mb-2">' +
-                '<span class="small text-uppercase text-white-50 fw-semibold">Pistas Descargadas</span>' +
+                '<span class="small text-uppercase text-white-50 fw-semibold">' + esc(_t('admin.statDownloadedTracks', 'Pistas Descargadas')) + '</span>' +
                 '<span class="p-2 rounded-3 bg-white bg-opacity-10" style="color:var(--bz-lavender);"><i class="bi bi-cloud-download"></i></span>' +
               '</div>' +
               '<div class="display-6 fw-bold text-white mb-1">43,120</div>' +
-              '<div class="small" style="color:var(--bz-soft);">14.2 TB transferidos</div>' +
+              '<div class="small" style="color:var(--bz-soft);">' + esc(_t('admin.statTransferred', '14.2 TB transferidos')) + '</div>' +
             '</div>' +
           '</div>' +
           '<div class="col-12 col-sm-6 col-xl-3">' +
             '<div class="bz-glass-card p-4 h-100">' +
               '<div class="d-flex justify-content-between align-items-center mb-2">' +
-                '<span class="small text-uppercase text-white-50 fw-semibold">Catálogo Activo</span>' +
+                '<span class="small text-uppercase text-white-50 fw-semibold">' + esc(_t('admin.statActiveCatalog', 'Catálogo Activo')) + '</span>' +
                 '<span class="p-2 rounded-3 bg-white bg-opacity-10" style="color:var(--bz-lavender);"><i class="bi bi-disc"></i></span>' +
               '</div>' +
-              '<div class="display-6 fw-bold text-white mb-1">24 <span class="fs-5 fw-normal text-white-50">Álbumes</span></div>' +
-              '<div class="small" style="color:var(--bz-soft);">380 canciones Hi-Res</div>' +
+              '<div class="display-6 fw-bold text-white mb-1">24 <span class="fs-5 fw-normal text-white-50">' + esc(_t('admin.statAlbums', 'Álbumes')) + '</span></div>' +
+              '<div class="small" style="color:var(--bz-soft);">' + esc(_t('admin.statHiResSongs', '380 canciones Hi-Res')) + '</div>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -313,44 +328,44 @@
           '<div class="col-12 col-sm-6 col-xl-3">' +
             '<div class="bz-glass-card p-3 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.03);">' +
               '<div class="d-flex align-items-center justify-content-between mb-2">' +
-                '<span class="small text-white-50">Oyentes en Línea</span>' +
-                '<span class="badge rounded-pill bg-success bg-opacity-25 text-success font-mono-bz px-2 py-1"><i class="bi bi-broadcast me-1"></i>En Vivo</span>' +
+                '<span class="small text-white-50">' + esc(_t('admin.onlineListeners', 'Oyentes en Línea')) + '</span>' +
+                '<span class="badge rounded-pill bg-success bg-opacity-25 text-success font-mono-bz px-2 py-1"><i class="bi bi-broadcast me-1"></i>' + esc(_t('admin.live', 'En Vivo')) + '</span>' +
               '</div>' +
               '<div class="h3 fw-bold text-white mb-1 font-mono-bz">1,428</div>' +
-              '<div class="small text-white-50">Streaming simultáneo activo</div>' +
+              '<div class="small text-white-50">' + esc(_t('admin.activeStreaming', 'Streaming simultáneo activo')) + '</div>' +
             '</div>' +
           '</div>' +
           '<div class="col-12 col-sm-6 col-xl-3">' +
             '<div class="bz-glass-card p-3 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.03);">' +
               '<div class="d-flex align-items-center justify-content-between mb-2">' +
-                '<span class="small text-white-50">Almacenamiento CDN</span>' +
+                '<span class="small text-white-50">' + esc(_t('admin.cdnStorage', 'Almacenamiento CDN')) + '</span>' +
                 '<span class="small text-white-50 font-mono-bz">71%</span>' +
               '</div>' +
               '<div class="h3 fw-bold text-white mb-2 font-mono-bz">14.2 <span class="fs-6 fw-normal text-white-50">/ 20 TB</span></div>' +
               '<div class="progress rounded-pill bg-white bg-opacity-10" style="height: 6px;">' +
                 '<div class="progress-bar rounded-pill" style="width: 71%; background: linear-gradient(90deg, #c084fc, #f472b6);"></div>' +
               '</div>' +
-              '<div class="small text-white-50 mt-1">5.8 TB libres en almacenamiento</div>' +
+              '<div class="small text-white-50 mt-1">' + esc(_t('admin.storageFree', '5.8 TB libres en almacenamiento')) + '</div>' +
             '</div>' +
           '</div>' +
           '<div class="col-12 col-sm-6 col-xl-3">' +
             '<div class="bz-glass-card p-3 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.03);">' +
               '<div class="d-flex align-items-center justify-content-between mb-2">' +
-                '<span class="small text-white-50">Uptime y Disponibilidad</span>' +
+                '<span class="small text-white-50">' + esc(_t('admin.uptime', 'Uptime y Disponibilidad')) + '</span>' +
                 '<span class="text-success small"><i class="bi bi-shield-fill-check"></i></span>' +
               '</div>' +
               '<div class="h3 fw-bold text-white mb-1 font-mono-bz">99.98%</div>' +
-              '<div class="small text-white-50">Cero incidencias en 30 días</div>' +
+              '<div class="small text-white-50">' + esc(_t('admin.uptimeDesc', 'Cero incidencias en 30 días')) + '</div>' +
             '</div>' +
           '</div>' +
           '<div class="col-12 col-sm-6 col-xl-3">' +
             '<div class="bz-glass-card p-3 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.03);">' +
               '<div class="d-flex align-items-center justify-content-between mb-2">' +
-                '<span class="small text-white-50">Calidad de Streaming</span>' +
+                '<span class="small text-white-50">' + esc(_t('admin.streamingQuality', 'Calidad de Streaming')) + '</span>' +
                 '<span class="badge rounded-pill bg-white bg-opacity-10 text-white font-mono-bz">Hi-Res</span>' +
               '</div>' +
               '<div class="h3 fw-bold text-white mb-1 font-mono-bz">320 kbps</div>' +
-              '<div class="small text-white-50">Audio estéreo sin pérdidas</div>' +
+              '<div class="small text-white-50">' + esc(_t('admin.losslessAudio', 'Audio estéreo sin pérdidas')) + '</div>' +
             '</div>' +
           '</div>' +
         '</div>' +
@@ -361,12 +376,12 @@
             '<div class="bz-glass-card p-4 h-100">' +
               '<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-3">' +
                 '<div>' +
-                  '<h4 class="h5 fw-bold text-white mb-1"><i class="bi bi-graph-up-arrow me-2" style="color:var(--bz-lavender);"></i>Tráfico y Reproducciones</h4>' +
-                  '<p class="small text-white-50 mb-0">Picos de actividad y telemetría de streaming</p>' +
+                  '<h4 class="h5 fw-bold text-white mb-1"><i class="bi bi-graph-up-arrow me-2" style="color:var(--bz-lavender);"></i>' + esc(_t('admin.trafficTitle', 'Tráfico y Reproducciones')) + '</h4>' +
+                  '<p class="small text-white-50 mb-0">' + esc(_t('admin.trafficDesc', 'Picos de actividad y telemetría de streaming')) + '</p>' +
                 '</div>' +
                 '<div class="bz-segmented-dock">' +
                   ['24h', '7d', '30d'].map(function (r) {
-                    var label = r === '24h' ? '24 Horas' : r === '7d' ? '7 Días' : '30 Días';
+                    var label = r === '24h' ? _t('admin.range24h', '24 Horas') : r === '7d' ? _t('admin.range7d', '7 Días') : _t('admin.range30d', '30 Días');
                     var activeCls = state.timeRange === r ? 'active' : '';
                     return '<button type="button" class="bz-segmented-btn ' + activeCls + '" data-dash-range="' + r + '">' + label + '</button>';
                   }).join('') +
@@ -379,7 +394,7 @@
                     '<div class="bz-chart-col">' +
                       '<div class="bz-chart-tooltip text-center">' +
                         '<strong class="d-block text-white">' + c.plays.toLocaleString() + ' plays</strong>' +
-                        '<span style="color:var(--bz-soft);">' + c.users.toLocaleString() + ' oyentes</span>' +
+                        '<span style="color:var(--bz-soft);">' + c.users.toLocaleString() + ' ' + esc(_t('admin.chartListeners', 'oyentes')) + '</span>' +
                       '</div>' +
                       '<div class="bz-chart-track">' +
                         '<div class="bz-chart-bar" style="height:' + hPct + '%;"></div>' +
@@ -396,10 +411,10 @@
             '<div class="bz-glass-card p-4 h-100 d-flex flex-column justify-content-between">' +
               '<div>' +
                 '<div class="d-flex align-items-center justify-content-between mb-3">' +
-                  '<h4 class="h5 fw-bold text-white mb-0"><i class="bi bi-pie-chart me-2" style="color:var(--bz-lavender);"></i>Géneros en Tendencia</h4>' +
-                  '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz">Audiencia</span>' +
+                  '<h4 class="h5 fw-bold text-white mb-0"><i class="bi bi-pie-chart me-2" style="color:var(--bz-lavender);"></i>' + esc(_t('admin.genresTitle', 'Géneros en Tendencia')) + '</h4>' +
+                  '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz">' + esc(_t('admin.audience', 'Audiencia')) + '</span>' +
                 '</div>' +
-                '<p class="small text-white-50 mb-4">Preferencia de géneros entre la comunidad de oyentes</p>' +
+                '<p class="small text-white-50 mb-4">' + esc(_t('admin.genresDesc', 'Preferencia de géneros entre la comunidad de oyentes')) + '</p>' +
                 '<div class="d-grid gap-3">' +
                   GENRE_DISTRIBUTION.map(function (g) {
                     return (
@@ -417,8 +432,8 @@
                 '</div>' +
               '</div>' +
               '<div class="pt-3 border-top border-white border-opacity-10 mt-3 d-flex align-items-center justify-content-between small text-white-50">' +
-                '<span>Plataforma principal:</span>' +
-                '<strong class="text-white font-mono-bz">Web Desktop 58% · Móvil 36%</strong>' +
+                '<span>' + esc(_t('admin.mainPlatform', 'Plataforma principal:')) + '</span>' +
+                '<strong class="text-white font-mono-bz">' + esc(_t('admin.platformSplit', 'Web Desktop 58% · Móvil 36%')) + '</strong>' +
               '</div>' +
             '</div>' +
           '</div>' +
@@ -429,10 +444,10 @@
           '<div class="col-12 col-xl-6">' +
             '<div class="bz-glass-card p-4 h-100">' +
               '<div class="d-flex align-items-center justify-content-between mb-3">' +
-                '<h4 class="h5 fw-bold text-white mb-0"><i class="bi bi-fire me-2 text-warning"></i>Top Canciones en Plataforma</h4>' +
-                '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz">Catálogo</span>' +
+                '<h4 class="h5 fw-bold text-white mb-0"><i class="bi bi-fire me-2 text-warning"></i>' + esc(_t('admin.topTracksInPlatform', 'Top Canciones en Plataforma')) + '</h4>' +
+                '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz">' + esc(_t('admin.catalogBadge', 'Catálogo')) + '</span>' +
               '</div>' +
-              '<p class="small text-white-50 mb-3">Pistas con mayor volumen de reproducción y descargas</p>' +
+              '<p class="small text-white-50 mb-3">' + esc(_t('admin.topTracksDesc', 'Pistas con mayor volumen de reproducción y descargas')) + '</p>' +
               '<div class="d-grid gap-2">' +
                 DEMO_POPULAR_TRACKS.map(function (t, i) {
                   return (
@@ -447,7 +462,7 @@
                       '</div>' +
                       '<div class="text-end font-mono-bz" style="font-size:0.78rem;">' +
                         '<div class="text-white fw-bold">' + t.plays.toLocaleString() + ' plays</div>' +
-                        '<div class="text-white-50">' + t.downloads.toLocaleString() + ' descargas</div>' +
+                        '<div class="text-white-50">' + t.downloads.toLocaleString() + ' ' + esc(_t('admin.thDownloads', 'descargas')) + '</div>' +
                       '</div>' +
                     '</div>'
                   );
@@ -459,12 +474,12 @@
           '<div class="col-12 col-xl-6">' +
             '<div class="bz-glass-card p-4 h-100">' +
               '<div class="d-flex align-items-center justify-content-between mb-3">' +
-                '<h4 class="h5 fw-bold text-white mb-0"><i class="bi bi-clock-history me-2" style="color:var(--bz-lavender);"></i>Registro de Actividad y Eventos</h4>' +
-                '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz">Auditoría</span>' +
+                '<h4 class="h5 fw-bold text-white mb-0"><i class="bi bi-clock-history me-2" style="color:var(--bz-lavender);"></i>' + esc(_t('admin.recentEvents', 'Registro de Actividad y Eventos')) + '</h4>' +
+                '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz">' + esc(_t('admin.auditBadge', 'Auditoría')) + '</span>' +
               '</div>' +
-              '<p class="small text-white-50 mb-3">Eventos recientes registrados por el sistema de Bitszone</p>' +
+              '<p class="small text-white-50 mb-3">' + esc(_t('admin.recentEventsDesc', 'Eventos recientes registrados por el sistema de Bitszone')) + '</p>' +
               '<div class="d-grid gap-2">' +
-                SYSTEM_ACTIVITY_EVENTS.map(function (ev) {
+                getSystemActivityEvents().map(function (ev) {
                   return (
                     '<div class="d-flex align-items-start gap-3 p-2.5 rounded-3" style="background: rgba(255,255,255,0.03);">' +
                       '<div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1" style="width:32px;height:32px;background:rgba(255,255,255,0.08);color:' + ev.color + ';">' +
@@ -492,13 +507,13 @@
             '<div class="col-12 col-md-6">' +
               '<div class="position-relative">' +
                 '<i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-white-50"></i>' +
-                '<input id="dashUserSearch" type="text" class="form-control bz-input-dark bz-input-with-icon" placeholder="Buscar administrador o correo..." value="' + escHtml(state.searchQuery) + '" />' +
+                '<input id="dashUserSearch" type="text" class="form-control bz-input-dark bz-input-with-icon" placeholder="' + escHtml(_t('admin.searchAdminPlaceholder', 'Buscar administrador o correo...')) + '" value="' + escHtml(state.searchQuery) + '" />' +
               '</div>' +
             '</div>' +
             '<div class="col-12 col-md-6 d-flex justify-content-md-end">' +
               '<div class="bz-segmented-dock">' +
                 ['all', 'admin'].map(function (roleKey) {
-                  var txt = roleKey === 'all' ? 'Todos' : 'Admins';
+                  var txt = roleKey === 'all' ? _t('admin.filterAll', 'Todos') : _t('admin.filterAdmins', 'Admins');
                   var activeCls = state.userFilter === roleKey ? 'active' : '';
                   return '<button type="button" class="bz-segmented-btn ' + activeCls + '" data-dash-role="' + roleKey + '">' + txt + '</button>';
                 }).join('') +
@@ -509,27 +524,27 @@
             '<table class="table table-dark table-hover align-middle mb-0" style="--bs-table-bg: transparent; --bs-table-hover-bg: rgba(255,255,255,0.06);">' +
               '<thead>' +
                 '<tr class="text-white-50 small text-uppercase">' +
-                  '<th>Administrador</th><th>Rol</th><th>Estado</th><th class="text-center">Canciones</th><th class="text-center">Descargas</th><th class="text-end">Acción</th>' +
+                  '<th>' + esc(_t('admin.thAdmin', 'Administrador')) + '</th><th>' + esc(_t('admin.thRole', 'Rol')) + '</th><th>' + esc(_t('admin.thStatus', 'Estado')) + '</th><th class="text-center">' + esc(_t('admin.thSongs', 'Canciones')) + '</th><th class="text-center">' + esc(_t('admin.thDownloads', 'Descargas')) + '</th><th class="text-end">' + esc(_t('admin.thAction', 'Acción')) + '</th>' +
                 '</tr>' +
               '</thead>' +
               '<tbody>' +
                 (filteredUsers.length === 0
-                  ? '<tr><td colspan="6" class="text-center py-4 text-white-50">No se encontraron administradores con ese criterio.</td></tr>'
+                  ? '<tr><td colspan="6" class="text-center py-4 text-white-50">' + esc(_t('admin.noAdminsFound', 'No se encontraron administradores con ese criterio.')) + '</td></tr>'
                   : filteredUsers.map(function (u) {
                       var isRoot = (u.id === 'demo-1' || u.email === 'bitszone.app@gmail.com');
                       var avatarHtml = u.avatar_url
                         ? '<img src="' + escHtml(u.avatar_url) + '" alt="" width="38" height="38" class="rounded-circle object-fit-cover" />'
                         : '<span class="rounded-circle d-inline-flex align-items-center justify-content-center fw-bold text-white" style="width:38px;height:38px;background:rgba(168,85,247,0.3);">' + escHtml(u.username.charAt(0).toUpperCase()) + '</span>';
                       
-                      var roleBadge = '<span class="badge rounded-pill" style="background:rgba(168,85,247,0.28);color:#e9d5ff;"><i class="bi bi-shield-check me-1"></i>Admin</span>';
+                      var roleBadge = '<span class="badge rounded-pill" style="background:rgba(168,85,247,0.28);color:#e9d5ff;"><i class="bi bi-shield-check me-1"></i>' + esc(_t('admin.roleAdminBadge', 'Admin')) + '</span>';
 
                       var statusHtml = u.status === 'online'
-                        ? '<span class="text-success small"><i class="bi bi-circle-fill me-1" style="font-size:0.5rem;"></i>En línea</span>'
-                        : '<span class="text-warning small"><i class="bi bi-circle-fill me-1" style="font-size:0.5rem;"></i>Inactivo</span>';
+                        ? '<span class="text-success small"><i class="bi bi-circle-fill me-1" style="font-size:0.5rem;"></i>' + esc(_t('admin.statusOnline', 'En línea')) + '</span>'
+                        : '<span class="text-warning small"><i class="bi bi-circle-fill me-1" style="font-size:0.5rem;"></i>' + esc(_t('admin.statusInactive', 'Inactivo')) + '</span>';
                       
                       var actionBtn = isRoot
-                        ? '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 px-3 py-2"><i class="bi bi-lock me-1"></i>Inmutable</span>'
-                        : '<button type="button" class="btn btn-sm bz-btn-subtle px-3" data-toggle-admin-id="' + escHtml(u.id) + '">' + (u.role === 'admin' ? 'Quitar Admin' : 'Hacer Admin') + '</button>';
+                        ? '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 px-3 py-2"><i class="bi bi-lock me-1"></i>' + esc(_t('admin.immutable', 'Inmutable')) + '</span>'
+                        : '<button type="button" class="btn btn-sm bz-btn-subtle px-3" data-toggle-admin-id="' + escHtml(u.id) + '">' + (u.role === 'admin' ? esc(_t('admin.removeAdmin', 'Quitar Admin')) : esc(_t('admin.makeAdmin', 'Hacer Admin'))) + '</button>';
 
                       return (
                         '<tr>' +
@@ -551,8 +566,8 @@
     } else if (state.activeTab === 'music') {
       bodyHtml =
         '<div class="bz-glass-card p-4 mb-4">' +
-          '<h4 class="h5 fw-bold text-white mb-1"><i class="bi bi-fire me-2" style="color:var(--bz-lavender);"></i>Top Canciones Más Escuchadas</h4>' +
-          '<p class="small text-white-50 mb-4">Métricas de reproducción y rendimiento en el catálogo</p>' +
+          '<h4 class="h5 fw-bold text-white mb-1"><i class="bi bi-fire me-2" style="color:var(--bz-lavender);"></i>' + esc(_t('admin.topTracksGlobal', 'Top Canciones Más Escuchadas')) + '</h4>' +
+          '<p class="small text-white-50 mb-4">' + esc(_t('admin.metricsDesc', 'Métricas de reproducción y rendimiento en el catálogo')) + '</p>' +
           '<div class="d-grid gap-2">' +
             DEMO_POPULAR_TRACKS.map(function (t, i) {
               return (
@@ -564,7 +579,7 @@
                   '</div>' +
                   '<div class="text-end font-mono-bz small">' +
                     '<div class="text-white fw-bold">' + t.plays.toLocaleString() + ' plays</div>' +
-                    '<div class="text-white-50">' + t.downloads.toLocaleString() + ' descargas</div>' +
+                    '<div class="text-white-50">' + t.downloads.toLocaleString() + ' ' + esc(_t('admin.thDownloads', 'descargas')) + '</div>' +
                   '</div>' +
                 '</div>'
               );
@@ -620,7 +635,7 @@
           if (state.users[i].id === uid && state.users[i].id !== 'demo-1' && state.users[i].email !== 'bitszone.app@gmail.com') {
             state.users[i].role = state.users[i].role === 'admin' ? 'user' : 'admin';
             saveDemoUsers();
-            notify('Rol de ' + state.users[i].username + ' actualizado a ' + state.users[i].role.toUpperCase());
+            notify(_t('admin.roleUpdatedToast', 'Rol de {username} actualizado a {role}', { username: state.users[i].username, role: state.users[i].role.toUpperCase() }));
             renderDashboard(container, ctx);
             break;
           }

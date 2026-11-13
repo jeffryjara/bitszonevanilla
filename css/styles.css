@@ -4469,28 +4469,47 @@ body.bz-theme-light {
   --bz-text: #0f172a;
   --bz-muted: #475569;
   --bz-dim: #64748b;
-  --bz-glass-bg: rgba(255, 255, 255, 0.86);
+  --bz-glass-bg: rgba(255, 255, 255, 0.9);
   --bz-glass-border: rgba(15, 23, 42, 0.08);
-  --bz-glass-highlight: rgba(255, 255, 255, 0.95);
+  --bz-glass-highlight: rgba(255, 255, 255, 0.98);
+  background: #ffffff !important;
   background-color: #ffffff !important;
   color: #0f172a !important;
 }
 
-/* Lienzo ambiental luminoso con sutil degradado lavanda y rosa sobre blanco puro */
-body.bz-theme-light .bz-ambient-canvas {
-  background:
-    radial-gradient(ellipse 90% 70% at 15% 15%, rgba(168, 85, 247, 0.09), transparent 60%),
-    radial-gradient(ellipse 80% 65% at 85% 20%, rgba(244, 114, 182, 0.08), transparent 58%),
-    radial-gradient(ellipse 85% 70% at 50% 90%, rgba(99, 102, 241, 0.06), transparent 65%),
-    #ffffff !important;
+/* Lienzo ambiental luminoso sin degradados oscuros — Blanco Puro */
+body.bz-theme-light .bz-ambient-canvas,
+body.bz-theme-light .bz-player-bg-layer,
+body.bz-theme-light[data-theme-mode] .bz-player-bg-layer,
+body.bz-theme-light .bz-player-bg-layer[class*="theme-"] {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
 }
-body.bz-theme-light .bz-molten-orb {
-  opacity: 0.12 !important;
-  filter: blur(110px) !important;
+body.bz-theme-light .bz-dynamic-bg-scrim {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+body.bz-theme-light .bz-dynamic-bg-cover,
+body.bz-theme-light .bz-starfield,
+body.bz-theme-light .bz-noise-overlay,
+body.bz-theme-light .bz-molten-orb,
+body.bz-theme-light .bz-ambient-glow,
+body.bz-theme-light .bz-mini-ambient-glow,
+body.bz-theme-light .bz-exp-backdrop-glow,
+body.bz-theme-light .bz-exp-ambient-bg,
+body.bz-theme-light .bz-exp-ambient-scrim,
+body.bz-theme-light .bz-glass-sheen,
+body.bz-theme-light .bz-artist-halo,
+body.bz-theme-light .bz-artist-hero-glow,
+body.bz-theme-light .bz-album-header-ambient,
+body.bz-theme-light .bz-cover-overlay,
+body.bz-theme-light .bz-auth-vignette {
+  display: none !important;
 }
 
 /* Tipografía en Modo Claro: textos blancos adaptados a contraste nítido oscuro */
-body.bz-theme-light .text-white:not(.bz-keep-white):not(.badge):not(.btn-primary):not(.bz-btn-primary):not(.bz-btn-hero) {
+body.bz-theme-light .text-white:not(.bz-keep-white):not(.badge):not(.btn-primary):not(.bz-btn-primary):not(.bz-btn-hero):not(.bz-album-play-pill) {
   color: #0f172a !important;
 }
 body.bz-theme-light .text-white-50 {
@@ -4501,9 +4520,29 @@ body.bz-theme-light .opacity-50 {
   opacity: 0.75 !important;
 }
 
+/* Compatibilidad con no-blur en Modo Claro */
+body.bz-theme-light.bz-no-blur,
+body.bz-theme-light.bz-no-blur .bz-glass,
+body.bz-theme-light.bz-no-blur .bz-glass-card,
+body.bz-theme-light.bz-no-blur .bz-modal-glass .modal-content,
+body.bz-theme-light.bz-no-blur .bz-miniplayer,
+body.bz-theme-light.bz-no-blur .bz-sidebar,
+body.bz-theme-light.bz-no-blur .bz-side-lyrics-panel,
+body.bz-theme-light.bz-no-blur .bz-queue-drawer,
+body.bz-theme-light.bz-no-blur .bz-expanded-player,
+body.bz-theme-light.bz-no-blur .bz-mobile-tabbar,
+body.bz-theme-light.bz-no-blur .bz-mobile-topbar,
+body.bz-theme-light.bz-no-blur .bz-ad-card,
+body.bz-theme-light.bz-no-blur .modal-content,
+body.bz-theme-light.bz-no-blur .dropdown-menu,
+body.bz-theme-light.bz-no-blur .offcanvas {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+}
+
 /* Sidebar en Modo Claro */
 body.bz-theme-light .bz-sidebar {
-  background: rgba(255, 255, 255, 0.88) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
   border-right: 1px solid rgba(15, 23, 42, 0.08) !important;
@@ -4549,7 +4588,7 @@ body.bz-theme-light #storageAvailText strong {
 
 /* MiniPlayer en Modo Claro */
 body.bz-theme-light .bz-miniplayer {
-  background: rgba(255, 255, 255, 0.94) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
   border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
@@ -4568,9 +4607,7 @@ body.bz-theme-light .bz-miniplayer .btn-icon-subtle:hover {
   color: #0f172a !important;
   background: rgba(15, 23, 42, 0.05) !important;
 }
-body.bz-theme-light .bz-seek-track {
-  background: rgba(15, 23, 42, 0.1) !important;
-}
+body.bz-theme-light .bz-seek-track,
 body.bz-theme-light .bz-vol-track {
   background: rgba(15, 23, 42, 0.1) !important;
 }
@@ -4580,12 +4617,145 @@ body.bz-theme-light #mobMiniPlayBtn {
   color: #ffffff !important;
 }
 
+/* Seekbar Wavy SVG en Modo Claro */
+body.bz-theme-light #bzWavyPlayed,
+body.bz-theme-light #expWavyPlayed {
+  stroke: #7e22ce !important;
+}
+body.bz-theme-light #bzWavyDot,
+body.bz-theme-light #expWavyDot {
+  fill: #7e22ce !important;
+  filter: drop-shadow(0 0 6px rgba(126, 34, 206, 0.4)) !important;
+}
+body.bz-theme-light #bzWavyUnplayed,
+body.bz-theme-light #expWavyUnplayed {
+  stroke: rgba(15, 23, 42, 0.16) !important;
+}
+
+/* Reproductor Gigante Expandido en Modo Claro — Puro Blanco sin degradados */
+body.bz-theme-light .bz-exp-modal .modal-content {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-exp-ambient-bg,
+body.bz-theme-light .bz-exp-ambient-scrim,
+body.bz-theme-light .bz-exp-cover-grad,
+body.bz-theme-light .bz-exp-cover-sheen {
+  display: none !important;
+}
+body.bz-theme-light .bz-exp-close-btn {
+  background: rgba(15, 23, 42, 0.06) !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-exp-track-item {
+  border-bottom-color: rgba(15, 23, 42, 0.06) !important;
+}
+body.bz-theme-light .bz-exp-track-item:hover {
+  background: rgba(15, 23, 42, 0.04) !important;
+}
+body.bz-theme-light .bz-exp-track-item.is-active {
+  background: rgba(126, 34, 206, 0.08) !important;
+}
+body.bz-theme-light .bz-exp-cover-dock {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06) !important;
+}
+body.bz-theme-light #bzExpFloatingMenu {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12) !important;
+}
+body.bz-theme-light .bz-exp-floating-item {
+  color: #334155 !important;
+}
+body.bz-theme-light .bz-exp-floating-item:hover {
+  background: rgba(15, 23, 42, 0.05) !important;
+  color: #0f172a !important;
+}
+
+/* Hero de Secciones & Álbumes en Modo Claro — Sin degradados */
+body.bz-theme-light .bz-section-hero {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-hero-title {
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-hero-stat-pill {
+  background: rgba(15, 23, 42, 0.05) !important;
+  color: #475569 !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-catalog-card {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-track-row {
+  border-color: rgba(15, 23, 42, 0.06) !important;
+}
+body.bz-theme-light .bz-track-row:hover {
+  background: rgba(15, 23, 42, 0.04) !important;
+}
+body.bz-theme-light .bz-track-row.is-playing {
+  background: rgba(126, 34, 206, 0.08) !important;
+}
+body.bz-theme-light .bz-icon-action {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-icon-action:hover {
+  color: #0f172a !important;
+  background: rgba(15, 23, 42, 0.06) !important;
+}
+body.bz-theme-light .bz-sort-pill {
+  background: rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-search-pill-wrap {
+  border-color: rgba(15, 23, 42, 0.1) !important;
+}
+body.bz-theme-light .bz-search-pill-input {
+  background: rgba(15, 23, 42, 0.04) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-search-pill-input::placeholder {
+  color: #94a3b8 !important;
+}
+body.bz-theme-light .bz-search-pill-wrap > i {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-album-header-wrap {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+body.bz-theme-light .bz-album-play-pill {
+  background: #0f172a !important;
+  color: #ffffff !important;
+}
+body.bz-theme-light .bz-album-play-pill:hover {
+  background: #1e293b !important;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22) !important;
+}
+body.bz-theme-light .bz-library-dropdown-btn {
+  background: rgba(15, 23, 42, 0.05) !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  color: #0f172a !important;
+}
+
 /* Tarjetas y Vidrio en Modo Claro */
 body.bz-theme-light .bz-glass,
 body.bz-theme-light .bz-glass-card {
-  background: rgba(255, 255, 255, 0.85) !important;
-  border: 1px solid rgba(15, 23, 42, 0.07) !important;
-  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.02) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04) !important;
 }
 body.bz-theme-light .bz-glass-card:hover {
   border-color: rgba(168, 85, 247, 0.35) !important;
@@ -4598,13 +4768,80 @@ body.bz-theme-light .bz-card-sub {
   color: #64748b !important;
 }
 
-/* Modales en Modo Claro */
+/* Modales & Diálogos en Modo Claro — Fondo Blanco Puro, cero degradados oscuros */
 body.bz-theme-light .bz-modal-glass .modal-content,
-body.bz-theme-light .modal-content {
+body.bz-theme-light .modal-content,
+body.bz-theme-light .modal-content.bz-ad-card,
+body.bz-theme-light .bz-ad-modal .modal-content.bz-ad-card,
+body.bz-theme-light #authRequiredModal .modal-content.bz-ad-card,
+body.bz-theme-light #confirmActionModal .modal-content.bz-ad-card,
+body.bz-theme-light #addToPlaylistModal .modal-content,
+body.bz-theme-light #createPlaylistModal .modal-content,
+body.bz-theme-light #shortcutsModal .modal-content,
+body.bz-theme-light #unsavedGuardModal .modal-content,
+body.bz-theme-light #systemDiagModal .modal-content,
+body.bz-theme-light #accountModal .modal-content,
+body.bz-theme-light #profileModal .modal-content,
+body.bz-theme-light #helpCenterModal .modal-content,
+body.bz-theme-light #settingsModal .modal-content,
+body.bz-theme-light #lyricsSyncModal .modal-content,
+body.bz-theme-light #adminAddUserModal .modal-content,
+body.bz-theme-light #adminEditUserModal .modal-content,
+body.bz-theme-light #adminDeleteModal .modal-content,
+body.bz-theme-light #adminResetModal .modal-content,
+body.bz-theme-light #adminBulkRoleModal .modal-content,
+body.bz-theme-light #adminExportAuditModal .modal-content,
+body.bz-theme-light #adminViewLogModal .modal-content,
+body.bz-theme-light #adminPurgeLogsModal .modal-content,
+body.bz-theme-light #adminBroadcastModal .modal-content {
   background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
   border: 1px solid rgba(15, 23, 42, 0.1) !important;
-  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.15) !important;
+  box-shadow: 0 24px 60px rgba(15, 23, 42, 0.12) !important;
   color: #0f172a !important;
+}
+body.bz-theme-light .bz-ad-card,
+body.bz-theme-light #adCardWrap {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light #addToPlaylistModal,
+body.bz-theme-light #createPlaylistModal,
+body.bz-theme-light #authRequiredModal,
+body.bz-theme-light #confirmActionModal,
+body.bz-theme-light #shortcutsModal,
+body.bz-theme-light #unsavedGuardModal {
+  background: rgba(15, 23, 42, 0.35) !important;
+}
+body.bz-theme-light .modal-header,
+body.bz-theme-light .modal-body,
+body.bz-theme-light .modal-footer {
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .offcanvas,
+body.bz-theme-light .dropdown-menu {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .dropdown-item {
+  color: #334155 !important;
+}
+body.bz-theme-light .dropdown-item:hover,
+body.bz-theme-light .dropdown-item:focus {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .dropdown-item.active {
+  background-color: rgba(126, 34, 206, 0.1) !important;
+  color: #7e22ce !important;
 }
 body.bz-theme-light .bz-modal-close-float {
   background: rgba(15, 23, 42, 0.05) !important;
@@ -4633,6 +4870,108 @@ body.bz-theme-light .bz-btn-subtle {
   background: rgba(15, 23, 42, 0.04) !important;
   border-color: rgba(15, 23, 42, 0.08) !important;
   color: #475569 !important;
+}
+
+/* Tablas, Inputs y Dashboard en Modo Claro */
+body.bz-theme-light .table-dark {
+  --bs-table-bg: #ffffff !important;
+  --bs-table-color: #0f172a !important;
+  --bs-table-border-color: rgba(15, 23, 42, 0.08) !important;
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .table-dark > :not(caption) > * > * {
+  background-color: transparent !important;
+  color: #0f172a !important;
+  border-bottom-color: rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .table-dark tbody tr:hover > * {
+  background-color: rgba(15, 23, 42, 0.03) !important;
+}
+body.bz-theme-light .bz-input-dark,
+body.bz-theme-light .bz-diag-card,
+body.bz-theme-light .bz-event-item,
+body.bz-theme-light .bz-admin-kpi-card {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .form-control,
+body.bz-theme-light .form-select {
+  background-color: #f8fafc !important;
+  border-color: rgba(15, 23, 42, 0.15) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .form-control:focus,
+body.bz-theme-light .form-select:focus {
+  background-color: #ffffff !important;
+  border-color: #7e22ce !important;
+  color: #0f172a !important;
+  box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.15) !important;
+}
+body.bz-theme-light .bz-segmented-dock {
+  background: #f1f5f9 !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-chart-track {
+  background: #e2e8f0 !important;
+}
+body.bz-theme-light .bz-chart-tooltip {
+  background: #0f172a !important;
+  color: #ffffff !important;
+}
+body.bz-theme-light .bz-toast-pill {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-toast-pill span,
+body.bz-theme-light .bz-toast-pill i {
+  color: #0f172a !important;
+}
+
+/* Login Page en Modo Claro */
+body.bz-theme-light.bz-auth-body {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-auth-card {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-auth-right-panel {
+  background: #f8fafc !important;
+  background-image: none !important;
+  border-left: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-auth-title {
+  color: #0f172a !important;
+  text-shadow: none !important;
+}
+body.bz-theme-light .bz-auth-subtitle {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-glass-pill-btn {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06) !important;
+}
+body.bz-theme-light .bz-glass-pill-btn:hover {
+  background: #f1f5f9 !important;
+  color: #0f172a !important;
 }
 
 /* Segmented Buttons en Modo Claro */
@@ -4671,7 +5010,7 @@ body.bz-theme-light .bz-scale-point.is-active {
 
 /* Panel Lateral de Letras en Modo Claro */
 body.bz-theme-light .bz-side-lyrics-panel {
-  background: rgba(255, 255, 255, 0.94) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
   border-left-color: rgba(15, 23, 42, 0.08) !important;
 }
 body.bz-theme-light #sideLyricsTitle {
@@ -4722,27 +5061,69 @@ body.bz-theme-light .border-white {
   border-color: rgba(15, 23, 42, 0.08) !important;
 }
 
+/* Móvil en Modo Claro */
+body.bz-theme-light .bz-mobile-tabbar {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-mobile-topbar {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-mob-tab-btn {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-mob-tab-btn.is-active {
+  color: #7e22ce !important;
+}
+body.bz-theme-light .bz-mob-mini-card {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.08) !important;
+}
+
 /* ==========================================================================
    MODO ALTO CONTRASTE (WCAG AAA) — Blanco Puro (#FFFFFF) y Negro Puro (#000000)
    Diseñado específicamente para personas con discapacidad visual.
    ========================================================================== */
 body.bz-high-contrast,
 body.bz-high-contrast * {
+  background-image: none !important;
   text-shadow: none !important;
   box-shadow: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 body.bz-high-contrast {
+  background-color: #000000 !important;
   background: #000000 !important;
   color: #ffffff !important;
 }
 
+/* Ocultar capas dinámicas, orbes, efectos ambientales y degradados */
 body.bz-high-contrast .bz-ambient-canvas,
 body.bz-high-contrast .bz-molten-orb,
 body.bz-high-contrast .bz-dynamic-bg-cover,
+body.bz-high-contrast .bz-dynamic-bg-scrim,
+body.bz-high-contrast .bz-player-bg-layer,
 body.bz-high-contrast .bz-ambient-glow,
 body.bz-high-contrast .bz-exp-backdrop-glow,
-body.bz-high-contrast .bz-mini-ambient-glow {
+body.bz-high-contrast .bz-exp-ambient-bg,
+body.bz-high-contrast .bz-exp-ambient-scrim,
+body.bz-high-contrast .bz-exp-cover-grad,
+body.bz-high-contrast .bz-exp-cover-sheen,
+body.bz-high-contrast .bz-mini-ambient-glow,
+body.bz-high-contrast .bz-glass-sheen,
+body.bz-high-contrast .bz-artist-halo,
+body.bz-high-contrast .bz-artist-hero-glow,
+body.bz-high-contrast .bz-album-header-ambient,
+body.bz-high-contrast .bz-cover-overlay,
+body.bz-high-contrast .bz-starfield,
+body.bz-high-contrast .bz-noise-overlay,
+body.bz-high-contrast .bz-auth-vignette {
   display: none !important;
 }
 
@@ -4752,18 +5133,60 @@ body.bz-high-contrast .bz-miniplayer,
 body.bz-high-contrast .bz-glass,
 body.bz-high-contrast .bz-glass-card,
 body.bz-high-contrast .modal-content,
+body.bz-high-contrast .bz-modal-glass .modal-content,
 body.bz-high-contrast .bz-side-lyrics-panel,
 body.bz-high-contrast .bz-queue-drawer,
 body.bz-high-contrast .dropdown-menu,
 body.bz-high-contrast .offcanvas,
 body.bz-high-contrast .bz-mobile-tabbar,
-body.bz-high-contrast .bz-mobile-topbar {
-  background: #000000 !important;
+body.bz-high-contrast .bz-mobile-topbar,
+body.bz-high-contrast .bz-section-hero,
+body.bz-high-contrast .bz-album-header-wrap,
+body.bz-high-contrast .bz-catalog-card,
+body.bz-high-contrast .bz-track-row,
+body.bz-high-contrast .bz-exp-modal .modal-content,
+body.bz-high-contrast .bz-exp-cover-dock,
+body.bz-high-contrast .bz-exp-track-item,
+body.bz-high-contrast .bz-ad-card,
+body.bz-high-contrast .bz-mob-mini-card,
+body.bz-high-contrast .modal-content.bz-ad-card,
+body.bz-high-contrast .bz-ad-modal .modal-content.bz-ad-card,
+body.bz-high-contrast #authRequiredModal .modal-content.bz-ad-card,
+body.bz-high-contrast #confirmActionModal .modal-content.bz-ad-card,
+body.bz-high-contrast #addToPlaylistModal .modal-content,
+body.bz-high-contrast #createPlaylistModal .modal-content,
+body.bz-high-contrast #shortcutsModal .modal-content,
+body.bz-high-contrast #unsavedGuardModal .modal-content,
+body.bz-high-contrast #systemDiagModal .modal-content,
+body.bz-high-contrast #accountModal .modal-content,
+body.bz-high-contrast #profileModal .modal-content,
+body.bz-high-contrast #helpCenterModal .modal-content,
+body.bz-high-contrast #settingsModal .modal-content,
+body.bz-high-contrast #lyricsSyncModal .modal-content,
+body.bz-high-contrast #adminAddUserModal .modal-content,
+body.bz-high-contrast #adminEditUserModal .modal-content,
+body.bz-high-contrast #adminDeleteModal .modal-content,
+body.bz-high-contrast #adminResetModal .modal-content,
+body.bz-high-contrast #adminBulkRoleModal .modal-content,
+body.bz-high-contrast #adminExportAuditModal .modal-content,
+body.bz-high-contrast #adminViewLogModal .modal-content,
+body.bz-high-contrast #adminPurgeLogsModal .modal-content,
+body.bz-high-contrast #adminBroadcastModal .modal-content {
   background-color: #000000 !important;
-  border: 2px solid #ffffff !important;
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+  background: #000000 !important;
+  background-image: none !important;
   color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  border-radius: 8px !important;
+}
+
+body.bz-high-contrast #addToPlaylistModal,
+body.bz-high-contrast #createPlaylistModal,
+body.bz-high-contrast #authRequiredModal,
+body.bz-high-contrast #confirmActionModal,
+body.bz-high-contrast #shortcutsModal,
+body.bz-high-contrast #unsavedGuardModal {
+  background: rgba(0, 0, 0, 0.85) !important;
 }
 
 /* Todos los textos en blanco puro */
@@ -4781,52 +5204,95 @@ body.bz-high-contrast small,
 body.bz-high-contrast strong,
 body.bz-high-contrast a,
 body.bz-high-contrast i,
+body.bz-high-contrast div,
 body.bz-high-contrast .text-white,
 body.bz-high-contrast .text-white-50,
 body.bz-high-contrast .text-muted,
-body.bz-high-contrast .bz-nav-label {
+body.bz-high-contrast .text-secondary,
+body.bz-high-contrast .opacity-40,
+body.bz-high-contrast .opacity-50,
+body.bz-high-contrast .opacity-75,
+body.bz-high-contrast .bz-nav-label,
+body.bz-high-contrast .bz-card-title,
+body.bz-high-contrast .bz-card-sub {
   color: #ffffff !important;
   font-weight: 700 !important;
   opacity: 1 !important;
 }
 
-/* Botones: Negro con Borde Blanco Puro / Hover o Activo Blanco Puro con Texto Negro */
+/* Botones: Negro con Borde Blanco Puro */
 body.bz-high-contrast .btn,
 body.bz-high-contrast .bz-btn-hero-subtle,
 body.bz-high-contrast .bz-btn-subtle,
 body.bz-high-contrast .bz-btn-primary,
 body.bz-high-contrast .bz-btn-hero,
 body.bz-high-contrast .bz-seg-btn,
+body.bz-high-contrast .bz-sort-pill,
+body.bz-high-contrast .bz-album-play-pill,
+body.bz-high-contrast .bz-library-dropdown-btn,
+body.bz-high-contrast .bz-icon-action,
 body.bz-high-contrast button {
   background: #000000 !important;
+  background-color: #000000 !important;
   color: #ffffff !important;
   border: 2px solid #ffffff !important;
   font-weight: 800 !important;
 }
 
+/* Estados interactivos / hover / activo: Invertido a Blanco Puro con texto Negro */
 body.bz-high-contrast .btn:hover,
 body.bz-high-contrast .bz-btn-hero-subtle:hover,
 body.bz-high-contrast .bz-btn-subtle:hover,
-body.bz-high-contrast .bz-seg-btn:hover {
+body.bz-high-contrast .bz-seg-btn:hover,
+body.bz-high-contrast .bz-nav-btn:hover,
+body.bz-high-contrast .dropdown-item:hover,
+body.bz-high-contrast .bz-track-row:hover,
+body.bz-high-contrast .bz-nav-btn.is-active,
+body.bz-high-contrast .bz-seg-btn.is-active,
+body.bz-high-contrast .bz-scale-point.is-active,
+body.bz-high-contrast .dropdown-item.active,
+body.bz-high-contrast .bz-track-row.is-playing,
+body.bz-high-contrast .bz-exp-track-item.is-active,
+body.bz-high-contrast .bz-lyric-line.is-active,
+body.bz-high-contrast .badge.bg-primary,
+body.bz-high-contrast .badge.bg-warning,
+body.bz-high-contrast .badge.bg-secondary {
+  background-color: #ffffff !important;
   background: #ffffff !important;
   color: #000000 !important;
+  border-color: #ffffff !important;
 }
+
 body.bz-high-contrast .btn:hover *,
-body.bz-high-contrast .bz-seg-btn:hover * {
+body.bz-high-contrast .bz-seg-btn:hover *,
+body.bz-high-contrast .bz-nav-btn:hover *,
+body.bz-high-contrast .dropdown-item:hover *,
+body.bz-high-contrast .bz-track-row:hover *,
+body.bz-high-contrast .bz-nav-btn.is-active *,
+body.bz-high-contrast .bz-seg-btn.is-active *,
+body.bz-high-contrast .dropdown-item.active *,
+body.bz-high-contrast .bz-track-row.is-playing *,
+body.bz-high-contrast .bz-exp-track-item.is-active *,
+body.bz-high-contrast .bz-lyric-line.is-active * {
   color: #000000 !important;
 }
 
-/* Elementos activos seleccionados: Invertidos a Blanco Puro de Fondo */
-body.bz-high-contrast .bz-nav-btn.is-active,
-body.bz-high-contrast .bz-seg-btn.is-active,
-body.bz-high-contrast .bz-scale-point.is-active {
-  background: #ffffff !important;
-  color: #000000 !important;
+/* Inputs y Buscadores en Alto Contraste */
+body.bz-high-contrast input,
+body.bz-high-contrast select,
+body.bz-high-contrast textarea,
+body.bz-high-contrast .bz-search-pill-input,
+body.bz-high-contrast .bz-search-input-clean {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
   border: 2px solid #ffffff !important;
 }
-body.bz-high-contrast .bz-nav-btn.is-active *,
-body.bz-high-contrast .bz-seg-btn.is-active * {
-  color: #000000 !important;
+body.bz-high-contrast input::placeholder,
+body.bz-high-contrast .bz-search-pill-input::placeholder,
+body.bz-high-contrast .bz-search-input-clean::placeholder {
+  color: #ffffff !important;
+  opacity: 0.85 !important;
 }
 
 /* Foco Visible Ultra Accesible para Navegación por Teclado */
@@ -4835,7 +5301,7 @@ body.bz-high-contrast :focus-visible {
   outline-offset: 3px !important;
 }
 
-/* Barras de Progreso: Blanco y Negro de Alto Grosor y Contraste */
+/* Barras de Progreso: Blanco y Negro */
 body.bz-high-contrast .progress,
 body.bz-high-contrast .bz-storage-progress-wrap,
 body.bz-high-contrast .bz-seek-track,
@@ -4848,6 +5314,23 @@ body.bz-high-contrast .progress-bar,
 body.bz-high-contrast .bz-seek-fill,
 body.bz-high-contrast .bz-vol-fill {
   background: #ffffff !important;
+}
+
+/* Wavy Seekbars en Alto Contraste */
+body.bz-high-contrast #bzWavyPlayed,
+body.bz-high-contrast #expWavyPlayed {
+  stroke: #ffffff !important;
+  stroke-width: 4px !important;
+}
+body.bz-high-contrast #bzWavyDot,
+body.bz-high-contrast #expWavyDot {
+  fill: #ffffff !important;
+  r: 6 !important;
+}
+body.bz-high-contrast #bzWavyUnplayed,
+body.bz-high-contrast #expWavyUnplayed {
+  stroke: #666666 !important;
+  stroke-width: 2px !important;
 }
 
 /* Sliders */
@@ -4872,8 +5355,6 @@ body.bz-high-contrast .bz-subtle-range::-moz-range-thumb {
 /* Letras Sincronizadas en Alto Contraste */
 body.bz-high-contrast .bz-lyric-line {
   color: #ffffff !important;
-  filter: none !important;
-  -webkit-filter: none !important;
   opacity: 0.65 !important;
   font-weight: 700 !important;
 }
@@ -4895,3 +5376,170 @@ body.bz-high-contrast .border-start,
 body.bz-high-contrast .border-end {
   border-color: #ffffff !important;
 }
+
+/* Tablas, Inputs, Charts y Dashboard en Alto Contraste */
+body.bz-high-contrast .table-dark {
+  --bs-table-bg: #000000 !important;
+  --bs-table-color: #ffffff !important;
+  --bs-table-border-color: #ffffff !important;
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+body.bz-high-contrast .table-dark > :not(caption) > * > * {
+  background-color: #000000 !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid #ffffff !important;
+}
+body.bz-high-contrast .table-dark tbody tr:hover > * {
+  background-color: #ffffff !important;
+  color: #000000 !important;
+}
+body.bz-high-contrast .bz-input-dark,
+body.bz-high-contrast .bz-diag-card,
+body.bz-high-contrast .bz-event-item,
+body.bz-high-contrast .bz-admin-kpi-card {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+body.bz-high-contrast .bz-segmented-dock {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+}
+body.bz-high-contrast .bz-chart-track {
+  background: #000000 !important;
+  border: 1px solid #ffffff !important;
+}
+body.bz-high-contrast .bz-chart-bar {
+  background: #ffffff !important;
+}
+body.bz-high-contrast .bz-chart-tooltip {
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+body.bz-high-contrast .bz-toast-pill {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+}
+body.bz-high-contrast .bz-toast-pill span,
+body.bz-high-contrast .bz-toast-pill i {
+  color: #ffffff !important;
+}
+
+/* Login Page en Alto Contraste */
+body.bz-high-contrast.bz-auth-body {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  color: #ffffff !important;
+}
+body.bz-high-contrast .bz-auth-card {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+}
+body.bz-high-contrast .bz-auth-right-panel {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  border-left: 2px solid #ffffff !important;
+}
+body.bz-high-contrast .bz-glass-pill-btn {
+  background-color: #000000 !important;
+  background: #000000 !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+}
+body.bz-high-contrast .bz-glass-pill-btn:hover {
+  background-color: #ffffff !important;
+  background: #ffffff !important;
+  color: #000000 !important;
+}
+
+/* ==========================================================================
+   RESPONSIVE MOBILE (< 768px y < 576px) — Adaptación para teléfonos Bootstrap
+   ========================================================================== */
+html, body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+@media (max-width: 767.98px) {
+  .bz-main-scroll {
+    padding: 0.75rem 0.9rem 140px !important;
+  }
+  .bz-miniplayer {
+    position: relative;
+    z-index: 30;
+  }
+  .bz-mob-mini-card {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .bz-exp-modal .modal-content {
+    padding-bottom: 2.5rem;
+    overflow-y: auto;
+  }
+  .bz-album-cover-wrap {
+    width: clamp(180px, 55vw, 280px);
+    margin: 0 auto 1.25rem;
+  }
+  .bz-auth-wrapper {
+    padding: 0.75rem;
+  }
+  .bz-auth-card {
+    border-radius: 1rem;
+    min-height: auto;
+  }
+  .bz-toast-pill {
+    max-width: calc(100vw - 2rem);
+  }
+}
+
+@media (max-width: 575.98px) {
+  .bz-toolbar-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.65rem;
+  }
+  .bz-segmented-pill {
+    width: 100%;
+    justify-content: center;
+  }
+  .bz-segmented-btn {
+    flex: 1;
+    justify-content: center;
+  }
+  .bz-search-pill-wrap {
+    width: 100%;
+  }
+  .bz-sort-pill {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .bz-section-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.85rem;
+    padding: 0.75rem 0;
+  }
+  .bz-track-row {
+    grid-template-columns: 24px 38px 1fr auto auto;
+    gap: 0.45rem;
+    padding: 0.45rem 0.5rem;
+  }
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+  .bz-settings-left-col {
+    border-right: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+  }
+  .dropdown-menu {
+    max-width: calc(100vw - 1.5rem);
+  }
+}
+

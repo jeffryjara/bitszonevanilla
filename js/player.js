@@ -9,6 +9,19 @@
   var Auth = window.BitszoneAuth;
   var CatalogApi = window.BitszoneCatalog;
 
+  function _t(key, fallback, params) {
+    if (window.BitszoneI18n && typeof window.BitszoneI18n.t === 'function') {
+      return window.BitszoneI18n.t(key, fallback, params);
+    }
+    var res = fallback !== undefined ? fallback : key;
+    if (params && typeof params === 'object') {
+      Object.keys(params).forEach(function (p) {
+        res = res.replace(new RegExp('\\{' + p + '\\}', 'g'), params[p]);
+      });
+    }
+    return res;
+  }
+
   var appState = {
     view: 'catalog', // 'catalog' | 'album' | 'artist' | 'library-favorites' | 'library-playlists' | 'library-playlist-detail' | 'library-licenses' | 'downloads' | 'dashboard'
     catalogExpandedSection: null, // null | 'songs' | 'artists' | 'albums'
@@ -66,32 +79,63 @@
   var volBubbleTimer = null;
 
   // ---- Sistema de Publicidad Intersticial (8s para usuarios sin sesión) ----
-  var AD_SPONSORS = [
-    {
-      badge: 'Bitszone Premium',
-      title: 'Música sin límites',
-      desc: 'Escucha canciones completas sin límites de 30 segundos, sin pausas y con la máxima fidelidad.',
-      image: './assets/img/bitszone-icon.png'
-    },
-    {
-      badge: 'Audio Lossless Hi-Fi',
-      title: 'Fidelidad de estudio 320 kbps',
-      desc: 'Descubre cada detalle y matiz acústico con la mejor resolución sonora al iniciar tu sesión gratis.',
-      image: './assets/img/albums/hybrid-theory.jpg'
-    },
-    {
-      badge: 'Bitszone Cloud',
-      title: 'Tus listas sincronizadas',
-      desc: 'Crea playlists ilimitadas, guarda tus favoritos y continúa escuchando en todos tus dispositivos.',
-      image: './assets/img/acceder-image.png'
-    },
-    {
-      badge: 'Modo Offline',
-      title: 'Tu música a donde vayas',
-      desc: 'Accede sin interrupciones ni consumo innecesario de tus datos móviles con una cuenta gratuita.',
-      image: './assets/img/bitszone-icon.png'
+  function getAdSponsors() {
+    var isEn = window.BitszoneI18n && window.BitszoneI18n.getLanguage() === 'en';
+    if (isEn) {
+      return [
+        {
+          badge: 'Bitszone Premium',
+          title: 'Limitless Music',
+          desc: 'Listen to full-length tracks with no 30-second limits, zero interruptions, and studio-grade fidelity.',
+          image: './assets/img/bitszone-icon.png'
+        },
+        {
+          badge: 'Lossless Hi-Fi Audio',
+          title: 'Studio Fidelity 320 kbps',
+          desc: 'Discover every acoustic nuance with ultra-high sound resolution when you sign in for free.',
+          image: './assets/img/albums/hybrid-theory.jpg'
+        },
+        {
+          badge: 'Bitszone Cloud',
+          title: 'Your Synced Playlists',
+          desc: 'Create unlimited playlists, keep your favorites safe, and continue listening on all devices.',
+          image: './assets/img/acceder-image.png'
+        },
+        {
+          badge: 'Offline Mode',
+          title: 'Your Music Anywhere',
+          desc: 'Enjoy uninterrupted music without wasting mobile data with a free account.',
+          image: './assets/img/bitszone-icon.png'
+        }
+      ];
     }
-  ];
+    return [
+      {
+        badge: 'Bitszone Premium',
+        title: 'Música sin límites',
+        desc: 'Escucha canciones completas sin límites de 30 segundos, sin pausas y con la máxima fidelidad.',
+        image: './assets/img/bitszone-icon.png'
+      },
+      {
+        badge: 'Audio Lossless Hi-Fi',
+        title: 'Fidelidad de estudio 320 kbps',
+        desc: 'Descubre cada detalle y matiz acústico con la mejor resolución sonora al iniciar tu sesión gratis.',
+        image: './assets/img/albums/hybrid-theory.jpg'
+      },
+      {
+        badge: 'Bitszone Cloud',
+        title: 'Tus listas sincronizadas',
+        desc: 'Crea playlists ilimitadas, guarda tus favoritos y continúa escuchando en todos tus dispositivos.',
+        image: './assets/img/acceder-image.png'
+      },
+      {
+        badge: 'Modo Offline',
+        title: 'Tu música a donde vayas',
+        desc: 'Accede sin interrupciones ni consumo innecesario de tus datos móviles con una cuenta gratuita.',
+        image: './assets/img/bitszone-icon.png'
+      }
+    ];
+  }
 
   var adState = {
     intervalId: null,
@@ -199,7 +243,8 @@
       updatePlayerBarsUI();
     }
 
-    var sponsor = AD_SPONSORS[adState.currentSponsorIdx % AD_SPONSORS.length];
+    var sponsorsList = getAdSponsors();
+    var sponsor = sponsorsList[adState.currentSponsorIdx % sponsorsList.length];
     adState.currentSponsorIdx += 1;
 
     var modalEl = document.getElementById('adInterstitialModal');
@@ -230,7 +275,7 @@
     if (titleEl) titleEl.textContent = sponsor.title;
     if (descEl) {
       descEl.textContent = isAuth
-        ? 'Espacio publicitario patrocinado. La música continuará automáticamente en unos segundos.'
+        ? _t('ad.authDesc', 'Espacio publicitario patrocinado. La música continuará automáticamente en unos segundos.')
         : sponsor.desc;
     }
     if (imgEl) {
@@ -346,57 +391,104 @@
   }
 
   // ---- Modal de Invitación a Iniciar Sesión (Acciones Restringidas para Invitados) ----
-  var AUTH_MODAL_COPY = {
-    downloads: {
-      badge: 'DESCARGAS SIN CONEXIÓN',
-      icon: 'bi-cloud-arrow-down-fill',
-      title: 'Descarga música en alta calidad',
-      desc: 'Inicia sesión gratis para guardar tus canciones y álbumes favoritos y escucharlos sin conexión en cualquier momento.'
-    },
-    favorites: {
-      badge: 'TUS FAVORITOS',
-      icon: 'bi-heart-fill',
-      title: 'Guarda lo que más te gusta',
-      desc: 'Inicia sesión gratis para agregar canciones a tus favoritos y acceder a ellas instantáneamente desde tu biblioteca.'
-    },
-    licenses: {
-      badge: 'CANCIÓN CON LICENCIA',
-      icon: 'bi-star-fill',
-      title: 'Desbloquea licencias exclusivas',
-      desc: '¡Has escuchado esta canción 5 veces consecutivas! Inicia sesión gratis para reclamar y disfrutar de tu licencia exclusiva por 30 días.'
-    },
-    playlists: {
-      badge: 'LISTAS DE REPRODUCCIÓN',
-      icon: 'bi-music-note-list',
-      title: 'Crea tus propias playlists',
-      desc: 'Inicia sesión gratis para armar listas de reproducción personalizadas con tus canciones favoritas de Bitszone.'
-    },
-    lyrics: {
-      badge: 'LETRAS SINCRONIZADAS',
-      icon: 'bi-mic-fill',
-      title: 'Canta con las letras en tiempo real',
-      desc: 'Inicia sesión gratis para seguir la letra de tus canciones favoritas sincronizada verso a verso y saltar a cualquier estrofa.'
-    },
-    queue: {
-      badge: 'COLA DE REPRODUCCIÓN',
-      icon: 'bi-list-ol',
-      title: 'Personaliza tu cola de reproducción',
-      desc: 'Inicia sesión gratis para agregar canciones a tu cola, decidir qué suena a continuación y armar tus sesiones musicales sin interrupciones.'
-    },
-    default: {
-      badge: 'FUNCIÓN EXCLUSIVA',
-      icon: 'bi-person-lock',
-      title: 'Inicia sesión para disfrutar de todo Bitszone',
-      desc: 'Crea tu cuenta o inicia sesión gratis para habilitar descargas, añadir a la cola, listas de reproducción personalizadas, favoritos y licencias exclusivas.'
-    }
-  };
+  function getAuthModalCopy(actionName) {
+    var isEn = window.BitszoneI18n && window.BitszoneI18n.getLanguage() === 'en';
+    var dict = isEn ? {
+      downloads: {
+        badge: 'OFFLINE DOWNLOADS',
+        icon: 'bi-cloud-arrow-down-fill',
+        title: 'Download music in high quality',
+        desc: 'Sign in for free to save your favorite songs and albums and listen offline anytime.'
+      },
+      favorites: {
+        badge: 'YOUR FAVORITES',
+        icon: 'bi-heart-fill',
+        title: 'Save what you love',
+        desc: 'Sign in for free to add tracks to your favorites and access them instantly in your library.'
+      },
+      licenses: {
+        badge: 'LICENSED TRACK',
+        icon: 'bi-star-fill',
+        title: 'Unlock exclusive licenses',
+        desc: 'You listened to this song 5 consecutive times! Sign in for free to claim your 30-day license.'
+      },
+      playlists: {
+        badge: 'PLAYLISTS',
+        icon: 'bi-music-note-list',
+        title: 'Build your custom playlists',
+        desc: 'Sign in for free to build customized playlists with your favorite Bitszone tracks.'
+      },
+      lyrics: {
+        badge: 'SYNCHRONIZED LYRICS',
+        icon: 'bi-mic-fill',
+        title: 'Sing along with real-time lyrics',
+        desc: 'Sign in for free to follow line-by-line synchronized lyrics and jump to any verse.'
+      },
+      queue: {
+        badge: 'PLAYBACK QUEUE',
+        icon: 'bi-list-ol',
+        title: 'Customize your playback queue',
+        desc: 'Sign in for free to add songs to your queue, control upcoming tracks, and stream seamlessly.'
+      },
+      default: {
+        badge: 'EXCLUSIVE FEATURE',
+        icon: 'bi-person-lock',
+        title: 'Sign in to enjoy all of Bitszone',
+        desc: 'Create your free account or sign in to enable offline downloads, queue management, custom playlists, favorites, and licenses.'
+      }
+    } : {
+      downloads: {
+        badge: 'DESCARGAS SIN CONEXIÓN',
+        icon: 'bi-cloud-arrow-down-fill',
+        title: 'Descarga música en alta calidad',
+        desc: 'Inicia sesión gratis para guardar tus canciones y álbumes favoritos y escucharlos sin conexión en cualquier momento.'
+      },
+      favorites: {
+        badge: 'TUS FAVORITOS',
+        icon: 'bi-heart-fill',
+        title: 'Guarda lo que más te gusta',
+        desc: 'Inicia sesión gratis para agregar canciones a tus favoritos y acceder a ellas instantáneamente desde tu biblioteca.'
+      },
+      licenses: {
+        badge: 'CANCIÓN CON LICENCIA',
+        icon: 'bi-star-fill',
+        title: 'Desbloquea licencias exclusivas',
+        desc: '¡Has escuchado esta canción 5 veces consecutivas! Inicia sesión gratis para reclamar y disfrutar de tu licencia exclusiva por 30 días.'
+      },
+      playlists: {
+        badge: 'LISTAS DE REPRODUCCIÓN',
+        icon: 'bi-music-note-list',
+        title: 'Crea tus propias playlists',
+        desc: 'Inicia sesión gratis para armar listas de reproducción personalizadas con tus canciones favoritas de Bitszone.'
+      },
+      lyrics: {
+        badge: 'LETRAS SINCRONIZADAS',
+        icon: 'bi-mic-fill',
+        title: 'Canta con las letras en tiempo real',
+        desc: 'Inicia sesión gratis para seguir la letra de tus canciones favoritas sincronizada verso a verso y saltar a cualquier estrofa.'
+      },
+      queue: {
+        badge: 'COLA DE REPRODUCCIÓN',
+        icon: 'bi-list-ol',
+        title: 'Personaliza tu cola de reproducción',
+        desc: 'Inicia sesión gratis para agregar canciones a tu cola, decidir qué suena a continuación y armar tus sesiones musicales sin interrupciones.'
+      },
+      default: {
+        badge: 'FUNCIÓN EXCLUSIVA',
+        icon: 'bi-person-lock',
+        title: 'Inicia sesión para disfrutar de todo Bitszone',
+        desc: 'Crea tu cuenta o inicia sesión gratis para habilitar descargas, añadir a la cola, listas de reproducción personalizadas, favoritos y licencias exclusivas.'
+      }
+    };
+    return dict[actionName] || dict.default;
+  }
 
   function openAuthRequiredModal(actionName) {
     if (isUserAdmin()) return;
     var modalEl = document.getElementById('authRequiredModal');
     if (!modalEl || !window.bootstrap || !window.bootstrap.Modal) return;
 
-    var copy = AUTH_MODAL_COPY[actionName] || AUTH_MODAL_COPY.default;
+    var copy = getAuthModalCopy(actionName);
     var badgeEl = document.getElementById('authModalBadge');
     var iconEl = document.getElementById('authModalIcon');
     var titleEl = document.getElementById('authModalTitle');
@@ -443,22 +535,22 @@
   }
 
   function formatTimeAgo(dateStr) {
-    if (!dateStr) return 'Hoy';
+    if (!dateStr) return _t('toast.timeToday', 'Hoy');
     var diffSec = Math.max(0, Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000));
-    if (diffSec < 60) return 'Hace un momento';
-    if (diffSec < 3600) return 'Hace ' + Math.floor(diffSec / 60) + ' min';
-    if (diffSec < 86400) return 'Hace ' + Math.floor(diffSec / 3600) + ' h';
-    return 'Hace ' + Math.floor(diffSec / 86400) + ' d';
+    if (diffSec < 60) return _t('toast.timeJustNow', 'Hace un momento');
+    if (diffSec < 3600) return _t('toast.timeMinAgo', 'Hace {n} min', { n: Math.floor(diffSec / 60) });
+    if (diffSec < 86400) return _t('toast.timeHourAgo', 'Hace {n} h', { n: Math.floor(diffSec / 3600) });
+    return _t('toast.timeDayAgo', 'Hace {n} d', { n: Math.floor(diffSec / 86400) });
   }
 
   function getLicenseDaysLeftText(addedAt) {
-    if (!addedAt) return '30 días';
+    if (!addedAt) return _t('toast.licDaysLeft', '30 días', { n: 30 });
     var daysPassed = (Date.now() - new Date(addedAt).getTime()) / (1000 * 60 * 60 * 24);
     var rem = Math.floor(30 - daysPassed);
-    if (rem < 0) return 'Expirada';
-    if (rem === 0) return 'Último día';
-    if (rem === 1) return '1 día';
-    return rem + ' días';
+    if (rem < 0) return _t('toast.licExpired', 'Expirada');
+    if (rem === 0) return _t('toast.licLastDay', 'Último día');
+    if (rem === 1) return _t('toast.licOneDay', '1 día');
+    return _t('toast.licDaysLeft', '{n} días', { n: rem });
   }
 
   var activeToastNodes = [];
@@ -826,7 +918,7 @@
       }
       var insertAt = Math.max(0, appState.queueIndex + 1);
       appState.queue.splice(insertAt, 0, Object.assign({}, track));
-      showToast('\'' + track.title + '\' sonará a continuación');
+      showToast(_t('toast.playNext', '"{title}" sonará a continuación', { title: track.title }));
       renderExpRightPanel();
     });
   }
@@ -839,7 +931,7 @@
         return;
       }
       appState.queue.push(Object.assign({}, track));
-      showToast('\'' + track.title + '\' añadida a la cola');
+      showToast(_t('toast.addedToQueue', '"{title}" añadida a la cola', { title: track.title }));
       renderExpRightPanel();
     });
   }
@@ -863,10 +955,10 @@
     } else if (qi === appState.queueIndex) {
       var nextIdx = Math.min(appState.queueIndex, appState.queue.length - 1);
       playAtQueueIndex(nextIdx);
-      if (removed) showToast('\'' + removed.title + '\' quitada de la cola');
+      if (removed) showToast(_t('toast.removedFromQueue', '"{title}" quitada de la cola', { title: removed.title }));
       return;
     }
-    if (removed) showToast('\'' + removed.title + '\' quitada de la cola');
+    if (removed) showToast(_t('toast.removedFromQueue', '"{title}" quitada de la cola', { title: removed.title }));
     renderExpRightPanel();
   }
 
@@ -913,7 +1005,7 @@
 
   function toggleShuffle() {
     appState.shuffle = !appState.shuffle;
-    showToast(appState.shuffle ? 'Modo aleatorio activado' : 'Modo aleatorio desactivado');
+    showToast(appState.shuffle ? _t('toast.shuffleOn', 'Modo aleatorio activado') : _t('toast.shuffleOff', 'Modo aleatorio desactivado'));
     updatePlayerBarsUI();
   }
 
@@ -921,7 +1013,11 @@
     var modes = ['off', 'all', 'one'];
     var idx = (modes.indexOf(appState.repeatMode) + 1) % modes.length;
     appState.repeatMode = modes[idx];
-    var msgs = { off: 'Repetición desactivada', all: 'Repetir toda la cola', one: 'Repetir canción actual' };
+    var msgs = {
+      off: _t('toast.repeatOff', 'Repetición desactivada'),
+      all: _t('toast.repeatAll', 'Repetir toda la cola'),
+      one: _t('toast.repeatOne', 'Repetir canción actual')
+    };
     showToast(msgs[appState.repeatMode]);
     updatePlayerBarsUI();
   }
@@ -1066,16 +1162,16 @@
     if (dockBtn) {
       dockBtn.innerHTML = '<span class="bz-dl-spinner" style="width: 18px; height: 18px; border-width: 2.5px;"></span>';
       dockBtn.style.pointerEvents = 'none';
-      dockBtn.setAttribute('title', 'Descargando álbum...');
+      dockBtn.setAttribute('title', _t('toast.downloadingAlbum', 'Descargando álbum...'));
     }
     var cardBtn = albumId ? document.querySelector('[data-album-quick-dl="' + albumId + '"]') : null;
     if (cardBtn) {
       cardBtn.innerHTML = '<span class="bz-dl-spinner"></span>';
       cardBtn.style.pointerEvents = 'none';
-      cardBtn.setAttribute('title', 'Descargando álbum...');
+      cardBtn.setAttribute('title', _t('toast.downloadingAlbum', 'Descargando álbum...'));
     }
 
-    showToast('Iniciando descarga de "' + albumTitle + '" (0/' + total + ')...');
+    showToast(_t('toast.startAlbumDownload', 'Iniciando descarga de "{album}" (0/{total})...', { album: albumTitle, total: total }));
 
     var index = 0;
     function processNext() {
@@ -1084,15 +1180,15 @@
           dockBtn.classList.add('is-downloaded');
           dockBtn.innerHTML = '<i class="bi bi-check-circle-fill fs-5 bz-pop-check" style="color: #4ade80;"></i>';
           dockBtn.style.pointerEvents = '';
-          dockBtn.setAttribute('title', 'Álbum ya descargado');
+          dockBtn.setAttribute('title', _t('catalog.albumAlreadyDownloaded', 'Álbum ya descargado'));
         }
         if (cardBtn) {
           cardBtn.classList.add('is-downloaded');
           cardBtn.innerHTML = '<i class="bi bi-check-circle-fill bz-pop-check" style="color: #4ade80; font-size: 0.86rem;"></i>';
           cardBtn.style.pointerEvents = '';
-          cardBtn.setAttribute('title', 'Álbum ya descargado');
+          cardBtn.setAttribute('title', _t('catalog.albumAlreadyDownloaded', 'Álbum ya descargado'));
         }
-        showToast('¡Álbum "' + albumTitle + '" guardado en Mis descargas (' + total + ' canciones)!');
+        showToast(_t('toast.albumDownloadFinished', '¡Álbum "{album}" guardado en Mis descargas ({total} canciones)!', { album: albumTitle, total: total }));
         setTimeout(function () {
           if (typeof onFinish === 'function') onFinish();
         }, 450);
@@ -1120,7 +1216,7 @@
 
         index++;
         if (total > 3 && index < total && index % 2 === 0) {
-          showToast('Descargando "' + albumTitle + '" (' + index + '/' + total + ')...');
+          showToast(_t('toast.downloadingAlbumProgress', 'Descargando "{album}" ({index}/{total})...', { album: albumTitle, index: index, total: total }));
         }
 
         setTimeout(processNext, 80);
@@ -1162,15 +1258,15 @@
     var isCurrent = appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) === Number(targetTrack.id);
     var itemsHtml = '';
     if (!isCurrent) {
-      itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="next"><span>Reproducir a continuación</span><i class="bi bi-text-indent-left"></i></button>';
+      itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="next"><span>' + _t('menu.playNext', 'Reproducir a continuación') + '</span><i class="bi bi-text-indent-left"></i></button>';
     }
-    itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="queue"><span>Añadir a la cola</span><i class="bi bi-list-ol"></i></button>';
-    itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="addpl"><span>Guardar en lista...</span><i class="bi bi-music-note-list"></i></button>';
-    itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="newpl"><span>Nueva playlist con esta</span><i class="bi bi-plus-circle"></i></button>';
+    itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="queue"><span>' + _t('menu.addToQueue', 'Añadir a la cola') + '</span><i class="bi bi-list-ol"></i></button>';
+    itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="addpl"><span>' + _t('menu.saveToPlaylist', 'Guardar en lista...') + '</span><i class="bi bi-music-note-list"></i></button>';
+    itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="newpl"><span>' + _t('menu.newPlaylistFromThis', 'Nueva playlist con esta') + '</span><i class="bi bi-plus-circle"></i></button>';
     if (includeNav) {
       itemsHtml += '<hr class="dropdown-divider border-white border-opacity-10 my-1" />';
-      itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="album"><span>Ir al álbum</span><i class="bi bi-disc"></i></button>';
-      itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="artist"><span>Ir al artista</span><i class="bi bi-person"></i></button>';
+      itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="album"><span>' + _t('menu.goToAlbum', 'Ir al álbum') + '</span><i class="bi bi-disc"></i></button>';
+      itemsHtml += '<button type="button" class="dropdown-item" data-expmenu="artist"><span>' + _t('menu.goToArtist', 'Ir al artista') + '</span><i class="bi bi-person"></i></button>';
     }
 
     menu.innerHTML = itemsHtml;
@@ -1938,9 +2034,9 @@
             '</div>' +
             (active && appState.isPlaying ? '<div class="fx-eq me-1"><i></i><i></i><i></i></div>' : '') +
             '<div class="bz-exp-row-actions d-flex align-items-center gap-1 flex-shrink-0">' +
-              '<button type="button" class="bz-icon-action fs-6 ' + (fav ? 'is-favorited' : '') + '" data-exp-row-fav="' + t.id + '" title="Favorito"><i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '"></i></button>' +
-              '<button type="button" class="bz-icon-action fs-6 ' + (dl ? 'is-downloaded' : '') + '" data-exp-row-dl="' + t.id + '" title="Descargar"><i class="bi ' + (dl ? 'bi-check-circle-fill' : 'bi-download') + '"></i></button>' +
-              '<button type="button" class="bz-icon-action fs-6" data-exp-row-menu="' + t.id + '" aria-expanded="false" title="Añadir a cola o lista"><i class="bi bi-three-dots"></i></button>' +
+              '<button type="button" class="bz-icon-action fs-6 ' + (fav ? 'is-favorited' : '') + '" data-exp-row-fav="' + t.id + '" title="' + _t('catalog.favorite', 'Favorito') + '"><i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '"></i></button>' +
+              '<button type="button" class="bz-icon-action fs-6 ' + (dl ? 'is-downloaded' : '') + '" data-exp-row-dl="' + t.id + '" title="' + _t('catalog.downloadTrack', 'Descargar') + '"><i class="bi ' + (dl ? 'bi-check-circle-fill' : 'bi-download') + '"></i></button>' +
+              '<button type="button" class="bz-icon-action fs-6" data-exp-row-menu="' + t.id + '" aria-expanded="false" title="' + _t('player.moreOptions', 'Añadir a cola o lista') + '"><i class="bi bi-three-dots"></i></button>' +
             '</div>' +
           '</div>'
         );
@@ -1960,7 +2056,7 @@
             var t = list.find(function (x) { return Number(x.id) === Number(btn.getAttribute('data-exp-row-fav')); });
             if (t) {
               var added = Storage.toggleFavorite(t);
-              showToast(added ? 'Agregada a favoritos' : 'Quitada de favoritos');
+              showToast(added ? _t('toast.favoriteAdded', 'Agregada a favoritos') : _t('toast.favoriteRemoved', 'Quitada de favoritos'));
               updatePlayerBarsUI();
               renderCurrentView();
             }
@@ -1975,7 +2071,7 @@
             if (t) {
               var isNew = Storage.downloadTrack(t, false);
               updateStorageMeterUI();
-              showToast(isNew ? 'Canción "' + t.title + '" guardada en Mis descargas' : 'La canción ya está en Mis descargas');
+              showToast(isNew ? _t('toast.downloaded', 'Canción guardada en Mis descargas') : _t('toast.downloadExists', 'La canción ya está en Mis descargas'));
               updatePlayerBarsUI();
               renderCurrentView();
             }
@@ -1993,10 +2089,10 @@
       var hasUpcoming = appState.queueIndex < appState.queue.length - 1;
       var head =
         '<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3 px-2">' +
-          '<span class="text-white-50 text-uppercase fw-bold" style="font-size:0.75rem; letter-spacing:0.2em;">Tu cola (' + appState.queue.length + ')</span>' +
+          '<span class="text-white-50 text-uppercase fw-bold" style="font-size:0.75rem; letter-spacing:0.2em;">' + _t('queue.title', 'Tu cola') + ' (' + appState.queue.length + ')</span>' +
           '<div class="d-flex align-items-center gap-2">' +
-            (hasUpcoming ? '<button type="button" id="btnExpClearNext" class="btn bz-btn-subtle btn-sm px-3 py-1" style="font-size:0.75rem;"><i class="bi bi-x-lg me-1"></i>Limpiar próximas</button>' : '') +
-            '<button type="button" id="btnExpCreateQueuePl" class="btn bz-btn-hero-subtle btn-sm px-3 py-1" style="font-size:0.76rem;"><i class="bi bi-music-note-list me-1"></i>Crear lista con la cola</button>' +
+            (hasUpcoming ? '<button type="button" id="btnExpClearNext" class="btn bz-btn-subtle btn-sm px-3 py-1" style="font-size:0.75rem;"><i class="bi bi-x-lg me-1"></i>' + _t('queue.clearNext', 'Limpiar próximas') + '</button>' : '') +
+            '<button type="button" id="btnExpCreateQueuePl" class="btn bz-btn-hero-subtle btn-sm px-3 py-1" style="font-size:0.76rem;"><i class="bi bi-music-note-list me-1"></i>' + _t('queue.saveAsPlaylist', 'Crear lista con la cola') + '</button>' +
           '</div>' +
         '</div>';
 
@@ -2015,10 +2111,10 @@
             '</div>' +
             (active && appState.isPlaying ? '<div class="fx-eq me-1"><i></i><i></i><i></i></div>' : '') +
             '<div class="bz-exp-row-actions d-flex align-items-center gap-1 flex-shrink-0">' +
-              (qi > 0 ? '<button type="button" class="bz-icon-action" data-exp-q-up="' + qi + '" title="Subir en cola"><i class="bi bi-arrow-up-short fs-5"></i></button>' : '') +
-              (qi < appState.queue.length - 1 ? '<button type="button" class="bz-icon-action" data-exp-q-down="' + qi + '" title="Bajar en cola"><i class="bi bi-arrow-down-short fs-5"></i></button>' : '') +
-              '<button type="button" class="bz-icon-action" data-exp-q-pl="' + qi + '" title="Guardar en playlist"><i class="bi bi-plus-circle fs-6"></i></button>' +
-              (appState.queue.length > 1 ? '<button type="button" class="bz-icon-action text-danger" data-exp-q-rm="' + qi + '" title="Quitar de la cola"><i class="bi bi-x-circle fs-6"></i></button>' : '') +
+              (qi > 0 ? '<button type="button" class="bz-icon-action" data-exp-q-up="' + qi + '" title="' + _t('queue.moveUp', 'Subir') + '"><i class="bi bi-arrow-up-short fs-5"></i></button>' : '') +
+              (qi < appState.queue.length - 1 ? '<button type="button" class="bz-icon-action" data-exp-q-down="' + qi + '" title="' + _t('queue.moveDown', 'Bajar') + '"><i class="bi bi-arrow-down-short fs-5"></i></button>' : '') +
+              '<button type="button" class="bz-icon-action" data-exp-q-pl="' + qi + '" title="' + _t('album.addToPlaylist', 'Guardar en playlist') + '"><i class="bi bi-plus-circle fs-6"></i></button>' +
+              (appState.queue.length > 1 ? '<button type="button" class="bz-icon-action text-danger" data-exp-q-rm="' + qi + '" title="' + _t('queue.remove', 'Quitar') + '"><i class="bi bi-x-circle fs-6"></i></button>' : '') +
             '</div>' +
             '<span class="font-mono-bz small text-white-50 flex-shrink-0">' + formatDurationMs(qt.duration) + '</span>' +
           '</div>'
@@ -2028,10 +2124,10 @@
       var sugSection =
         '<div class="mt-4 pt-3 border-top border-white border-opacity-10 px-2">' +
           '<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">' +
-            '<span class="text-white-50 text-uppercase fw-bold" style="font-size:0.72rem; letter-spacing:0.2em;">Añadir canciones a la cola</span>' +
+            '<span class="text-white-50 text-uppercase fw-bold" style="font-size:0.72rem; letter-spacing:0.2em;">' + _t('queue.addSongsTitle', 'Añadir canciones a la cola') + '</span>' +
             '<div class="position-relative" style="width: 195px;">' +
               '<i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-white-50" style="font-size:0.75rem; pointer-events:none;"></i>' +
-              '<input id="expSugSearch" type="text" class="form-control form-control-sm bz-input-dark ps-4 py-1" style="font-size:0.78rem; border-radius:999px;" placeholder="Buscar canción..." value="' + esc(appState.expQueueSearch || '') + '" />' +
+              '<input id="expSugSearch" type="text" class="form-control form-control-sm bz-input-dark ps-4 py-1" style="font-size:0.78rem; border-radius:999px;" placeholder="' + _t('queue.searchSong', 'Buscar canción...') + '" value="' + esc(appState.expQueueSearch || '') + '" />' +
             '</div>' +
           '</div>' +
           '<div id="expSugList" class="d-grid gap-1"></div>' +
@@ -2059,7 +2155,7 @@
         });
         var shown = candidates.slice(0, 10);
         if (!shown.length) {
-          sugListEl.innerHTML = '<div class="text-white-50 small py-2">No hay sugerencias disponibles para esa búsqueda.</div>';
+          sugListEl.innerHTML = '<div class="text-white-50 small py-2">' + _t('queue.noSuggestions', 'No hay sugerencias disponibles para esa búsqueda.') + '</div>';
           return;
         }
         sugListEl.innerHTML = shown.map(function (item) {
@@ -2071,8 +2167,8 @@
                 '<div class="text-white fw-semibold text-truncate" style="font-size:0.86rem;">' + esc(st.title) + '</div>' +
                 '<div class="text-white-50 text-truncate" style="font-size:0.74rem;">' + esc(st.artist) + '</div>' +
               '</div>' +
-              '<button type="button" class="btn bz-btn-subtle btn-sm px-2 py-1 flex-shrink-0" style="font-size:0.72rem;" data-sug-addq="' + st.id + '" title="Añadir a la cola"><i class="bi bi-plus-lg me-1"></i>Cola</button>' +
-              '<button type="button" class="bz-icon-action flex-shrink-0" data-sug-addpl="' + st.id + '" title="Añadir a playlist"><i class="bi bi-music-note-list"></i></button>' +
+              '<button type="button" class="btn bz-btn-subtle btn-sm px-2 py-1 flex-shrink-0" style="font-size:0.72rem;" data-sug-addq="' + st.id + '" title="' + _t('menu.addToQueue', 'Añadir a la cola') + '"><i class="bi bi-plus-lg me-1"></i>' + _t('queue.btnQueue', 'Cola') + '</button>' +
+              '<button type="button" class="bz-icon-action flex-shrink-0" data-sug-addpl="' + st.id + '" title="' + _t('album.addToPlaylist', 'Añadir a playlist') + '"><i class="bi bi-music-note-list"></i></button>' +
             '</div>'
           );
         }).join('');
@@ -2117,7 +2213,7 @@
             return;
           }
           if (!appState.queue.length) return;
-          openCreatePlaylistModal(appState.queue, 'Cola · ' + (album.title || track.title));
+          openCreatePlaylistModal(appState.queue, _t('queue.title', 'Cola') + ' · ' + (album.title || track.title));
         });
       }
 
@@ -2129,7 +2225,7 @@
             return;
           }
           appState.queue = appState.queue.slice(0, appState.queueIndex + 1);
-          showToast('Se limpiaron las siguientes pistas de la cola');
+          showToast(_t('toast.queueCleared', 'Se limpiaron las siguientes pistas de la cola'));
           renderExpRightPanel();
         });
       }
@@ -2221,8 +2317,8 @@
                     '<div class="rounded-4 bg-white bg-opacity-10 d-flex align-items-center justify-content-center text-white-50 mb-3 shadow-sm" style="width: 64px; height: 64px;">' +
                       '<i class="bi bi-mic fs-2 text-white-50"></i>' +
                     '</div>' +
-                    '<p class="text-white fw-bold fs-5 mb-1">Letra no disponible</p>' +
-                    '<p class="text-white-50 small mb-0" style="max-width: 320px;">No encontramos la letra sincronizada para esta canción.</p>' +
+                    '<p class="text-white fw-bold fs-5 mb-1">' + _t('lyrics.notFound', 'Letra no disponible') + '</p>' +
+                    '<p class="text-white-50 small mb-0" style="max-width: 320px;">' + _t('lyrics.notFoundDesc', 'No encontramos la letra sincronizada para esta canción.') + '</p>' +
                   '</div>';
               }
             });
@@ -2400,7 +2496,7 @@
 
   function navigate(viewName, extra) {
     if (viewName === 'dashboard' && !Auth.isAdmin()) {
-      showToast('Acceso restringido: inicia sesión como Administrador para ver el Dashboard.');
+      showToast(_t('toast.adminRestricted', 'Acceso restringido: inicia sesión como Administrador para ver el Dashboard.'));
       viewName = 'catalog';
     }
 
@@ -2470,7 +2566,7 @@
         stage.innerHTML =
           '<div class="d-flex flex-column align-items-center justify-content-center py-5 my-5 text-center">' +
             '<div class="spinner-border mb-3" style="color:var(--bz-lavender); width:2.8rem; height:2.8rem;" role="status"></div>' +
-            '<p class="text-white-50">Cargando catálogo de Bitszone…</p>' +
+            '<p class="text-white-50">' + _t('catalog.loading', 'Cargando catálogo de Bitszone…') + '</p>' +
           '</div>';
         return;
       }
@@ -2527,10 +2623,10 @@
       if (mainTrack) {
         actionButtonsHtml =
           '<div class="d-flex align-items-center gap-1 flex-shrink-0">' +
-            '<button type="button" class="bz-icon-action ' + (dl ? 'is-downloaded' : '') + '" data-quick-dl="' + mainTrack.id + '" title="' + (dl ? 'Descargada' : 'Descargar canción') + '">' +
+            '<button type="button" class="bz-icon-action ' + (dl ? 'is-downloaded' : '') + '" data-quick-dl="' + mainTrack.id + '" title="' + (dl ? _t('catalog.trackDownloaded', 'Descargada') : _t('catalog.downloadTrack', 'Descargar canción')) + '">' +
               '<i class="bi ' + (dl ? 'bi-check-circle-fill' : 'bi-download') + '" style="font-size:0.86rem;"></i>' +
             '</button>' +
-            '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-quick-fav="' + mainTrack.id + '" title="Favorito">' +
+            '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-quick-fav="' + mainTrack.id + '" title="' + _t('catalog.favorite', 'Favorito') + '">' +
               '<i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '" style="font-size:0.86rem;"></i>' +
             '</button>' +
           '</div>';
@@ -2538,11 +2634,11 @@
     } else {
       actionButtonsHtml =
         '<div class="d-flex align-items-center gap-1 flex-shrink-0">' +
-          '<button type="button" class="bz-icon-action ' + (allDl ? 'is-downloaded' : '') + '" data-album-quick-dl="' + esc(album.id) + '" title="' + (allDl ? 'Álbum ya descargado' : 'Descargar álbum completo') + '">' +
+          '<button type="button" class="bz-icon-action ' + (allDl ? 'is-downloaded' : '') + '" data-album-quick-dl="' + esc(album.id) + '" title="' + (allDl ? _t('catalog.albumAlreadyDownloaded', 'Álbum ya descargado') : _t('catalog.downloadFullAlbum', 'Descargar álbum completo')) + '">' +
             '<i class="bi ' + (allDl ? 'bi-check-circle-fill' : 'bi-download') + '" style="font-size:0.86rem;"></i>' +
           '</button>' +
           (mainTrack ? (
-            '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-quick-fav="' + mainTrack.id + '" title="Favorito">' +
+            '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-quick-fav="' + mainTrack.id + '" title="' + _t('catalog.favorite', 'Favorito') + '">' +
               '<i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '" style="font-size:0.86rem;"></i>' +
             '</button>'
           ) : '') +
@@ -2554,7 +2650,7 @@
         '<div class="bz-cover-box mb-2">' +
           '<img src="' + esc(album.coverUrl) + '" alt="' + esc(titleText) + '" loading="lazy" />' +
           '<div class="bz-cover-overlay">' +
-            '<button type="button" class="bz-play-orb" data-card-play="' + esc(album.id) + '" data-song-mode="' + (isSongMode ? '1' : '0') + '" aria-label="Reproducir ' + esc(titleText) + '">' +
+            '<button type="button" class="bz-play-orb" data-card-play="' + esc(album.id) + '" data-song-mode="' + (isSongMode ? '1' : '0') + '" aria-label="' + _t('player.play', 'Reproducir') + ' ' + esc(titleText) + '">' +
               '<i class="bi bi-play-fill"></i>' +
             '</button>' +
           '</div>' +
@@ -2576,9 +2672,9 @@
   function wrapScrollableRow(innerHtml) {
     return (
       '<div class="bz-scroll-row-wrap">' +
-        '<button type="button" class="bz-scroll-arrow is-left" aria-label="Desplazar a la izquierda"><i class="bi bi-chevron-left"></i></button>' +
+        '<button type="button" class="bz-scroll-arrow is-left" aria-label="' + _t('catalog.scrollLeft', 'Desplazar a la izquierda') + '"><i class="bi bi-chevron-left"></i></button>' +
         '<div class="bz-horiz-row">' + innerHtml + '</div>' +
-        '<button type="button" class="bz-scroll-arrow is-right" aria-label="Desplazar a la derecha"><i class="bi bi-chevron-right"></i></button>' +
+        '<button type="button" class="bz-scroll-arrow is-right" aria-label="' + _t('catalog.scrollRight', 'Desplazar a la derecha') + '"><i class="bi bi-chevron-right"></i></button>' +
       '</div>'
     );
   }
@@ -2634,18 +2730,18 @@
 
     function renderBackButtonHtml(btnId) {
       return (
-        '<button type="button" id="' + btnId + '" class="bz-back-btn" aria-label="Atrás">' +
+        '<button type="button" id="' + btnId + '" class="bz-back-btn" aria-label="' + _t('catalog.back', 'Atrás') + '">' +
           '<span class="bz-back-icon"><i class="bi bi-arrow-left"></i></span>' +
-          '<span class="bz-back-label">Atrás</span>' +
+          '<span class="bz-back-label">' + _t('catalog.back', 'Atrás') + '</span>' +
         '</button>'
       );
     }
 
     function sectionHeader(title, secKey, sortKey, currentSort) {
       var sortItems = [
-        { id: 'default', label: 'Por defecto' },
-        { id: 'alpha', label: 'Alfabético (A-Z)' },
-        { id: 'popular', label: 'Más populares' }
+        { id: 'default', label: _t('catalog.sortDefault', 'Por defecto') },
+        { id: 'alpha', label: _t('catalog.sortAlpha', 'Alfabético (A-Z)') },
+        { id: 'popular', label: _t('catalog.sortPopular', 'Más populares') }
       ];
       return (
         '<div class="d-flex align-items-center justify-content-between mb-3 pt-1">' +
@@ -2653,7 +2749,7 @@
             (exp ? renderBackButtonHtml('btnCollapseCatalogSection') : '') +
             '<h2 class="h4 fw-bold text-white mb-0">' + title + '</h2>' +
             '<div class="dropdown">' +
-              '<button class="btn bz-btn-subtle btn-sm rounded-circle d-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width:30px;height:30px;background:rgba(255,255,255,0.06);border:none;" title="Ordenar"><i class="bi bi-filter"></i></button>' +
+              '<button class="btn bz-btn-subtle btn-sm rounded-circle d-flex align-items-center justify-content-center" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="width:30px;height:30px;background:rgba(255,255,255,0.06);border:none;" title="' + _t('catalog.sort', 'Ordenar') + '"><i class="bi bi-filter"></i></button>' +
               '<ul class="dropdown-menu bz-library-popover-menu">' +
                 sortItems.map(function (opt) {
                   var act = currentSort === opt.id;
@@ -2667,7 +2763,7 @@
               '</ul>' +
             '</div>' +
           '</div>' +
-          (!exp ? '<button type="button" class="btn btn-link text-decoration-none small text-white-50 p-0" data-expand-sec="' + secKey + '">Mostrar todo</button>' : '') +
+          (!exp ? '<button type="button" class="btn btn-link text-decoration-none small text-white-50 p-0" data-expand-sec="' + secKey + '">' + _t('catalog.showAll', 'Mostrar todo') + '</button>' : '') +
         '</div>'
       );
     }
@@ -2676,7 +2772,7 @@
       var listHtml = exp === 'songs'
         ? '<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 g-3">' + songsList.map(function (a) { return '<div class="col">' + renderAlbumCardHtml(a, true).replace('bz-catalog-card', 'bz-catalog-card w-100') + '</div>'; }).join('') + '</div>'
         : wrapScrollableRow(songsList.map(function (a) { return renderAlbumCardHtml(a, true); }).join(''));
-      sectionsHtml += '<section class="mb-5">' + sectionHeader('Canciones del momento', 'songs', 'songsSort', appState.songsSort) + listHtml + '</section>';
+      sectionsHtml += '<section class="mb-5">' + sectionHeader(_t('catalog.trendingSongs', 'Canciones del momento'), 'songs', 'songsSort', appState.songsSort) + listHtml + '</section>';
     }
 
     if (!exp || exp === 'artists') {
@@ -2687,21 +2783,21 @@
               '<img src="' + esc(ar.img) + '" alt="' + esc(ar.name) + '" loading="lazy" />' +
             '</div>' +
             '<div class="text-white fw-semibold text-truncate" style="font-size:0.9rem;">' + esc(ar.name) + '</div>' +
-            '<div class="text-white-50" style="font-size:0.75rem;">' + esc(ar.type) + '</div>' +
+            '<div class="text-white-50" style="font-size:0.75rem;">' + esc(ar.type === 'Grupo Musical' ? _t('catalog.musicalGroup', 'Grupo Musical') : _t('catalog.artistBadge', 'Artista')) + '</div>' +
           '</div>';
         return exp === 'artists' ? '<div class="col">' + card + '</div>' : card;
       }).join('');
       var artHtml = exp === 'artists'
         ? '<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 g-4">' + artCards + '</div>'
         : wrapScrollableRow(artCards);
-      sectionsHtml += '<section class="mb-5">' + sectionHeader('Artistas populares', 'artists', 'artistsSort', appState.artistsSort) + artHtml + '</section>';
+      sectionsHtml += '<section class="mb-5">' + sectionHeader(_t('catalog.popularArtists', 'Artistas populares'), 'artists', 'artistsSort', appState.artistsSort) + artHtml + '</section>';
     }
 
     if (!exp || exp === 'albums') {
       var albHtml = exp === 'albums'
         ? '<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 g-3">' + albumsList.map(function (a) { return '<div class="col">' + renderAlbumCardHtml(a, false).replace('bz-catalog-card', 'bz-catalog-card w-100') + '</div>'; }).join('') + '</div>'
         : wrapScrollableRow(albumsList.map(function (a) { return renderAlbumCardHtml(a, false); }).join(''));
-      sectionsHtml += '<section class="mb-4">' + sectionHeader('Álbumes destacados', 'albums', 'albumsSort', appState.albumsSort) + albHtml + '</section>';
+      sectionsHtml += '<section class="mb-4">' + sectionHeader(_t('catalog.featuredAlbums', 'Álbumes destacados'), 'albums', 'albumsSort', appState.albumsSort) + albHtml + '</section>';
     }
 
     container.innerHTML = sectionsHtml;
@@ -2759,7 +2855,9 @@
           var info = findTrackById(btn.getAttribute('data-quick-fav'));
           if (!info) return;
           var added = Storage.toggleFavorite(info.track);
-          showToast(added ? 'Canción \'' + info.track.title + '\' agregada a tu Biblioteca' : 'Canción \'' + info.track.title + '\' eliminada de tu Biblioteca');
+          showToast(added
+            ? _t('toast.favAdded', 'Canción \'{title}\' agregada a tu Biblioteca', { title: info.track.title })
+            : _t('toast.favRemoved', 'Canción \'{title}\' eliminada de tu Biblioteca', { title: info.track.title }));
           updatePlayerBarsUI();
           renderCurrentView();
         });
@@ -2772,7 +2870,9 @@
           var info = findTrackById(btn.getAttribute('data-quick-dl'));
           if (!info) return;
           var isNew = Storage.downloadTrack(info.track, false);
-          showToast(isNew ? 'Canción \'' + info.track.title + '\' descargada' : 'La canción ya está en Mis descargas');
+          showToast(isNew
+            ? _t('toast.downloadSaved', 'Canción \'{title}\' guardada en Mis descargas', { title: info.track.title })
+            : _t('toast.alreadyDownloaded', 'La canción ya está en Mis descargas'));
           updateStorageMeterUI();
           renderCurrentView();
         });
@@ -2790,19 +2890,19 @@
 
           if (isAllDownloaded) {
             openConfirmDialog(
-              '¿Eliminar álbum de descargas?',
-              'Se quitarán las ' + albumTracks.length + ' canciones del álbum "' + alb.title + '" de Mis descargas.',
+              _t('confirm.delAlbumTitle', '¿Eliminar álbum de descargas?'),
+              _t('confirm.delAlbumDesc', 'Se quitarán las {n} canciones del álbum "{album}" de Mis descargas.', { n: albumTracks.length, album: alb.title }),
               function () {
                 var ids = albumTracks.map(function (t) { return t.id; });
                 Storage.removeTracks(ids);
                 updateStorageMeterUI();
-                showToast('Álbum "' + alb.title + '" eliminado de Mis descargas');
+                showToast(_t('toast.albumDownloadRemoved', 'Álbum "{album}" eliminado de Mis descargas', { album: alb.title }));
                 renderCurrentView();
               },
-              'Eliminar álbum',
+              _t('confirm.delAlbumConfirmBtn', 'Eliminar álbum'),
               'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
               'bi-trash3-fill',
-              'Mis descargas'
+              _t('nav.downloads', 'Mis descargas')
             );
           } else {
             var missing = albumTracks.filter(function (t) { return !Storage.isDownloaded(t.id); });
@@ -2811,17 +2911,17 @@
             }, 0);
 
             openConfirmDialog(
-              '¿Descargar álbum completo?',
-              'Se descargarán ' + missing.length + (missing.length === 1 ? ' canción' : ' canciones') + ' del álbum "' + alb.title + '" (~' + totalMb.toFixed(1) + ' MB) en Mis descargas para escucharlas sin conexión.',
+              _t('confirm.downloadAlbumTitle', '¿Descargar álbum completo?'),
+              _t('confirm.downloadAlbumDesc', 'Se descargarán {n} canciones del álbum "{album}" (~{mb} MB) en Mis descargas para escucharlas sin conexión.', { n: missing.length, album: alb.title, mb: totalMb.toFixed(1) }),
               function () {
                 downloadAlbumProgressively(alb, missing, function () {
                   renderCurrentView();
                 });
               },
-              'Descargar álbum',
+              _t('confirm.downloadAlbumConfirmBtn', 'Descargar álbum'),
               'btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill',
               'bi-cloud-arrow-down-fill',
-              'Descarga de álbum'
+              _t('confirm.downloadAlbumBadge', 'Descarga de álbum')
             );
           }
         });
@@ -2878,38 +2978,38 @@
             '<div class="bz-glass-sheen"></div>' +
           '</div>' +
           '<div class="bz-album-action-dock">' +
-            '<button type="button" id="btnAlbumPlayAll" class="bz-album-play-pill" title="Reproducir todo">' +
-              '<i class="bi bi-play-fill fs-5"></i><span>Reproducir todo</span>' +
+            '<button type="button" id="btnAlbumPlayAll" class="bz-album-play-pill" title="' + _t('album.playAll', 'Reproducir todo') + '">' +
+              '<i class="bi bi-play-fill fs-5"></i><span>' + _t('album.playAll', 'Reproducir todo') + '</span>' +
             '</button>' +
             (!isPlaylist ? (
-              '<button type="button" id="btnAlbumFavAll" class="bz-album-dock-btn ' + (allFav ? 'is-favorited' : '') + '" title="' + (allFav ? 'Quitar álbum de favoritos' : 'Añadir álbum a favoritos') + '">' +
+              '<button type="button" id="btnAlbumFavAll" class="bz-album-dock-btn ' + (allFav ? 'is-favorited' : '') + '" title="' + (allFav ? _t('album.favRemove', 'Quitar álbum de favoritos') : _t('album.favAdd', 'Añadir álbum a favoritos')) + '">' +
                 '<i class="bi ' + (allFav ? 'bi-heart-fill' : 'bi-heart') + ' fs-5"></i>' +
               '</button>'
             ) : '') +
-            '<button type="button" id="btnAlbumDownloadAll" class="bz-album-dock-btn ' + (allDl ? 'is-downloaded' : '') + '" title="' + (allDl ? 'Álbum ya descargado' : 'Descargar álbum') + '">' +
+            '<button type="button" id="btnAlbumDownloadAll" class="bz-album-dock-btn ' + (allDl ? 'is-downloaded' : '') + '" title="' + (allDl ? _t('album.downloaded', 'Álbum ya descargado') : _t('album.download', 'Descargar álbum')) + '">' +
               '<i class="bi ' + (allDl ? 'bi-check-circle-fill' : 'bi-download') + ' fs-5"></i>' +
             '</button>' +
             '<div class="dropdown">' +
-              '<button type="button" class="bz-album-dock-btn" data-bs-toggle="dropdown" aria-expanded="false" title="Más opciones">' +
+              '<button type="button" class="bz-album-dock-btn" data-bs-toggle="dropdown" aria-expanded="false" title="' + _t('album.more', 'Más opciones') + '">' +
                 '<i class="bi bi-three-dots fs-5"></i>' +
               '</button>' +
               '<ul class="dropdown-menu dropdown-menu-end bz-library-popover-menu">' +
-                '<li><button type="button" class="dropdown-item" id="btnAlbumAddQueue"><span>Añadir a la cola</span><i class="bi bi-list-ol"></i></button></li>' +
+                '<li><button type="button" class="dropdown-item" id="btnAlbumAddQueue"><span>' + _t('album.addToQueue', 'Añadir a la cola') + '</span><i class="bi bi-list-ol"></i></button></li>' +
                 (isPlaylist
-                  ? '<li><button type="button" class="dropdown-item text-danger" id="btnPlaylistDelete"><span>Eliminar lista</span><i class="bi bi-trash"></i></button></li>'
-                  : '<li><button type="button" class="dropdown-item" id="btnAlbumSaveAsPl"><span>Guardar como lista nueva</span><i class="bi bi-music-note-list"></i></button></li>') +
+                  ? '<li><button type="button" class="dropdown-item text-danger" id="btnPlaylistDelete"><span>' + _t('album.deletePlaylist', 'Eliminar lista') + '</span><i class="bi bi-trash"></i></button></li>'
+                  : '<li><button type="button" class="dropdown-item" id="btnAlbumSaveAsPl"><span>' + _t('album.saveAsNew', 'Guardar como lista nueva') + '</span><i class="bi bi-music-note-list"></i></button></li>') +
               '</ul>' +
             '</div>' +
           '</div>' +
         '</div>' +
 
         '<div class="mt-2 w-100 px-2">' +
-          '<span class="text-white-50 text-uppercase fw-semibold d-block mb-1" style="font-size:0.72rem; letter-spacing:0.24em;">' + (isPlaylist ? 'Lista de reproducción' : 'Álbum') + '</span>' +
+          '<span class="text-white-50 text-uppercase fw-semibold d-block mb-1" style="font-size:0.72rem; letter-spacing:0.24em;">' + (isPlaylist ? _t('album.typePlaylist', 'Lista de reproducción') : _t('album.typeAlbum', 'Álbum')) + '</span>' +
           '<h1 class="fw-bold text-white mb-2" style="font-size: clamp(1.75rem, 2.75vw, 2.95rem); line-height: 1.1; letter-spacing: -0.02em; overflow-wrap: break-word;">' + esc(albumObj.title) + '</h1>' +
           '<div class="d-flex flex-wrap align-items-center justify-content-center gap-2 text-white-50" style="font-size:0.9rem;">' +
             '<button type="button" id="btnAlbumToArtist" class="btn btn-link p-0 text-white fw-semibold text-uppercase text-decoration-none bz-hover-white" style="font-size:0.9rem; letter-spacing:0.04em;">' + esc(albumObj.artist) + '</button>' +
             '<span>•</span><span>' + esc(albumObj.year || '2024') + '</span>' +
-            '<span>•</span><span>' + tracks.length + (tracks.length === 1 ? ' canción' : ' canciones') + '</span>' +
+            '<span>•</span><span>' + tracks.length + ' ' + (tracks.length === 1 ? _t('catalog.song', 'canción') : _t('catalog.songs', 'canciones')) + '</span>' +
             (totalMs ? ('<span>•</span><span>' + formatAlbumDurationPretty(totalMs) + '</span>') : '') +
           '</div>' +
         '</div>' +
@@ -2920,14 +3020,14 @@
     var rightColHtml =
       '<div class="col-12 col-lg-7">' +
         (tracks.length === 0
-          ? '<div class="py-5 text-center text-white-50">Esta lista aún no tiene canciones. Usa el botón <strong>+</strong> en cualquier canción del catálogo para agregarla.</div>'
+          ? '<div class="py-5 text-center text-white-50">' + _t('album.emptyPlaylist', 'Esta lista aún no tiene canciones. Usa el botón + en cualquier canción del catálogo para agregarla.') + '</div>'
           : '<div class="bz-album-tracklist-scroll">' +
               tracks.map(function (t, i) {
                 var playing = appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) === Number(t.id);
                 var fav = Storage.isFavorite(t.id);
                 var dl = Storage.isDownloaded(t.id);
                 var lic = Storage.isLicensed(t.id);
-                var timeDisplay = isAuth ? formatDurationMs(t.duration) : '30s preview';
+                var timeDisplay = isAuth ? formatDurationMs(t.duration) : _t('album.preview30s', '30s preview');
                 return (
                   '<div class="bz-album-track-row ' + (playing ? 'is-playing' : '') + '" data-row-play-idx="' + i + '">' +
                     '<div class="bz-row-idx-wrap text-white-50 font-mono-bz small">' +
@@ -2944,10 +3044,10 @@
                     '</div>' +
                     '<div class="d-flex align-items-center gap-2">' +
                       '<div class="bz-row-hover-actions">' +
-                        '<button type="button" class="bz-icon-action" data-row-addpl="' + t.id + '" title="Agregar a playlist"><i class="bi bi-plus-circle"></i></button>' +
-                        '<button type="button" class="bz-icon-action ' + (dl ? 'is-downloaded' : '') + '" data-row-dl="' + t.id + '" title="Guardar en descargas"><i class="bi ' + (dl ? 'bi-check-circle-fill' : 'bi-download') + '"></i></button>' +
-                        '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-row-fav="' + t.id + '" title="Favorito"><i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '"></i></button>' +
-                        (isPlaylist ? '<button type="button" class="bz-icon-action text-danger" data-row-rmpl="' + t.id + '" title="Quitar de playlist"><i class="bi bi-x-circle"></i></button>' : '') +
+                        '<button type="button" class="bz-icon-action" data-row-addpl="' + t.id + '" title="' + _t('album.addToPlaylist', 'Agregar a playlist') + '"><i class="bi bi-plus-circle"></i></button>' +
+                        '<button type="button" class="bz-icon-action ' + (dl ? 'is-downloaded' : '') + '" data-row-dl="' + t.id + '" title="' + _t('album.saveToDownloads', 'Guardar en descargas') + '"><i class="bi ' + (dl ? 'bi-check-circle-fill' : 'bi-download') + '"></i></button>' +
+                        '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-row-fav="' + t.id + '" title="' + _t('catalog.favorite', 'Favorito') + '"><i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '"></i></button>' +
+                        (isPlaylist ? '<button type="button" class="bz-icon-action text-danger" data-row-rmpl="' + t.id + '" title="' + _t('album.removeFromPlaylist', 'Quitar de playlist') + '"><i class="bi bi-x-circle"></i></button>' : '') +
                       '</div>' +
                       '<span class="font-mono-bz small text-white-50 text-end text-nowrap" style="min-width:' + (isAuth ? '42px' : '78px') + ';">' + timeDisplay + '</span>' +
                     '</div>' +
@@ -2995,7 +3095,7 @@
             if (shouldRemove && isFav) Storage.toggleFavorite(t);
             else if (!shouldRemove && !isFav) Storage.toggleFavorite(t);
           });
-          showToast(shouldRemove ? 'Álbum quitado de favoritos' : 'Álbum "' + albumObj.title + '" guardado en favoritos');
+          showToast(shouldRemove ? _t('toast.favoriteRemoved', 'Álbum quitado de favoritos') : _t('toast.favoriteAdded', 'Álbum guardado en favoritos'));
           updatePlayerBarsUI();
           renderAlbumView(container, albumObj, isPlaylist);
         });
@@ -3014,19 +3114,19 @@
 
           if (isAllDownloaded) {
             openConfirmDialog(
-              '¿Eliminar álbum de descargas?',
-              'Se quitarán las ' + albumTracks.length + ' canciones del álbum "' + albumObj.title + '" de Mis descargas.',
+              _t('confirm.delAlbumTitle', '¿Eliminar álbum de descargas?'),
+              _t('confirm.delAlbumDesc', 'Se quitarán las {n} canciones del álbum "{album}" de Mis descargas.', { n: albumTracks.length, album: albumObj.title }),
               function () {
                 var ids = albumTracks.map(function (t) { return t.id; });
                 Storage.removeTracks(ids);
                 updateStorageMeterUI();
-                showToast('Álbum "' + albumObj.title + '" eliminado de Mis descargas');
+                showToast(_t('toast.albumDownloadRemoved', 'Álbum "{album}" eliminado de Mis descargas', { album: albumObj.title }));
                 renderAlbumView(container, albumObj, isPlaylist);
               },
-              'Eliminar álbum',
+              _t('downloads.removeDownload', 'Eliminar álbum'),
               'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
               'bi-trash3-fill',
-              'Mis descargas'
+              _t('downloads.kicker', 'Mis descargas')
             );
           } else {
             var missing = albumTracks.filter(function (t) { return !Storage.isDownloaded(t.id); });
@@ -3035,17 +3135,17 @@
             }, 0);
 
             openConfirmDialog(
-              '¿Descargar álbum completo?',
-              'Se descargarán ' + missing.length + (missing.length === 1 ? ' canción' : ' canciones') + ' del álbum "' + albumObj.title + '" (~' + totalMb.toFixed(1) + ' MB) en Mis descargas para escucharlas sin conexión.',
+              _t('confirm.downloadAlbumTitle', '¿Descargar álbum completo?'),
+              _t('confirm.downloadAlbumDesc', 'Se descargarán {n} canciones del álbum "{album}" (~{mb} MB) en Mis descargas para escucharlas sin conexión.', { n: missing.length, album: albumObj.title, mb: totalMb.toFixed(1) }),
               function () {
                 downloadAlbumProgressively(albumObj, missing, function () {
                   renderAlbumView(container, albumObj, isPlaylist);
                 });
               },
-              'Descargar álbum',
+              _t('album.download', 'Descargar álbum'),
               'btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill',
               'bi-cloud-arrow-down-fill',
-              'Descarga de álbum'
+              _t('album.typeAlbum', 'Descarga de álbum')
             );
           }
         });
@@ -3061,7 +3161,7 @@
             playTrack(tracks[0], albumObj, tracks);
           } else {
             appState.queue = appState.queue.concat(tracks);
-            showToast(tracks.length + ' canciones añadidas a la cola');
+            showToast(_t('toast.trackAddedQueue', '{n} canciones añadidas a la cola', { n: tracks.length }));
             updatePlayerBarsUI();
           }
         });
@@ -3075,7 +3175,7 @@
           var created = Storage.createPlaylist(albumObj.title);
           if (created) {
             tracks.forEach(function (t) { Storage.addTrackToPlaylist(created.id, t); });
-            showToast('Playlist "' + created.name + '" guardada en tu biblioteca');
+            showToast(_t('toast.playlistCreated', 'Playlist "{name}" guardada en tu biblioteca', { name: created.name }));
           }
         });
       });
@@ -3085,7 +3185,7 @@
     if (rmPlBtn && isPlaylist) {
       rmPlBtn.addEventListener('click', function () {
         Storage.deletePlaylist(albumObj.id);
-        showToast('Playlist "' + albumObj.title + '" eliminada');
+        showToast(_t('toast.playlistDeleted', 'Playlist "{name}" eliminada', { name: albumObj.title }));
         navigate('library-playlists');
       });
     }
@@ -3105,7 +3205,7 @@
           var tr = tracks.find(function (x) { return Number(x.id) === tid; });
           if (!tr) return;
           var added = Storage.toggleFavorite(tr);
-          showToast(added ? 'Agregada a favoritos' : 'Quitada de favoritos');
+          showToast(added ? _t('toast.favoriteAdded', 'Agregada a favoritos') : _t('toast.favoriteRemoved', 'Quitada de favoritos'));
           updatePlayerBarsUI();
           renderAlbumView(container, albumObj, isPlaylist);
         });
@@ -3121,7 +3221,7 @@
           if (!tr) return;
           var isNew = Storage.downloadTrack(tr, false);
           updateStorageMeterUI();
-          showToast(isNew ? 'Canción "' + tr.title + '" guardada en Mis descargas' : 'La canción ya está en Mis descargas');
+          showToast(isNew ? _t('toast.downloaded', 'Canción "{title}" guardada en Mis descargas', { title: tr.title }) : _t('toast.downloadExists', 'La canción ya está en Mis descargas'));
           renderAlbumView(container, albumObj, isPlaylist);
         });
       });
@@ -3141,7 +3241,7 @@
         e.stopPropagation();
         var tid = Number(btn.getAttribute('data-row-rmpl'));
         var updatedPl = Storage.removeTrackFromPlaylist(albumObj.id, tid);
-        showToast('Canción removida de la playlist');
+        showToast(_t('toast.playlistDeleted', 'Canción removida de la playlist'));
         if (updatedPl) {
           albumObj.tracks = updatedPl.tracks;
           renderAlbumView(container, albumObj, true);
@@ -3169,22 +3269,23 @@
             '<div class="bz-glass-sheen rounded-circle"></div>' +
           '</div>' +
         '</div>' +
-        '<span class="text-white-50 text-uppercase fw-semibold d-block mb-1" style="font-size:0.72rem; letter-spacing:0.25em;">' + esc(artist.type || 'Artista') + '</span>' +
+        '<span class="text-white-50 text-uppercase fw-semibold d-block mb-1" style="font-size:0.72rem; letter-spacing:0.25em;">' + esc(artist.type === 'Grupo Musical' ? _t('catalog.musicalGroup', 'Grupo Musical') : _t('catalog.artistBadge', 'Artista')) + '</span>' +
         '<h1 class="fw-bold text-white mb-2" style="font-size: clamp(1.9rem, 3.5vw, 3.15rem); letter-spacing: -0.02em;">' + esc(artist.name) + '</h1>' +
         '<p class="text-white-50 mb-4" style="font-size:0.95rem;">' +
-          artistAlbums.length + (artistAlbums.length === 1 ? ' álbum' : ' álbumes') + ' · ' + allSongs.length + (allSongs.length === 1 ? ' canción' : ' canciones') +
+          artistAlbums.length + ' ' + _t(artistAlbums.length === 1 ? 'common.albumSingular' : 'common.albumsPlural', artistAlbums.length === 1 ? 'álbum' : 'álbumes') + ' · ' +
+          allSongs.length + ' ' + _t(allSongs.length === 1 ? 'common.songSingular' : 'common.songsPlural', allSongs.length === 1 ? 'canción' : 'canciones') +
         '</p>' +
-        '<button type="button" id="btnArtistPlayAll" class="bz-album-play-pill"><i class="bi bi-play-fill fs-5"></i><span>Reproducir todo</span></button>' +
+        '<button type="button" id="btnArtistPlayAll" class="bz-album-play-pill"><i class="bi bi-play-fill fs-5"></i><span>' + esc(_t('album.playAll', 'Reproducir todo')) + '</span></button>' +
       '</div>';
 
     var rightColHtml =
       '<div class="col-12 col-lg-7">' +
         '<div class="d-flex align-items-center justify-content-between mb-3 px-1">' +
-          '<h2 class="h4 fw-bold text-white mb-0">Discografía</h2>' +
-          '<span class="small text-white-50 fw-medium">' + artistAlbums.length + (artistAlbums.length === 1 ? ' lanzamiento' : ' lanzamientos') + '</span>' +
+          '<h2 class="h4 fw-bold text-white mb-0">' + esc(_t('artist.discography', 'Discografía')) + '</h2>' +
+          '<span class="small text-white-50 fw-medium">' + artistAlbums.length + ' ' + _t(artistAlbums.length === 1 ? 'artist.releaseSingular' : 'artist.releasesPlural', artistAlbums.length === 1 ? 'lanzamiento' : 'lanzamientos') + '</span>' +
         '</div>' +
         (artistAlbums.length === 0
-          ? '<div class="py-5 text-center text-white-50">No hay álbumes disponibles para este artista en el catálogo.</div>'
+          ? '<div class="py-5 text-center text-white-50">' + esc(_t('artist.empty', 'No hay álbumes disponibles para este artista en el catálogo.')) + '</div>'
           : '<div class="bz-album-tracklist-scroll" style="padding-left:0.25rem;">' +
               '<div class="row row-cols-2 g-4">' +
                 artistAlbums.map(function (a) {
@@ -3194,11 +3295,11 @@
                         '<div class="bz-cover-box mb-2">' +
                           '<img src="' + esc(a.coverUrl) + '" alt="' + esc(a.title) + '" loading="lazy" />' +
                           '<div class="bz-cover-overlay">' +
-                            '<button type="button" class="bz-play-orb" data-card-play="' + esc(a.id) + '" aria-label="Reproducir ' + esc(a.title) + '"><i class="bi bi-play-fill"></i></button>' +
+                            '<button type="button" class="bz-play-orb" data-card-play="' + esc(a.id) + '" aria-label="' + esc(_t('catalog.playAria', 'Reproducir {title}', { title: a.title })) + '"><i class="bi bi-play-fill"></i></button>' +
                           '</div>' +
                         '</div>' +
                         '<div class="text-white fw-semibold text-truncate" style="font-size:0.95rem;">' + esc(a.title) + '</div>' +
-                        '<div class="text-white-50" style="font-size:0.78rem;">' + esc(a.year || '2024') + ' · ' + (a.tracks ? a.tracks.length : 0) + ' canciones</div>' +
+                        '<div class="text-white-50" style="font-size:0.78rem;">' + esc(a.year || '2024') + ' · ' + (a.tracks ? a.tracks.length : 0) + ' ' + _t((a.tracks && a.tracks.length === 1) ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</div>' +
                       '</div>' +
                     '</div>'
                   );
@@ -3233,9 +3334,9 @@
           '<i class="bi bi-chevron-down"></i>' +
         '</button>' +
         '<ul class="dropdown-menu bz-library-popover-menu">' +
-          '<li><button type="button" class="dropdown-item ' + (activeLibTab === 'favorites' ? 'active' : '') + '" data-switch-lib="library-favorites"><span>Canciones favoritas</span><i class="bi bi-heart"></i></button></li>' +
-          '<li><button type="button" class="dropdown-item ' + (activeLibTab === 'playlists' ? 'active' : '') + '" data-switch-lib="library-playlists"><span>Listas de reproducción</span><i class="bi bi-music-note-list"></i></button></li>' +
-          '<li><button type="button" class="dropdown-item ' + (activeLibTab === 'licenses' ? 'active' : '') + '" data-switch-lib="library-licenses"><span>Canciones con licencia</span><i class="bi bi-star"></i></button></li>' +
+          '<li><button type="button" class="dropdown-item ' + (activeLibTab === 'favorites' ? 'active' : '') + '" data-switch-lib="library-favorites"><span>' + esc(_t('library.favorites', 'Canciones favoritas')) + '</span><i class="bi bi-heart"></i></button></li>' +
+          '<li><button type="button" class="dropdown-item ' + (activeLibTab === 'playlists' ? 'active' : '') + '" data-switch-lib="library-playlists"><span>' + esc(_t('library.playlists', 'Listas de reproducción')) + '</span><i class="bi bi-music-note-list"></i></button></li>' +
+          '<li><button type="button" class="dropdown-item ' + (activeLibTab === 'licenses' ? 'active' : '') + '" data-switch-lib="library-licenses"><span>' + esc(_t('library.licenses', 'Canciones con licencia')) + '</span><i class="bi bi-star"></i></button></li>' +
         '</ul>' +
       '</div>'
     );
@@ -3270,8 +3371,8 @@
       if (!albumMap[aid]) {
         albumMap[aid] = {
           id: aid,
-          title: t.albumTitle || 'Canciones sueltas',
-          artist: t.artist || 'Varios',
+          title: t.albumTitle || _t('library.singleSongs', 'Canciones sueltas'),
+          artist: t.artist || _t('library.various', 'Varios'),
           coverUrl: t.albumCover || './assets/img/bitszone-icon.png',
           tracks: []
         };
@@ -3298,10 +3399,10 @@
     var availMb = Math.max(0, baseMb - usedMb);
 
     var statsHtml =
-      '<span class="bz-hero-stat-pill"><i class="bi bi-music-note-beamed"></i> ' + rawTracks.length + (rawTracks.length === 1 ? ' canción' : ' canciones') + '</span>' +
-      '<span class="bz-hero-stat-pill"><i class="bi bi-disc"></i> ' + totalAlbumsCount + (totalAlbumsCount === 1 ? ' álbum' : ' álbumes') + '</span>' +
+      '<span class="bz-hero-stat-pill"><i class="bi bi-music-note-beamed"></i> ' + rawTracks.length + ' ' + _t(rawTracks.length === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</span>' +
+      '<span class="bz-hero-stat-pill"><i class="bi bi-disc"></i> ' + totalAlbumsCount + ' ' + _t(totalAlbumsCount === 1 ? 'common.albumSingular' : 'common.albumsPlural', 'álbumes') + '</span>' +
       (cfg.kind === 'downloads'
-        ? '<span class="bz-hero-stat-pill"><i class="bi bi-hdd"></i> ' + availMb.toFixed(1) + ' MB libres de 5.00 GB (' + usedMb.toFixed(1) + ' MB ocupados)</span>'
+        ? '<span class="bz-hero-stat-pill"><i class="bi bi-hdd"></i> ' + _t('downloads.storageStats', '{free} MB libres de 5.00 GB ({used} MB ocupados)', { free: availMb.toFixed(1), used: usedMb.toFixed(1) }) + '</span>'
         : '');
 
     var heroTitleNode = cfg.kind === 'downloads'
@@ -3310,8 +3411,8 @@
 
     var heroActions = rawTracks.length ? (
       '<div class="d-flex gap-2">' +
-        '<button type="button" id="btnColPlayAll" class="btn bz-btn-hero-subtle btn-sm px-3 py-2"><i class="bi bi-play-fill me-1"></i>Escuchar todo</button>' +
-        (cfg.kind === 'downloads' ? '<button type="button" id="btnColClearDownloads" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2"><i class="bi bi-trash me-1"></i>Vaciar</button>' : '') +
+        '<button type="button" id="btnColPlayAll" class="btn bz-btn-hero-subtle btn-sm px-3 py-2"><i class="bi bi-play-fill me-1"></i>' + esc(_t('library.playAll', 'Escuchar todo')) + '</button>' +
+        (cfg.kind === 'downloads' ? '<button type="button" id="btnColClearDownloads" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2"><i class="bi bi-trash me-1"></i>' + esc(_t('downloads.clearAll', 'Vaciar')) + '</button>' : '') +
       '</div>'
     ) : '';
 
@@ -3329,23 +3430,23 @@
       '</div>';
 
     var sortLabels = {
-      'default': 'Por defecto',
-      'recent': 'Añadidos recientemente',
-      'alpha': 'Alfabéticamente',
-      'size_desc': 'Más pesados',
-      'size_asc': 'Menos pesados'
+      'default': _t('catalog.sortDefault', 'Por defecto'),
+      'recent': _t('catalog.sortRecent', 'Añadidos recientemente'),
+      'alpha': _t('catalog.sortAlpha', 'Alfabéticamente'),
+      'size_desc': _t('catalog.sortSizeDesc', 'Más pesados'),
+      'size_asc': _t('catalog.sortSizeAsc', 'Menos pesados')
     };
 
     var toolbarHtml =
       '<div class="bz-toolbar-row">' +
         '<div class="bz-segmented-pill">' +
-          '<button type="button" class="bz-segmented-btn ' + (viewMode === 'canciones' ? 'is-active' : '') + '" data-col-mode="canciones"><i class="bi bi-music-note-beamed"></i><span>Canciones</span></button>' +
-          '<button type="button" class="bz-segmented-btn ' + (viewMode === 'albumes' ? 'is-active' : '') + '" data-col-mode="albumes"><i class="bi bi-disc"></i><span>Álbumes</span></button>' +
+          '<button type="button" class="bz-segmented-btn ' + (viewMode === 'canciones' ? 'is-active' : '') + '" data-col-mode="canciones"><i class="bi bi-music-note-beamed"></i><span>' + esc(_t('library.modeSongs', 'Canciones')) + '</span></button>' +
+          '<button type="button" class="bz-segmented-btn ' + (viewMode === 'albumes' ? 'is-active' : '') + '" data-col-mode="albumes"><i class="bi bi-disc"></i><span>' + esc(_t('library.modeAlbums', 'Álbumes')) + '</span></button>' +
         '</div>' +
         '<div class="dropdown">' +
           '<button type="button" class="bz-sort-pill" data-bs-toggle="dropdown" aria-expanded="false">' +
             '<i class="bi bi-arrow-down-up text-white-50"></i>' +
-            '<span class="text-white-50 d-none d-sm-inline">Ordenar:</span>' +
+            '<span class="text-white-50 d-none d-sm-inline">' + esc(_t('catalog.sortBy', 'Ordenar:')) + '</span>' +
             '<span>' + esc(sortLabels[sortBy] || 'Por defecto') + '</span>' +
             '<i class="bi bi-chevron-down small text-white-50 ms-1"></i>' +
           '</button>' +
@@ -3373,17 +3474,17 @@
     } else if (filteredTracks.length === 0) {
       bodyHtml =
         '<div class="bz-section-empty py-5">' +
-          '<p class="text-white-50">No se encontraron canciones para "' + esc(search) + '".</p>' +
+          '<p class="text-white-50">' + esc(_t('library.noResults', 'No se encontraron canciones para')) + ' "' + esc(search) + '".</p>' +
         '</div>';
     } else if (viewMode === 'albumes') {
       var activeGroup = selAlbumId ? groups.find(function (g) { return g.id === selAlbumId; }) : null;
       if (activeGroup) {
         bodyHtml =
           '<div class="mb-3">' +
-            '<button type="button" id="btnColBackToAlbums" class="btn bz-btn-subtle btn-sm px-3 py-1 mb-3"><i class="bi bi-arrow-left me-1"></i>Todos los álbumes</button>' +
+            '<button type="button" id="btnColBackToAlbums" class="btn bz-btn-subtle btn-sm px-3 py-1 mb-3"><i class="bi bi-arrow-left me-1"></i>' + esc(_t('library.allAlbums', 'Todos los álbumes')) + '</button>' +
             '<div class="d-flex align-items-center gap-3 mb-4">' +
               '<img src="' + esc(activeGroup.coverUrl) + '" width="76" height="76" class="rounded-4 object-fit-cover shadow" alt="" />' +
-              '<div><h4 class="fw-bold text-white mb-0">' + esc(activeGroup.title) + '</h4><div class="small text-white-50">' + esc(activeGroup.artist) + ' · ' + activeGroup.tracks.length + ' canciones</div></div>' +
+              '<div><h4 class="fw-bold text-white mb-0">' + esc(activeGroup.title) + '</h4><div class="small text-white-50">' + esc(activeGroup.artist) + ' · ' + activeGroup.tracks.length + ' ' + _t(activeGroup.tracks.length === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</div></div>' +
             '</div>' +
             renderTracksTableHtml(activeGroup.tracks, cfg.kind) +
           '</div>';
@@ -3467,18 +3568,18 @@
     if (clearDlBtn) {
       clearDlBtn.addEventListener('click', function () {
         openConfirmDialog(
-          '¿Vaciar todas tus descargas?',
-          'Se eliminarán todas las canciones descargadas de tu almacenamiento local.',
+          _t('downloads.clearConfirmTitle', '¿Vaciar todas tus descargas?'),
+          _t('downloads.clearConfirmMsg', 'Se eliminarán todas las canciones descargadas de tu almacenamiento local.'),
           function () {
             Storage.clearDownloads();
             updateStorageMeterUI();
-            showToast('Lista de descargas vaciada');
+            showToast(_t('downloads.clearedToast', 'Lista de descargas vaciada'));
             renderCurrentView();
           },
-          'Vaciar descargas',
+          _t('downloads.clearBtn', 'Vaciar descargas'),
           'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
           'bi-trash3-fill',
-          'Mis descargas'
+          _t('downloads.badge', 'Mis descargas')
         );
       });
     }
@@ -3514,8 +3615,8 @@
             ? '<i class="bi bi-trash"></i>'
             : (kind === 'licenses' ? '<i class="bi bi-star-fill text-warning"></i>' : '<i class="bi bi-heart-fill"></i>');
           var rmTitle = kind === 'downloads'
-            ? 'Eliminar descarga'
-            : (kind === 'licenses' ? 'Quitar licencia' : 'Quitar de favoritos');
+            ? _t('downloads.removeTitle', 'Eliminar descarga')
+            : (kind === 'licenses' ? _t('licenses.removeTitle', 'Quitar licencia') : _t('favorites.removeTitle', 'Quitar de favoritos'));
 
           return (
             '<div class="bz-track-row ' + (playing ? 'is-playing' : '') + '" data-col-play-id="' + t.id + '">' +
@@ -3528,9 +3629,9 @@
                 '<div class="small text-white-50 text-truncate">' + esc(t.artist) + ' · <span class="opacity-75">' + esc(rightMeta) + '</span></div>' +
               '</div>' +
               '<div class="d-flex align-items-center gap-1">' +
-                '<button type="button" class="bz-icon-action" data-col-addpl="' + t.id + '" title="Agregar a playlist"><i class="bi bi-plus-circle"></i></button>' +
-                (kind === 'downloads' ? '<button type="button" class="bz-icon-action" data-col-file="' + t.id + '" title="Descargar archivo MP3"><i class="bi bi-file-earmark-arrow-down"></i></button>' : '') +
-                '<button type="button" class="bz-icon-action ' + (kind === 'favorites' ? 'is-favorited' : '') + '" data-col-rm="' + t.id + '" title="' + rmTitle + '">' + rmIcon + '</button>' +
+                '<button type="button" class="bz-icon-action" data-col-addpl="' + t.id + '" title="' + esc(_t('tracks.addPl', 'Agregar a playlist')) + '"><i class="bi bi-plus-circle"></i></button>' +
+                (kind === 'downloads' ? '<button type="button" class="bz-icon-action" data-col-file="' + t.id + '" title="' + esc(_t('tracks.downloadMp3', 'Descargar archivo MP3')) + '"><i class="bi bi-file-earmark-arrow-down"></i></button>' : '') +
+                '<button type="button" class="bz-icon-action ' + (kind === 'favorites' ? 'is-favorited' : '') + '" data-col-rm="' + t.id + '" title="' + esc(rmTitle) + '">' + rmIcon + '</button>' +
               '</div>' +
               '<div class="font-mono-bz small text-white-50 text-end" style="min-width:44px;">' + formatDurationMs(t.duration) + '</div>' +
             '</div>'
@@ -3566,7 +3667,7 @@
           var tr = activeTracks.find(function (x) { return Number(x.id) === tid; });
           if (tr) {
             Storage.downloadTrack(tr, true);
-            showToast('Descargando MP3 de "' + tr.title + '"');
+            showToast(_t('toast.downloadingMp3', 'Descargando MP3 de "{title}"', { title: tr.title }));
           }
         });
       });
@@ -3582,27 +3683,27 @@
           var trMb = (Storage.calculateTrackMb ? Storage.calculateTrackMb(tr) : (Number(tr.sizeMb) || 3.8)).toFixed(1);
           Storage.removeDownload(tid);
           updateStorageMeterUI();
-          showToast('Canción eliminada de descargas (' + trMb + ' MB liberados)');
+          showToast(_t('toast.downloadRemoved', 'Canción eliminada de descargas ({mb} MB liberados)', { mb: trMb }));
           renderCurrentView();
         } else if (cfg.kind === 'licenses') {
           openConfirmDialog(
-            '¿Quitar de canciones con licencia?',
-            'Se eliminará "' + tr.title + '" de tus canciones con licencia.',
+            _t('licenses.confirmRemoveTitle', '¿Quitar de canciones con licencia?'),
+            _t('licenses.confirmRemoveMsg', 'Se eliminará "{title}" de tus canciones con licencia.', { title: tr.title }),
             function () {
               Storage.removeLicense(tid);
-              showToast('La canción "' + tr.title + '" se eliminó de Canciones con licencia');
+              showToast(_t('licenses.removedToast', 'La canción "{title}" se eliminó de Canciones con licencia', { title: tr.title }));
               updatePlayerBarsUI();
               renderCurrentView();
             },
-            'Quitar licencia',
+            _t('licenses.removeBtn', 'Quitar licencia'),
             'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
             'bi-shield-x',
-            'Licencias'
+            _t('licenses.badge', 'Licencias')
           );
           return;
         } else {
           Storage.toggleFavorite(tr);
-          showToast('Quitada de favoritos');
+          showToast(_t('toast.favRemoved', 'Quitada de favoritos'));
         }
         updatePlayerBarsUI();
         renderCurrentView();
@@ -3619,9 +3720,9 @@
         var fakeAlbum = {
           id: found.id,
           title: found.name,
-          artist: (Auth.getSession() ? Auth.getSession().name : 'Mi Biblioteca'),
+          artist: (Auth.getSession() ? Auth.getSession().name : _t('library.myLibrary', 'Mi Biblioteca')),
           coverUrl: (found.tracks[0] && found.tracks[0].albumCover) || './assets/img/bitszone-icon.png',
-          year: 'Playlist',
+          year: _t('library.playlistBadge', 'Playlist'),
           totalDuration: found.tracks.reduce(function (s, t) { return s + (t.duration || 0); }, 0),
           tracks: found.tracks
         };
@@ -3638,23 +3739,23 @@
           '<div class="d-flex align-items-center gap-3 gap-md-4 min-w-0">' +
             '<div class="bz-hero-icon-tile is-playlists"><i class="bi bi-music-note-list"></i></div>' +
             '<div class="d-flex flex-column gap-1 min-w-0">' +
-              '<span class="bz-hero-kicker">BIBLIOTECA</span>' +
-              '<div class="bz-hero-title">' + renderLibraryHeroDropdownHtml('playlists', 'Listas de reproducción') + '</div>' +
+              '<span class="bz-hero-kicker">' + esc(_t('library.kicker', 'BIBLIOTECA')) + '</span>' +
+              '<div class="bz-hero-title">' + renderLibraryHeroDropdownHtml('playlists', _t('library.playlists', 'Listas de reproducción')) + '</div>' +
               '<div class="d-flex flex-wrap gap-2 mt-2">' +
-                '<span class="bz-hero-stat-pill"><i class="bi bi-collection"></i> ' + playlists.length + (playlists.length === 1 ? ' lista' : ' listas') + '</span>' +
-                '<span class="bz-hero-stat-pill"><i class="bi bi-music-note-beamed"></i> ' + totalSongs + ' canciones</span>' +
+                '<span class="bz-hero-stat-pill"><i class="bi bi-collection"></i> ' + playlists.length + ' ' + _t(playlists.length === 1 ? 'library.playlistSingular' : 'library.playlistsPlural', 'listas') + '</span>' +
+                '<span class="bz-hero-stat-pill"><i class="bi bi-music-note-beamed"></i> ' + totalSongs + ' ' + _t(totalSongs === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</span>' +
               '</div>' +
             '</div>' +
           '</div>' +
-          '<button type="button" id="btnLibraryNewPlaylist" class="btn bz-btn-hero-subtle btn-sm px-3 py-2"><i class="bi bi-plus-lg me-1"></i>Nueva Playlist</button>' +
+          '<button type="button" id="btnLibraryNewPlaylist" class="btn bz-btn-hero-subtle btn-sm px-3 py-2"><i class="bi bi-plus-lg me-1"></i>' + esc(_t('library.newPlaylist', 'Nueva Playlist')) + '</button>' +
         '</div>';
 
       var plBody = playlists.length === 0
         ? '<div class="bz-section-empty">' +
             '<div class="bz-empty-orb is-playlists"><i class="bi bi-music-note-list"></i></div>' +
-            '<h3 class="h4 fw-bold text-white mb-0">Aún no tienes listas</h3>' +
-            '<p class="text-white-50 small mb-0" style="max-width:340px;">Crea una playlist personalizada para agrupar tus canciones favoritas.</p>' +
-            '<button type="button" class="btn bz-btn-hero-subtle btn-sm px-3 py-2 mt-3" data-empty-create-pl><i class="bi bi-plus-lg me-1"></i>Crear playlist</button>' +
+            '<h3 class="h4 fw-bold text-white mb-0">' + esc(_t('library.emptyPlaylistsTitle', 'Aún no tienes listas')) + '</h3>' +
+            '<p class="text-white-50 small mb-0" style="max-width:340px;">' + esc(_t('library.emptyPlaylistsDesc', 'Crea una playlist personalizada para agrupar tus canciones favoritas.')) + '</p>' +
+            '<button type="button" class="btn bz-btn-hero-subtle btn-sm px-3 py-2 mt-3" data-empty-create-pl><i class="bi bi-plus-lg me-1"></i>' + esc(_t('library.createPlaylistBtn', 'Crear playlist')) + '</button>' +
           '</div>'
         : '<div class="row g-3 pt-2">' +
             playlists.map(function (p) {
@@ -3664,7 +3765,7 @@
                   '<div class="bz-catalog-card w-100" data-open-pl="' + esc(p.id) + '">' +
                     '<div class="bz-cover-box mb-2"><img src="' + esc(cover) + '" alt="' + esc(p.name) + '" /></div>' +
                     '<div class="text-white fw-semibold text-truncate" style="font-size:0.9rem;">' + esc(p.name) + '</div>' +
-                    '<div class="text-white-50" style="font-size:0.76rem;">' + p.tracks.length + ' canciones</div>' +
+                    '<div class="text-white-50" style="font-size:0.76rem;">' + p.tracks.length + ' ' + _t(p.tracks.length === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</div>' +
                   '</div>' +
                 '</div>'
               );
@@ -3707,16 +3808,16 @@
       renderCollectionSection(container, {
         kind: 'licenses',
         libTab: 'licenses',
-        kicker: 'BIBLIOTECA',
-        title: 'Canciones con licencia',
+        kicker: _t('library.kicker', 'BIBLIOTECA'),
+        title: _t('library.licenses', 'Canciones con licencia'),
         iconClass: 'bi-star',
         tracks: isAuthLic ? Storage.getLicenses() : [],
         statePrefix: 'lib',
-        emptyTitle: isAuthLic ? 'No tienes canciones con licencia' : 'Función para usuarios con cuenta',
+        emptyTitle: isAuthLic ? _t('licenses.emptyTitle', 'No tienes canciones con licencia') : _t('licenses.guestTitle', 'Función para usuarios con cuenta'),
         emptyText: isAuthLic
-          ? 'Las canciones con licencia aparecen aquí tras escucharlas 5 veces consecutivas y duran 30 días.'
-          : 'Inicia sesión para desbloquear licencias de 30 días al escuchar tus canciones favoritas.',
-        searchPlaceholder: 'Buscar en biblioteca'
+          ? _t('licenses.emptyDesc', 'Las canciones con licencia aparecen aquí tras escucharlas 5 veces consecutivas y duran 30 días.')
+          : _t('licenses.guestDesc', 'Inicia sesión para desbloquear licencias de 30 días al escuchar tus canciones favoritas.'),
+        searchPlaceholder: _t('library.searchPlaceholder', 'Buscar en biblioteca...')
       });
       return;
     }
@@ -3725,16 +3826,16 @@
     renderCollectionSection(container, {
       kind: 'favorites',
       libTab: 'favorites',
-      kicker: 'BIBLIOTECA',
-      title: 'Canciones favoritas',
+      kicker: _t('library.kicker', 'BIBLIOTECA'),
+      title: _t('library.favorites', 'Canciones favoritas'),
       iconClass: 'bi-heart',
       tracks: isAuthFav ? Storage.getFavorites() : [],
       statePrefix: 'lib',
-      emptyTitle: isAuthFav ? 'Todavía no tienes favoritas' : 'Tus canciones favoritas',
+      emptyTitle: isAuthFav ? _t('favorites.emptyTitle', 'Todavía no tienes favoritas') : _t('favorites.guestTitle', 'Tus canciones favoritas'),
       emptyText: isAuthFav
-        ? 'Toca el corazón de cualquier canción para guardarla aquí.'
-        : 'Inicia sesión gratis para guardar tus canciones favoritas y tenerlas siempre a mano.',
-      searchPlaceholder: 'Buscar en biblioteca'
+        ? _t('favorites.emptyDesc', 'Toca el corazón de cualquier canción para guardarla aquí.')
+        : _t('favorites.guestDesc', 'Inicia sesión gratis para guardar tus canciones favoritas y tenerlas siempre a mano.'),
+      searchPlaceholder: _t('library.searchPlaceholder', 'Buscar en biblioteca...')
     });
   }
 
@@ -3743,16 +3844,16 @@
     var isAuthDl = isUserAuthenticated();
     renderCollectionSection(container, {
       kind: 'downloads',
-      kicker: 'MIS DESCARGAS',
-      title: 'Canciones descargadas',
+      kicker: _t('downloads.kicker', 'MIS DESCARGAS'),
+      title: _t('downloads.title', 'Canciones descargadas'),
       iconClass: 'bi-cloud-arrow-down',
       tracks: isAuthDl ? Storage.getDownloads() : [],
       statePrefix: 'dl',
-      emptyTitle: isAuthDl ? 'Aún no tienes descargas' : 'Descargas sin conexión',
+      emptyTitle: isAuthDl ? _t('downloads.emptyTitle', 'Aún no tienes descargas') : _t('downloads.guestTitle', 'Descargas sin conexión'),
       emptyText: isAuthDl
-        ? 'Descarga canciones o álbumes con el botón de descarga y escúchalas aquí, sin conexión.'
-        : 'Inicia sesión gratis para descargar tus canciones favoritas y escucharlas sin conexión.',
-      searchPlaceholder: 'Buscar en descargas'
+        ? _t('downloads.emptyDesc', 'Descarga canciones o álbumes con el botón de descarga y escúchalas aquí, sin conexión.')
+        : _t('downloads.guestDesc', 'Inicia sesión gratis para descargar tus canciones favoritas y escucharlas sin conexión.'),
+      searchPlaceholder: _t('downloads.searchPlaceholder', 'Buscar en descargas...')
     });
   }
 
@@ -3806,7 +3907,7 @@
 
     if (listEl) {
       listEl.innerHTML = pls.length === 0
-        ? '<div class="text-center py-3 text-white-50 small"><i class="bi bi-music-note-beamed d-block fs-3 mb-2 opacity-50"></i>No tienes playlists todavía. Crea una abajo rápido:</div>'
+        ? '<div class="text-center py-3 text-white-50 small"><i class="bi bi-music-note-beamed d-block fs-3 mb-2 opacity-50"></i>' + esc(_t('modal.addToPlEmpty', 'No tienes playlists todavía. Crea una abajo rápido:')) + '</div>'
         : pls.map(function (p) {
             return (
               '<button type="button" data-pick-pl="' + esc(p.id) + '" class="btn w-100 text-start bz-ad-pl-btn rounded-pill px-3.5 py-2.5 mb-2 d-flex justify-content-between align-items-center">' +
@@ -3820,7 +3921,7 @@
         btn.addEventListener('click', function () {
           var pid = btn.getAttribute('data-pick-pl');
           var res = Storage.addTrackToPlaylist(pid, track);
-          showToast(res.added ? 'Añadida a "' + res.playlist.name + '"' : 'Ya estaba en "' + res.playlist.name + '"');
+          showToast(_t(res.added ? 'toast.plTrackAdded' : 'toast.plTrackExists', res.added ? 'Añadida a "{name}"' : 'Ya estaba en "{name}"', { name: res.playlist.name }));
           var apEl = document.getElementById('addToPlaylistModal');
           var m = apEl && window.bootstrap ? window.bootstrap.Modal.getInstance(apEl) : null;
           if (m) m.hide();
@@ -3844,14 +3945,14 @@
     if (titleEl) titleEl.textContent = title;
     if (msgEl) msgEl.textContent = message;
     if (badgeEl) {
-      badgeEl.innerHTML = '<i class="bi bi-stars me-1 text-white-50"></i> ' + esc(badgeText || 'Confirmación');
+      badgeEl.innerHTML = '<i class="bi bi-stars me-1 text-white-50"></i> ' + esc(badgeText || _t('common.confirmation', 'Confirmación'));
     }
     if (iconEl) {
       iconEl.className = 'bi ' + (iconClass || 'bi-cloud-arrow-down-fill') + ' text-white';
     }
 
     if (okBtn) {
-      okBtn.textContent = confirmLabel || 'Confirmar';
+      okBtn.textContent = confirmLabel || _t('common.confirm', 'Confirmar');
       okBtn.className = btnClass || 'btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill';
 
       var cloned = okBtn.cloneNode(true);
@@ -3907,7 +4008,7 @@
 
     nameInput.value = (s.name && s.name.toUpperCase() === 'SUPERADMIN') ? 'Admin' : s.name;
     emailEl.textContent = s.email;
-    roleBadgeEl.textContent = (s.role === 'superadmin' || s.role === 'admin') ? 'ADMIN' : 'OYENTE';
+    roleBadgeEl.textContent = (s.role === 'superadmin' || s.role === 'admin') ? _t('nav.adminBadge', 'ADMIN') : _t('nav.userBadge', 'OYENTE');
     updateAvatarPreview(currentAvatar);
     refreshProfileSaveState();
 
@@ -3915,15 +4016,15 @@
     var st = Storage.getProfileStats();
     statsEl.innerHTML =
       '<div class="row g-3 mb-4">' +
-        '<div class="col-4"><div class="p-3 rounded-4 bg-white bg-opacity-10 text-center"><div class="h4 fw-bold text-white mb-0">' + st.totalListens + '</div><small class="text-white-50">Escuchas</small></div></div>' +
-        '<div class="col-4"><div class="p-3 rounded-4 bg-white bg-opacity-10 text-center"><div class="h4 fw-bold text-white mb-0">' + st.minutes + '</div><small class="text-white-50">Minutos</small></div></div>' +
-        '<div class="col-4"><div class="p-3 rounded-4 bg-white bg-opacity-10 text-center"><div class="h4 fw-bold text-white mb-0">' + st.distinctArtists + '</div><small class="text-white-50">Artistas</small></div></div>' +
+        '<div class="col-4"><div class="p-3 rounded-4 bg-white bg-opacity-10 text-center"><div class="h4 fw-bold text-white mb-0">' + st.totalListens + '</div><small class="text-white-50">' + esc(_t('profile.listens', 'Escuchas')) + '</small></div></div>' +
+        '<div class="col-4"><div class="p-3 rounded-4 bg-white bg-opacity-10 text-center"><div class="h4 fw-bold text-white mb-0">' + st.minutes + '</div><small class="text-white-50">' + esc(_t('profile.minutes', 'Minutos')) + '</small></div></div>' +
+        '<div class="col-4"><div class="p-3 rounded-4 bg-white bg-opacity-10 text-center"><div class="h4 fw-bold text-white mb-0">' + st.distinctArtists + '</div><small class="text-white-50">' + esc(_t('profile.artists', 'Artistas')) + '</small></div></div>' +
       '</div>' +
-      '<h6 class="text-white-50 text-uppercase small mb-2">Artistas más escuchados</h6>' +
+      '<h6 class="text-white-50 text-uppercase small mb-2">' + esc(_t('profile.topArtists', 'Artistas más escuchados')) + '</h6>' +
       (st.topArtists.length === 0
-        ? '<p class="small text-white-50">Reproduce canciones para construir tu historial.</p>'
+        ? '<p class="small text-white-50">' + esc(_t('profile.noHistory', 'Reproduce canciones para construir tu historial.')) + '</p>'
         : st.topArtists.map(function (a) {
-            return '<div class="d-flex justify-content-between py-2 border-bottom border-white border-opacity-10 small"><span class="text-white">' + esc(a.name) + '</span><span class="font-mono-bz text-white-50">' + a.count + ' plays</span></div>';
+            return '<div class="d-flex justify-content-between py-2 border-bottom border-white border-opacity-10 small"><span class="text-white">' + esc(a.name) + '</span><span class="font-mono-bz text-white-50">' + a.count + ' ' + esc(_t('profile.plays', 'plays')) + '</span></div>';
           }).join(''));
 
     nameInput.oninput = refreshProfileSaveState;
@@ -3946,7 +4047,7 @@
     function performProfileSave() {
       var clean = nameInput.value.trim();
       if (clean.length < 3) {
-        showToast('El nombre debe tener al menos 3 caracteres.');
+        showToast(_t('profile.nameTooShort', 'El nombre debe tener al menos 3 caracteres.'));
         return false;
       }
       Auth.updateProfile({ name: clean, avatarUrl: pendingAvatar });
@@ -3960,7 +4061,7 @@
         renderCurrentView();
       }
 
-      showToast('Perfil actualizado correctamente');
+      showToast(_t('profile.saved', 'Perfil actualizado correctamente'));
       return true;
     }
 
@@ -3970,7 +4071,7 @@
 
     document.getElementById('btnProfileCloseGuard').onclick = function () {
       if (isProfileDirty()) {
-        document.getElementById('unsavedModalPrompt').textContent = 'Tienes cambios sin guardar en tu perfil.';
+        document.getElementById('unsavedModalPrompt').textContent = _t('guard.profilePrompt', 'Tienes cambios sin guardar en tu perfil.');
         var unsavedModal = window.bootstrap.Modal.getOrCreateInstance(document.getElementById('unsavedGuardModal'));
         document.getElementById('btnUnsavedSaveExit').onclick = function () {
           if (performProfileSave()) {
@@ -4268,7 +4369,7 @@
         if (consecutivePlay.count === 5) {
           if (isUserAuthenticated()) {
             if (Storage.addLicense(cur)) {
-              showToast('La canción "' + cur.title + '" se agregó a Canciones con licencia');
+              showToast('"' + cur.title + '" ' + _t('toast.licenseAdded', 'se agregó a Canciones con licencia'));
               updatePlayerBarsUI();
               renderCurrentView();
             }
@@ -4431,7 +4532,7 @@
       if (!appState.nowPlayingTrack) return;
       requireAuth('favorites', function () {
         var added = Storage.toggleFavorite(appState.nowPlayingTrack);
-        showToast(added ? 'Agregada a favoritos' : 'Quitada de favoritos');
+        showToast(added ? _t('toast.favAdded', 'Agregada a favoritos') : _t('toast.favRemoved', 'Quitada de favoritos'));
         updatePlayerBarsUI();
         renderCurrentView();
       });
@@ -4445,7 +4546,7 @@
       requireAuth('downloads', function () {
         var isNew = Storage.downloadTrack(appState.nowPlayingTrack, false);
         updateStorageMeterUI();
-        showToast(isNew ? 'Canción "' + appState.nowPlayingTrack.title + '" guardada en Mis descargas' : 'La canción ya está en Mis descargas');
+        showToast(isNew ? _t('toast.downloadSaved', 'Canción "{title}" guardada en Mis descargas', { title: appState.nowPlayingTrack.title }) : _t('toast.downloadAlready', 'La canción ya está en Mis descargas'));
         updatePlayerBarsUI();
       });
     });
@@ -4595,8 +4696,8 @@
           var crInst = crEl && window.bootstrap ? window.bootstrap.Modal.getInstance(crEl) : null;
           if (crInst) crInst.hide();
           showToast(batch.length
-            ? ('Playlist "' + created.name + '" creada con ' + batch.length + (batch.length === 1 ? ' canción' : ' canciones'))
-            : ('Playlist "' + created.name + '" creada'));
+            ? (_t('library.playlistBadge', 'Playlist') + ' "' + created.name + '" ' + _t('toast.playlistCreated', 'creada') + ' (' + batch.length + ' ' + _t(batch.length === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + ')')
+            : (_t('library.playlistBadge', 'Playlist') + ' "' + created.name + '" ' + _t('toast.playlistCreated', 'creada')));
           var expEl = document.getElementById('expandedPlayerModal');
           var expOpen = expEl && expEl.classList.contains('show');
           if (!expOpen) navigate('library-playlists');
@@ -4618,7 +4719,7 @@
           var apEl = document.getElementById('addToPlaylistModal');
           var apInst = apEl && window.bootstrap ? window.bootstrap.Modal.getInstance(apEl) : null;
           if (apInst) apInst.hide();
-          showToast('Playlist "' + created.name + '" creada y canción añadida');
+          showToast(_t('library.playlistBadge', 'Playlist') + ' "' + created.name + '" ' + _t('toast.playlistCreated', 'creada') + ' & ' + _t('toast.addedToPlaylist', 'Añadida a'));
         }
       });
     }
@@ -4633,7 +4734,7 @@
         if (created) {
           inp.value = '';
           window.bootstrap.Modal.getInstance(document.getElementById('addAdminModal')).hide();
-          showToast('"' + created.username + '" agregado como Admin (Demo)');
+          showToast(_t('admin.createdToast', '"{username}" agregado como Admin (Demo)', { username: created.username }));
           renderCurrentView();
         }
       });
@@ -4676,7 +4777,7 @@
           document.getElementById('relTitleInput').value = '';
           document.getElementById('relArtistInput').value = '';
           window.bootstrap.Modal.getInstance(document.getElementById('releaseDemoModal')).hide();
-          showToast('Lanzamiento Demo "' + titleVal + '" agregado temporalmente al catálogo');
+          showToast(_t('admin.releaseToast', 'Lanzamiento Demo "{title}" agregado temporalmente al catálogo', { title: titleVal }));
           renderCurrentView();
         }
       });
@@ -4800,6 +4901,14 @@
         updatePlayerBarsUI();
         renderCurrentView();
       }
+    });
+
+    window.addEventListener('bz:language-changed', function () {
+      renderCurrentView();
+      updatePlayerBarsUI();
+      updateStorageMeterUI();
+      updateSideLyricsHeader();
+      if (appState.isSideLyricsOpen) renderSideLyricsPanel();
     });
   });
 
