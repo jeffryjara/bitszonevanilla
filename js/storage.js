@@ -5,6 +5,7 @@
   'use strict';
 
   var BASE_STORAGE_GB = 5.0;
+  var BASE_STORAGE_MB = 5120.0;
 
   var DEFAULT_SETTINGS = {
     textScale: 100,
@@ -92,17 +93,30 @@
   function isDownloaded(trackId) {
     return getDownloads().some(function (t) { return Number(t.id) === Number(trackId); });
   }
-  function getUsedBytes() {
+  function calculateTrackMb(track) {
+    if (!track) return 3.8;
+    if (typeof track.sizeMb === 'number' && track.sizeMb > 0) return Number(track.sizeMb);
+    var dur = Number(track.duration) || 180000;
+    var durSecs = dur < 10000 ? dur : Math.floor(dur / 1000);
+    return Number((durSecs * 0.023).toFixed(2)) || 3.8;
+  }
+
+  function getUsedMb() {
     return getDownloads().reduce(function (acc, t) {
-      var mb = Number(t.sizeMb) || 3.8;
-      return acc + mb * 1024 * 1024;
+      return acc + calculateTrackMb(t);
     }, 0);
   }
+
+  function getUsedBytes() {
+    return getUsedMb() * 1024 * 1024;
+  }
+
   function downloadTrack(track, downloadMp3File) {
     var list = getDownloads();
     var already = list.some(function (t) { return Number(t.id) === Number(track.id); });
     if (!already) {
-      list.unshift(Object.assign({}, track, { addedAt: new Date().toISOString() }));
+      var mb = calculateTrackMb(track);
+      list.unshift(Object.assign({}, track, { sizeMb: mb, addedAt: new Date().toISOString() }));
       writeJson('bz_v_downloads', list);
     }
     if (downloadMp3File && track.previewUrl && typeof fetch === 'function') {
@@ -124,10 +138,39 @@
     }
     return !already;
   }
+
+  function downloadTracks(trackList) {
+    if (!Array.isArray(trackList) || !trackList.length) return 0;
+    var list = getDownloads();
+    var existingIds = {};
+    list.forEach(function (t) { existingIds[String(t.id)] = true; });
+    var addedCount = 0;
+    trackList.forEach(function (track) {
+      if (!track || existingIds[String(track.id)]) return;
+      var mb = calculateTrackMb(track);
+      list.unshift(Object.assign({}, track, { sizeMb: mb, addedAt: new Date().toISOString() }));
+      existingIds[String(track.id)] = true;
+      addedCount++;
+    });
+    if (addedCount > 0) {
+      writeJson('bz_v_downloads', list);
+    }
+    return addedCount;
+  }
+
+  function removeTracks(trackIds) {
+    if (!Array.isArray(trackIds) || !trackIds.length) return;
+    var idSet = {};
+    trackIds.forEach(function (id) { idSet[String(id)] = true; });
+    var list = getDownloads().filter(function (t) { return !idSet[String(t.id)]; });
+    writeJson('bz_v_downloads', list);
+  }
+
   function removeDownload(trackId) {
     var list = getDownloads().filter(function (t) { return Number(t.id) !== Number(trackId); });
     writeJson('bz_v_downloads', list);
   }
+
   function clearDownloads() {
     writeJson('bz_v_downloads', []);
   }
@@ -245,6 +288,7 @@
 
   window.BitszoneStorage = {
     BASE_STORAGE_GB: BASE_STORAGE_GB,
+    BASE_STORAGE_MB: BASE_STORAGE_MB,
     DEFAULT_SETTINGS: DEFAULT_SETTINGS,
     getFavorites: getFavorites,
     isFavorite: isFavorite,
@@ -256,7 +300,11 @@
     getDownloads: getDownloads,
     isDownloaded: isDownloaded,
     getUsedBytes: getUsedBytes,
+    getUsedMb: getUsedMb,
+    calculateTrackMb: calculateTrackMb,
     downloadTrack: downloadTrack,
+    downloadTracks: downloadTracks,
+    removeTracks: removeTracks,
     removeDownload: removeDownload,
     clearDownloads: clearDownloads,
     getPlaylists: getPlaylists,

@@ -146,21 +146,27 @@
           <i class="bi bi-gear fs-6"></i><span class="bz-nav-label">Configuración</span>
         </button>
 
-        <button id="btnSidebarStorage" type="button" class="bz-storage-btn bz-storage-details w-100 text-start border-0 bg-transparent p-2 mt-1 border-top border-white border-opacity-10" data-nav-view="downloads" title="Mis descargas y almacenamiento">
-          <div class="d-flex align-items-center justify-content-between mb-1">
-            <div class="d-flex align-items-center gap-2">
-              <i class="bi bi-hdd text-white-50" style="font-size: 0.82rem;"></i>
-              <div>
-                <div class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.62rem; letter-spacing: 0.08em;">Almacenamiento</div>
-                <div id="storageAvailText" style="font-size: 0.72rem; color: rgba(255,255,255,0.7);">
-                  <strong class="text-white">5.00GB</strong> de 5.00GB
+        <!-- Separador superior con más espacio antes del almacenamiento -->
+        <hr class="border-white border-opacity-10 my-3" />
+
+        <!-- Botón de almacenamiento más espacioso y prominente -->
+        <button id="btnSidebarStorage" type="button" class="bz-storage-btn bz-storage-details w-100 text-start border-0" data-nav-view="downloads" title="Mis descargas y almacenamiento">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center gap-2.5">
+              <div class="bz-storage-icon-box">
+                <i class="bi bi-hdd-fill"></i>
+              </div>
+              <div class="min-w-0">
+                <div class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.68rem; letter-spacing: 0.09em;">Almacenamiento</div>
+                <div id="storageAvailText" class="font-mono-bz text-truncate" style="font-size: 0.78rem; color: rgba(255,255,255,0.85);">
+                  <strong class="text-white">5,120.0 MB</strong> de 5.00 GB
                 </div>
               </div>
             </div>
-            <i class="bi bi-chevron-right text-white-50 small opacity-50 bz-storage-chevron"></i>
+            <i class="bi bi-chevron-right text-white-50 small opacity-60 bz-storage-chevron ms-1"></i>
           </div>
-          <div class="progress rounded-pill" style="height: 3px; background: rgba(255,255,255,0.12);">
-            <div id="storageProgressBar" class="progress-bar rounded-pill" style="width: 2%; background: linear-gradient(90deg, #60a5fa, #a855f7);"></div>
+          <div class="progress rounded-pill" style="height: 4px; background: rgba(255,255,255,0.12);">
+            <div id="storageProgressBar" class="progress-bar rounded-pill" style="width: 0%; background: linear-gradient(90deg, #60a5fa, #a855f7);"></div>
           </div>
         </button>
       </div>

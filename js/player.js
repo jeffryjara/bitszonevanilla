@@ -945,17 +945,21 @@
 
   function updateStorageMeterUI() {
     var dlCount = Storage.getDownloads().length;
-    var usedBytes = Storage.getUsedBytes();
-    var usedGB = usedBytes / (1024 * 1024 * 1024);
-    var availGB = Math.max(0, Storage.BASE_STORAGE_GB - usedGB);
-    var usedPct = Math.min(100, (usedGB / Storage.BASE_STORAGE_GB) * 100);
+    var usedMb = Storage.getUsedMb ? Storage.getUsedMb() : (Storage.getUsedBytes() / (1024 * 1024));
+    var baseMb = Storage.BASE_STORAGE_MB || 5120.0;
+    var availMb = Math.max(0, baseMb - usedMb);
+    var usedPct = Math.min(100, (usedMb / baseMb) * 100);
 
     var bar = document.getElementById('storageProgressBar');
     var availEl = document.getElementById('storageAvailText');
     var badge = document.getElementById('downloadsCountBadge');
 
-    if (bar) bar.style.width = Math.max(2, usedPct).toFixed(1) + '%';
-    if (availEl) availEl.innerHTML = '<strong class="text-white">' + availGB.toFixed(2) + 'GB</strong> de 5.00GB';
+    if (bar) {
+      bar.style.width = (usedMb > 0 ? Math.max(3, usedPct) : 0).toFixed(1) + '%';
+    }
+    if (availEl) {
+      availEl.innerHTML = '<strong class="text-white">' + availMb.toFixed(1) + ' MB</strong> de 5.00 GB';
+    }
     if (badge) {
       badge.textContent = String(dlCount);
       badge.classList.toggle('d-none', dlCount === 0);
@@ -1979,9 +1983,36 @@
   function renderAlbumCardHtml(album, isSongMode) {
     var mainTrack = album.tracks && album.tracks[0];
     var titleText = isSongMode && mainTrack ? mainTrack.title : album.title;
-    var fav = mainTrack ? Storage.isFavorite(mainTrack.id) : false;
-    var dl = mainTrack ? Storage.isDownloaded(mainTrack.id) : false;
+    var allDl = album.tracks && album.tracks.length > 0 && album.tracks.every(function (t) { return Storage.isDownloaded(t.id); });
+    var dl = isSongMode ? (mainTrack ? Storage.isDownloaded(mainTrack.id) : false) : allDl;
     var lic = mainTrack ? Storage.isLicensed(mainTrack.id) : false;
+
+    var actionButtonsHtml = '';
+    if (isSongMode) {
+      if (mainTrack) {
+        actionButtonsHtml =
+          '<div class="d-flex align-items-center gap-1 flex-shrink-0">' +
+            '<button type="button" class="bz-icon-action ' + (dl ? 'is-downloaded' : '') + '" data-quick-dl="' + mainTrack.id + '" title="' + (dl ? 'Descargada' : 'Descargar canción') + '">' +
+              '<i class="bi ' + (dl ? 'bi-check-circle-fill' : 'bi-download') + '" style="font-size:0.86rem;"></i>' +
+            '</button>' +
+            '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-quick-fav="' + mainTrack.id + '" title="Favorito">' +
+              '<i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '" style="font-size:0.86rem;"></i>' +
+            '</button>' +
+          '</div>';
+      }
+    } else {
+      actionButtonsHtml =
+        '<div class="d-flex align-items-center gap-1 flex-shrink-0">' +
+          '<button type="button" class="bz-icon-action ' + (allDl ? 'is-downloaded' : '') + '" data-album-quick-dl="' + esc(album.id) + '" title="' + (allDl ? 'Álbum ya descargado' : 'Descargar álbum completo') + '">' +
+            '<i class="bi ' + (allDl ? 'bi-check-circle-fill' : 'bi-download') + '" style="font-size:0.86rem;"></i>' +
+          '</button>' +
+          (mainTrack ? (
+            '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-quick-fav="' + mainTrack.id + '" title="Favorito">' +
+              '<i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '" style="font-size:0.86rem;"></i>' +
+            '</button>'
+          ) : '') +
+        '</div>';
+    }
 
     return (
       '<div class="bz-catalog-card" data-open-album="' + esc(album.id) + '" data-song-mode="' + (isSongMode ? '1' : '0') + '">' +
@@ -2001,16 +2032,7 @@
             '</div>' +
             '<div class="text-white-50 text-truncate" style="font-size: 0.78rem;">' + esc(album.artist) + '</div>' +
           '</div>' +
-          (mainTrack ? (
-            '<div class="d-flex align-items-center gap-1 flex-shrink-0">' +
-              '<button type="button" class="bz-icon-action ' + (dl ? 'is-downloaded' : '') + '" data-quick-dl="' + mainTrack.id + '" title="Descargar">' +
-                '<i class="bi ' + (dl ? 'bi-check-circle-fill' : 'bi-download') + '" style="font-size:0.86rem;"></i>' +
-              '</button>' +
-              '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-quick-fav="' + mainTrack.id + '" title="Favorito">' +
-                '<i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '" style="font-size:0.86rem;"></i>' +
-              '</button>' +
-            '</div>'
-          ) : '') +
+          actionButtonsHtml +
         '</div>' +
       '</div>'
     );
@@ -2221,6 +2243,52 @@
         });
       });
     });
+    container.querySelectorAll('[data-album-quick-dl]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        requireAuth('downloads', function () {
+          var albId = btn.getAttribute('data-album-quick-dl');
+          var alb = findAlbumById(albId);
+          if (!alb || !alb.tracks || !alb.tracks.length) return;
+          var albumTracks = alb.tracks;
+          var isAllDownloaded = albumTracks.every(function (t) { return Storage.isDownloaded(t.id); });
+
+          if (isAllDownloaded) {
+            openConfirmDialog(
+              '¿Eliminar álbum de descargas?',
+              'Se quitarán las ' + albumTracks.length + ' canciones del álbum "' + alb.title + '" de Mis descargas.',
+              function () {
+                var ids = albumTracks.map(function (t) { return t.id; });
+                Storage.removeTracks(ids);
+                updateStorageMeterUI();
+                showToast('Álbum "' + alb.title + '" eliminado de Mis descargas');
+                renderCurrentView();
+              },
+              'Eliminar álbum',
+              'btn btn-danger rounded-pill btn-sm px-3'
+            );
+          } else {
+            var missing = albumTracks.filter(function (t) { return !Storage.isDownloaded(t.id); });
+            var totalMb = missing.reduce(function (sum, t) {
+              return sum + (Storage.calculateTrackMb ? Storage.calculateTrackMb(t) : (Number(t.sizeMb) || 3.8));
+            }, 0);
+
+            openConfirmDialog(
+              '¿Descargar álbum completo?',
+              'Se descargarán ' + missing.length + (missing.length === 1 ? ' canción' : ' canciones') + ' del álbum "' + alb.title + '" (~' + totalMb.toFixed(1) + ' MB) en Mis descargas para escucharlas sin conexión.',
+              function () {
+                Storage.downloadTracks(missing);
+                updateStorageMeterUI();
+                showToast('Álbum "' + alb.title + '" guardado en Mis descargas (' + missing.length + ' canciones)');
+                renderCurrentView();
+              },
+              'Descargar álbum',
+              'btn bz-btn-primary rounded-pill btn-sm px-3'
+            );
+          }
+        });
+      });
+    });
     container.querySelectorAll('[data-open-album]').forEach(function (el) {
       el.addEventListener('click', function () {
         var alb = findAlbumById(el.getAttribute('data-open-album'));
@@ -2400,10 +2468,45 @@
     if (dlAll) {
       dlAll.addEventListener('click', function () {
         requireAuth('downloads', function () {
-          tracks.forEach(function (t) { Storage.downloadTrack(t, false); });
-          updateStorageMeterUI();
-          showToast('Álbum "' + albumObj.title + '" guardado en Mis descargas');
-          renderAlbumView(container, albumObj, isPlaylist);
+          var fullAlbum = findAlbumById(albumObj.id) || findAlbumById(albumObj.title) || albumObj;
+          var albumTracks = (fullAlbum.tracks && fullAlbum.tracks.length) ? fullAlbum.tracks : tracks;
+          if (!albumTracks.length) return;
+
+          var isAllDownloaded = albumTracks.every(function (t) { return Storage.isDownloaded(t.id); });
+
+          if (isAllDownloaded) {
+            openConfirmDialog(
+              '¿Eliminar álbum de descargas?',
+              'Se quitarán las ' + albumTracks.length + ' canciones del álbum "' + albumObj.title + '" de Mis descargas.',
+              function () {
+                var ids = albumTracks.map(function (t) { return t.id; });
+                Storage.removeTracks(ids);
+                updateStorageMeterUI();
+                showToast('Álbum "' + albumObj.title + '" eliminado de Mis descargas');
+                renderAlbumView(container, albumObj, isPlaylist);
+              },
+              'Eliminar álbum',
+              'btn btn-danger rounded-pill btn-sm px-3'
+            );
+          } else {
+            var missing = albumTracks.filter(function (t) { return !Storage.isDownloaded(t.id); });
+            var totalMb = missing.reduce(function (sum, t) {
+              return sum + (Storage.calculateTrackMb ? Storage.calculateTrackMb(t) : (Number(t.sizeMb) || 3.8));
+            }, 0);
+
+            openConfirmDialog(
+              '¿Descargar álbum completo?',
+              'Se descargarán ' + missing.length + (missing.length === 1 ? ' canción' : ' canciones') + ' del álbum "' + albumObj.title + '" (~' + totalMb.toFixed(1) + ' MB) en Mis descargas para escucharlas sin conexión.',
+              function () {
+                Storage.downloadTracks(missing);
+                updateStorageMeterUI();
+                showToast('Álbum "' + albumObj.title + '" guardado en Mis descargas (' + missing.length + ' canciones)');
+                renderAlbumView(container, albumObj, isPlaylist);
+              },
+              'Descargar álbum',
+              'btn bz-btn-primary rounded-pill btn-sm px-3'
+            );
+          }
         });
       });
     }
@@ -2649,14 +2752,15 @@
     var totalAlbumMap = {};
     rawTracks.forEach(function (t) { totalAlbumMap[t.albumId || t.albumTitle || t.id] = true; });
     var totalAlbumsCount = Object.keys(totalAlbumMap).length;
-    var usedGB = Storage.getUsedBytes() / (1024 * 1024 * 1024);
-    var availGB = Math.max(0, Storage.BASE_STORAGE_GB - usedGB);
+    var usedMb = Storage.getUsedMb ? Storage.getUsedMb() : (Storage.getUsedBytes() / (1024 * 1024));
+    var baseMb = Storage.BASE_STORAGE_MB || 5120.0;
+    var availMb = Math.max(0, baseMb - usedMb);
 
     var statsHtml =
       '<span class="bz-hero-stat-pill"><i class="bi bi-music-note-beamed"></i> ' + rawTracks.length + (rawTracks.length === 1 ? ' canción' : ' canciones') + '</span>' +
       '<span class="bz-hero-stat-pill"><i class="bi bi-disc"></i> ' + totalAlbumsCount + (totalAlbumsCount === 1 ? ' álbum' : ' álbumes') + '</span>' +
       (cfg.kind === 'downloads'
-        ? '<span class="bz-hero-stat-pill"><i class="bi bi-hdd"></i> ' + availGB.toFixed(2) + 'GB libres de 5.00GB</span>'
+        ? '<span class="bz-hero-stat-pill"><i class="bi bi-hdd"></i> ' + availMb.toFixed(1) + ' MB libres de 5.00 GB (' + usedMb.toFixed(1) + ' MB ocupados)</span>'
         : '');
 
     var heroTitleNode = cfg.kind === 'downloads'
@@ -2926,9 +3030,11 @@
         var tr = activeTracks.find(function (x) { return Number(x.id) === tid; });
         if (!tr) return;
         if (cfg.kind === 'downloads') {
+          var trMb = (Storage.calculateTrackMb ? Storage.calculateTrackMb(tr) : (Number(tr.sizeMb) || 3.8)).toFixed(1);
           Storage.removeDownload(tid);
           updateStorageMeterUI();
-          showToast('Pista eliminada de descargas');
+          showToast('Canción eliminada de descargas (' + trMb + ' MB liberados)');
+          renderCurrentView();
         } else if (cfg.kind === 'licenses') {
           openConfirmDialog(
             '¿Quitar de canciones con licencia?',
@@ -3176,21 +3282,25 @@
     }
   }
 
-  function openConfirmDialog(title, message, onConfirm, confirmLabel) {
+  function openConfirmDialog(title, message, onConfirm, confirmLabel, btnClass) {
     document.getElementById('confirmActionTitle').textContent = title;
     document.getElementById('confirmActionMessage').textContent = message;
     var okBtn = document.getElementById('confirmActionOkBtn');
     okBtn.textContent = confirmLabel || 'Confirmar';
+    okBtn.className = btnClass || 'btn btn-danger rounded-pill btn-sm px-3';
 
     var cloned = okBtn.cloneNode(true);
     okBtn.parentNode.replaceChild(cloned, okBtn);
     cloned.addEventListener('click', function () {
-      var inst = window.bootstrap.Modal.getInstance(document.getElementById('confirmActionModal'));
+      var modalEl = document.getElementById('confirmActionModal');
+      var inst = window.bootstrap ? window.bootstrap.Modal.getInstance(modalEl) : null;
       if (inst) inst.hide();
       if (onConfirm) onConfirm();
     });
 
-    new window.bootstrap.Modal(document.getElementById('confirmActionModal')).show();
+    if (window.bootstrap) {
+      window.bootstrap.Modal.getOrCreateInstance(document.getElementById('confirmActionModal')).show();
+    }
   }
 
   function openProfileModal() {
