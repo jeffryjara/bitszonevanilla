@@ -4469,6 +4469,100 @@
       if (e.key === 'Escape') document.body.classList.remove('bz-drawer-open');
     });
 
+    // Barra inferior líquida: el selector se desliza (con efecto de estiramiento) hacia la pestaña activa
+    (function () {
+      var pill = document.getElementById('bzTabbarPill');
+      var sel = document.getElementById('bzTabSelector');
+      var menuBtn = document.getElementById('btnMobileMenu');
+      if (!pill || !sel) return;
+      var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var cur = null; // { left, width }
+
+      function tabs() {
+        return [].slice.call(pill.querySelectorAll('.bz-tab-btn')).filter(function (b) { return b.offsetParent !== null; });
+      }
+      function target() {
+        var list = tabs();
+        var drawer = document.body.classList.contains('bz-drawer-open');
+        list.forEach(function (b) { b.classList.toggle('is-menu-on', drawer && b === menuBtn); });
+        var btn = drawer ? menuBtn : list.filter(function (b) { return b.classList.contains('is-active'); })[0];
+        return btn || null;
+      }
+      function pop(btn) {
+        var ic = btn && btn.querySelector('i');
+        if (ic && ic.animate && !reduce) {
+          ic.animate([{ transform: 'scale(0.78)' }, { transform: 'scale(1.18)', offset: 0.55 }, { transform: 'scale(1)' }],
+            { duration: 420, easing: 'cubic-bezier(0.34, 1.4, 0.64, 1)' });
+        }
+      }
+      function place(animate) {
+        var btn = target();
+        if (!btn || !pill.offsetWidth) return;
+        var next = { left: btn.offsetLeft, width: btn.offsetWidth };
+        if (cur && cur.left === next.left && cur.width === next.width) return;
+        if (animate && cur && sel.animate && !reduce) {
+          var spanLeft = Math.min(cur.left, next.left);
+          var spanWidth = Math.abs(next.left - cur.left) + next.width;
+          sel.animate([
+            { left: cur.left + 'px', width: cur.width + 'px' },
+            { left: spanLeft + 'px', width: spanWidth + 'px', offset: 0.45 },
+            { left: next.left + 'px', width: next.width + 'px' }
+          ], { duration: 520, easing: 'cubic-bezier(0.4, 0, 0.2, 1)' });
+          pop(btn);
+        }
+        sel.style.left = next.left + 'px';
+        sel.style.width = next.width + 'px';
+        cur = next;
+      }
+
+      // Cambios de vista (clase is-active), cajón abierto/cerrado y tamaño
+      var mo = new MutationObserver(function () { place(true); });
+      pill.querySelectorAll('.bz-tab-btn').forEach(function (b) { mo.observe(b, { attributes: true, attributeFilter: ['class'] }); });
+      new MutationObserver(function () { place(true); }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
+      if (window.ResizeObserver) new ResizeObserver(function () { cur = null; place(false); }).observe(pill);
+      window.addEventListener('resize', function () { cur = null; place(false); });
+      window.addEventListener('bz:language-changed', function () { cur = null; place(false); });
+      place(false);
+
+      // Arrastre: deslizar el dedo por la barra mueve el selector y al soltar abre esa pestaña
+      var dragging = false, startX = 0, moved = false, hover = null;
+      function btnAt(x) {
+        var r = pill.getBoundingClientRect();
+        var px = x - r.left;
+        return tabs().filter(function (b) { return px >= b.offsetLeft && px <= b.offsetLeft + b.offsetWidth; })[0] || null;
+      }
+      pill.addEventListener('pointerdown', function (e) {
+        if (e.pointerType === 'mouse' && e.button !== 0) return;
+        dragging = true; moved = false; startX = e.clientX; hover = null;
+      });
+      pill.addEventListener('pointermove', function (e) {
+        if (!dragging) return;
+        if (Math.abs(e.clientX - startX) > 8) moved = true;
+        if (!moved) return;
+        var b = btnAt(e.clientX);
+        if (b && b !== hover) {
+          hover = b;
+          sel.style.left = b.offsetLeft + 'px';
+          sel.style.width = b.offsetWidth + 'px';
+          sel.style.transition = 'left 0.28s cubic-bezier(0.34, 1.3, 0.64, 1), width 0.28s ease';
+        }
+      });
+      function endDrag() {
+        if (!dragging) return;
+        dragging = false;
+        sel.style.transition = '';
+        if (moved && hover) {
+          var view = hover.getAttribute('data-nav-view');
+          if (view) { navigate(view); }
+          else if (hover === menuBtn) { document.body.classList.add('bz-drawer-open'); }
+        }
+        cur = null; place(false);
+        moved = false; hover = null;
+      }
+      window.addEventListener('pointerup', endDrag);
+      window.addEventListener('pointercancel', endDrag);
+    })();
+
     // Mini reproductor móvil: corazón y siguiente reutilizan los botones de la barra de escritorio
     var mobFav = document.getElementById('mobMiniFavBtn');
     var mobNext = document.getElementById('mobMiniNextBtn');

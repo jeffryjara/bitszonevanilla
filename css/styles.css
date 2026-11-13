@@ -1758,8 +1758,9 @@ body.bz-player-body {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(ellipse 75% 42% at 50% 0%, rgba(168, 85, 247, 0.14), transparent 72%),
-    linear-gradient(155deg, rgba(88, 28, 135, 0.14) 0%, #07060a 52%, rgba(24, 24, 48, 0.14) 100%);
+    linear-gradient(180deg, rgba(168, 85, 247, 0.15), transparent 600px) top / 100% 600px no-repeat,
+    linear-gradient(to bottom right, rgba(88, 28, 135, 0.2), #050505, rgba(30, 58, 138, 0.2)),
+    #050505;
   transition: background 0.55s ease;
 }
 
@@ -1810,7 +1811,10 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   pointer-events: none;
   z-index: 0;
   background: linear-gradient(180deg, rgba(7, 6, 10, 0.35) 0%, rgba(7, 6, 10, 0.9) 82%);
+  opacity: 0;
+  transition: opacity 0.8s ease;
 }
+.bz-dynamic-bg-cover.is-visible ~ .bz-dynamic-bg-scrim { opacity: 1; }
 
 .bz-app-frame {
   position: relative;
@@ -5589,42 +5593,72 @@ html, body {
     backdrop-filter: none;
     padding: 0.4rem 1rem calc(0.7rem + env(safe-area-inset-bottom));
   }
+  /* Barra "liquid glass": cristal con selector que se desliza entre pestañas */
   .bz-tabbar-pill {
+    position: relative;
     display: flex;
+    align-items: stretch;
     width: 100%;
-    align-items: center;
-    gap: 0.2rem;
-    padding: 0.35rem;
+    max-width: 560px;
+    margin: 0 auto;
+    padding: 6px;
     border-radius: 999px;
-    background: rgba(20, 17, 28, 0.86);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
-    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+      0 12px 32px rgba(0, 0, 0, 0.45);
+    touch-action: pan-y;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .bz-tab-selector {
+    position: absolute;
+    top: 6px;
+    bottom: 6px;
+    left: 0;
+    width: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25), 0 4px 14px rgba(0, 0, 0, 0.25);
+    pointer-events: none;
+    will-change: left, width;
   }
   .bz-tab-btn {
+    position: relative;
+    z-index: 1;
     flex: 1;
     min-width: 0;
+    min-height: 52px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.1rem;
-    padding: 0.45rem 0.2rem;
+    justify-content: center;
+    gap: 2px;
+    padding: 0;
     border-radius: 999px;
-    border: 1px solid transparent;
+    border: 0;
     background: transparent;
     color: rgba(255, 255, 255, 0.55);
     font-size: 0.6875rem;
     font-weight: 600;
+    letter-spacing: 0.025em;
     white-space: nowrap;
+    transition: color 0.2s ease;
   }
-  .bz-tab-btn i { font-size: 1.2rem; line-height: 1; }
-  .bz-tab-btn.is-active {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.16);
-    color: #fff;
-  }
-  .bz-tab-btn.is-active i { color: #c4b5fd; }
+  .bz-tab-btn i { font-size: 1.375rem; line-height: 1; color: rgba(255, 255, 255, 0.6); transition: color 0.2s ease; }
+  .bz-tab-btn.is-active,
+  body.bz-drawer-open .bz-tab-btn.is-menu-on { color: #fff; }
+  .bz-tab-btn.is-active i,
+  body.bz-drawer-open .bz-tab-btn.is-menu-on i { color: #d8b4fe; }
+  /* Con el cajón abierto el selector pasa a "Menú", así que Inicio deja de verse activo */
+  body.bz-drawer-open .bz-tab-btn.is-active:not(.is-menu-on) { color: rgba(255, 255, 255, 0.55); }
+  body.bz-drawer-open .bz-tab-btn.is-active:not(.is-menu-on) i { color: rgba(255, 255, 255, 0.6); }
+  .bz-tab-btn:focus-visible { outline: 2px solid #c084fc; outline-offset: -2px; }
 
   /* Mini reproductor flotante encima de la barra */
   .bz-miniplayer {
@@ -5753,17 +5787,21 @@ html, body {
   body.bz-drawer-open .bz-sidebar { visibility: visible; transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), visibility 0s; }
 
   body.bz-theme-light .bz-tabbar-pill {
-    background: rgba(255, 255, 255, 0.92);
+    background: rgba(255, 255, 255, 0.78);
     border-color: rgba(15, 10, 30, 0.1);
-    box-shadow: 0 12px 30px rgba(15, 10, 30, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 12px 30px rgba(15, 10, 30, 0.14);
   }
-  body.bz-theme-light .bz-tab-btn { color: rgba(15, 10, 30, 0.6); }
-  body.bz-theme-light .bz-tab-btn.is-active {
-    background: rgba(124, 58, 237, 0.1);
+  body.bz-theme-light .bz-tab-selector {
+    background: rgba(124, 58, 237, 0.12);
     border-color: rgba(124, 58, 237, 0.22);
-    color: #1a1033;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 4px 14px rgba(124, 58, 237, 0.15);
   }
-  body.bz-theme-light .bz-tab-btn.is-active i { color: #6d28d9; }
+  body.bz-theme-light .bz-tab-btn,
+  body.bz-theme-light .bz-tab-btn i { color: rgba(15, 10, 30, 0.6); }
+  body.bz-theme-light .bz-tab-btn.is-active,
+  body.bz-theme-light.bz-drawer-open .bz-tab-btn.is-menu-on { color: #1a1033; }
+  body.bz-theme-light .bz-tab-btn.is-active i,
+  body.bz-theme-light.bz-drawer-open .bz-tab-btn.is-menu-on i { color: #6d28d9; }
   body.bz-theme-light #mobMiniCard {
     background: rgba(255, 255, 255, 0.95);
     border-color: rgba(15, 10, 30, 0.1);
