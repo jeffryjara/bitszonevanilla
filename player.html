@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bitszone Web Player</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/img/favicon.svg" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap 5.3.8 & Bootstrap Icons (CDN Oficial) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <!-- Estilos Bitszone -->
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body class="bz-player-body">
+  <!-- Pantalla de Carga Inicial (Fiel a PlayerLoadingScreen.tsx) -->
+  <div id="bzPlayerLoadingScreen" class="bz-player-loading-screen" aria-hidden="false">
+    <div class="bz-loading-glow"></div>
+    <div class="bz-loading-noise"></div>
+    <div class="position-relative z-2 d-flex flex-column align-items-center justify-content-center">
+      <span class="bz-loading-logo">
+        <span class="fw-bolder text-white">Bits</span><span class="fw-bold" style="color: rgba(255,255,255,0.6);">zone</span>
+      </span>
+    </div>
+  </div>
+
+  <!-- Elemento de Audio Persistente (Nunca se destruye al cambiar vistas) -->
+  <audio id="bzAudioPlayer" preload="metadata"></audio>
+
+  <!-- Fondos Ambientales y Carátula Dinámica -->
+  <div class="bz-player-bg-layer" aria-hidden="true"></div>
+  <div id="dynamicBgCover" class="bz-dynamic-bg-cover" aria-hidden="true"></div>
+  <div class="bz-dynamic-bg-scrim" aria-hidden="true"></div>
+
+  <!-- Toasts Flotantes en Píldora Centrada (Liquid Glass) -->
+  <div id="bzToastContainer" class="bz-toast-stage" role="status" aria-live="polite"></div>
+
+  <!-- Encabezado Móvil / Tablet (visible < 992px) -->
+  <header class="d-flex d-lg-none align-items-center justify-content-between px-3 py-2 border-bottom border-white border-opacity-10 position-relative z-3" style="background: rgba(8,6,14,0.75); backdrop-filter: blur(20px);">
+    <div class="d-flex align-items-center gap-2">
+      <button type="button" class="btn btn-link text-white p-1" data-bs-toggle="offcanvas" data-bs-target="#mobileOffcanvas" aria-label="Abrir menú">
+        <i class="bi bi-list fs-4"></i>
+      </button>
+      <a href="./index.html" class="d-flex align-items-center gap-2 text-decoration-none">
+        <img src="./assets/img/bitszone-icon.png" alt="Bitszone" width="24" height="24" />
+        <span class="fw-bold text-white fs-5">Bits<span class="text-white-50">zone</span></span>
+      </a>
+    </div>
+    <a id="topAuthBtn" href="./login.html" class="btn bz-btn-subtle btn-sm px-3 py-1">
+      <i class="bi bi-person me-1"></i> Acceder
+    </a>
+  </header>
+
+  <!-- Offcanvas Móvil Bootstrap (Sidebar Drawer) -->
+  <div class="offcanvas offcanvas-start text-white border-end border-white border-opacity-10" tabindex="-1" id="mobileOffcanvas" style="background: rgba(11, 7, 18, 0.96); backdrop-filter: blur(24px); max-width: 280px;">
+    <div class="offcanvas-header border-bottom border-white border-opacity-10">
+      <a href="./index.html" class="text-decoration-none">
+        <span class="fw-bold fs-4 text-white">Bits<span style="color: rgba(255,255,255,0.52);">zone</span></span>
+      </a>
+      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Cerrar"></button>
+    </div>
+    <div class="offcanvas-body d-flex flex-column gap-2">
+      <button type="button" class="bz-nav-btn is-active" data-nav-view="catalog">
+        <i class="bi bi-house-door fs-5"></i><span>Inicio</span>
+      </button>
+      <button type="button" class="bz-nav-btn" data-nav-view="library-favorites">
+        <i class="bi bi-collection fs-5"></i><span>Biblioteca</span>
+      </button>
+      <button type="button" class="bz-nav-btn" data-nav-view="downloads">
+        <i class="bi bi-cloud-arrow-down fs-5"></i><span>Mis descargas</span>
+      </button>
+      <button type="button" class="bz-nav-btn bz-nav-btn--admin d-none" data-nav-view="dashboard" data-admin-only>
+        <i class="bi bi-speedometer2 fs-5"></i><span>Dashboard</span>
+      </button>
+      <hr class="border-white border-opacity-10 my-2" />
+      <button type="button" class="bz-nav-btn" data-open-shortcuts>
+        <i class="bi bi-keyboard fs-5"></i><span>Atajos</span>
+      </button>
+      <button type="button" class="bz-nav-btn" data-open-settings>
+        <i class="bi bi-gear fs-5"></i><span>Configuración</span>
+      </button>
+      <a href="./index.html" class="bz-nav-btn text-decoration-none">
+        <i class="bi bi-globe2 fs-5"></i><span>Ir al Landing</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Contenedor Principal (Sidebar Desktop + Escenario Scrollable) -->
+  <div class="bz-app-frame">
+    <!-- Sidebar Desktop -->
+    <aside id="bzDesktopSidebar" class="bz-sidebar">
+      <div class="d-flex align-items-center justify-content-between mb-3 px-2" style="height: 44px;">
+        <div class="bz-brand-group d-flex align-items-center gap-2 overflow-hidden">
+          <a href="./index.html" class="text-decoration-none d-flex align-items-center" title="Volver al Landing">
+            <span class="fw-bold text-white" style="font-size: 1.25rem; letter-spacing: -0.02em;">Bits<span style="color: rgba(255,255,255,0.52);">zone</span></span>
+          </a>
+          <span id="sidebarAdminBadge" class="bz-admin-badge d-none">ADMIN</span>
+        </div>
+        <button id="btnToggleDesktopSidebar" type="button" class="btn btn-sm rounded-circle flex-shrink-0 text-white-50 d-flex align-items-center justify-content-center" style="width: 34px; height: 34px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12);" title="Contraer/Expandir menú">
+          <i class="bi bi-layout-sidebar"></i>
+        </button>
+      </div>
+
+      <nav class="d-flex flex-column gap-1 flex-grow-1">
+        <button type="button" class="bz-nav-btn is-active" data-nav-view="catalog" title="Inicio">
+          <i class="bi bi-house-door fs-6"></i><span class="bz-nav-label">Inicio</span>
+        </button>
+        <button type="button" class="bz-nav-btn" data-nav-view="library-favorites" title="Biblioteca">
+          <i class="bi bi-collection fs-6"></i><span class="bz-nav-label">Biblioteca</span>
+        </button>
+        <button type="button" class="bz-nav-btn justify-content-between" data-nav-view="downloads" title="Mis descargas">
+          <span class="d-flex align-items-center gap-3">
+            <i class="bi bi-cloud-arrow-down fs-6"></i><span class="bz-nav-label">Mis descargas</span>
+          </span>
+          <span id="downloadsCountBadge" class="badge rounded-pill d-none bz-nav-label" style="background: rgba(96,165,250,0.22); color: #93c5fd;">0</span>
+        </button>
+        <button type="button" class="bz-nav-btn bz-nav-btn--admin d-none mt-1" data-nav-view="dashboard" data-admin-only title="Dashboard Demo">
+          <i class="bi bi-speedometer2 fs-6"></i><span class="bz-nav-label">Dashboard</span>
+        </button>
+      </nav>
+
+      <!-- Sección Inferior del Sidebar -->
+      <div class="mt-auto d-flex flex-column gap-1 pt-2">
+        <button id="btnSidebarProfile" type="button" class="bz-nav-btn d-none" title="Mi perfil">
+          <span id="sidebarAvatarBox" class="rounded-circle bg-white bg-opacity-10 d-inline-flex align-items-center justify-content-center overflow-hidden flex-shrink-0" style="width:22px;height:22px;">
+            <i class="bi bi-person-fill"></i>
+          </span>
+          <span id="sidebarAccountName" class="bz-nav-label text-truncate">Perfil</span>
+        </button>
+
+        <a id="linkSidebarLogin" href="./login.html" class="bz-nav-btn text-decoration-none" title="Acceder">
+          <i class="bi bi-person fs-6"></i><span class="bz-nav-label">Acceder</span>
+        </a>
+
+        <button id="btnSidebarShortcuts" type="button" class="bz-nav-btn" data-open-shortcuts title="Atajos de teclado">
+          <i class="bi bi-keyboard fs-6"></i><span class="bz-nav-label">Atajos</span>
+        </button>
+
+        <button type="button" class="bz-nav-btn" data-open-settings title="Configuración">
+          <i class="bi bi-gear fs-6"></i><span class="bz-nav-label">Configuración</span>
+        </button>
+
+        <div class="bz-storage-details px-2 pt-2 mt-1 border-top border-white border-opacity-10">
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="bi bi-hdd text-white-50" style="font-size: 0.78rem;"></i>
+            <div>
+              <div class="text-white-50 text-uppercase" style="font-size: 0.62rem; letter-spacing: 0.08em;">Almacenamiento</div>
+              <div id="storageAvailText" style="font-size: 0.72rem; color: rgba(255,255,255,0.65);">
+                <strong class="text-white">5.00GB</strong> de 5.00GB
+              </div>
+            </div>
+          </div>
+          <div class="progress rounded-pill" style="height: 3px; background: rgba(255,255,255,0.1);">
+            <div id="storageProgressBar" class="progress-bar rounded-pill" style="width: 2%; background: linear-gradient(90deg, #60a5fa, #a855f7);"></div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Escenario Principal -->
+    <main id="bzMainScroll" class="bz-main-scroll">
+      <div id="bzMainStage" class="container-fluid px-1 px-md-3"></div>
+    </main>
+  </div>
+
+  <!-- MINI REPRODUCTOR PERSISTENTE (Fiel a MiniPlayer.tsx) -->
+  <section id="bzMiniPlayer" class="bz-miniplayer d-none">
+    <!-- Barra Desktop (>= 768px) -->
+    <div class="d-none d-md-block position-relative">
+      <div class="position-absolute top-0 bottom-0 start-0 end-0 overflow-hidden pe-none">
+        <div id="miniAmbientGlow" class="bz-mini-ambient-glow"></div>
+      </div>
+
+      <!-- Onda Senoidal SVG Interactiva (WavyProgress) -->
+      <div id="bzSeekArea" class="bz-seek-bar-area" title="Arrastra o haz clic para adelantar">
+        <svg id="bzWavySvg" class="w-100 h-100" style="overflow: visible;">
+          <path id="bzWavyUnplayed" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+          <path id="bzWavyPlayed" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+          <circle id="bzWavyDot" r="5.5" fill="#ffffff"></circle>
+        </svg>
+      </div>
+
+      <div class="container-fluid px-4 py-2 d-flex align-items-center justify-content-between gap-3 position-relative z-2">
+        <!-- Izquierda: Info Pista -->
+        <div class="d-flex align-items-center gap-3" style="width: 32%; min-width: 220px;">
+          <div id="miniCoverClick" role="button" tabindex="0" class="bz-mini-cover-wrap position-relative rounded-3 overflow-hidden flex-shrink-0 shadow" style="width: 54px; height: 54px; cursor: pointer;" title="Expandir reproductor (F)" aria-label="Expandir reproductor a pantalla completa">
+            <img id="miniCoverImg" src="./assets/img/bitszone-icon.png" alt="Portada" class="w-100 h-100 object-fit-cover" />
+            <span class="bz-mini-cover-expand-overlay" aria-hidden="true">
+              <i class="bi bi-arrows-angle-expand fs-5 text-white"></i>
+            </span>
+          </div>
+          <div class="min-w-0">
+            <div id="miniTrackTitle" class="fw-bold text-white text-truncate bz-hover-underline" style="cursor:pointer; font-size: 0.98rem;" title="Expandir reproductor">Canción</div>
+            <div class="text-white-50 text-truncate" style="font-size: 0.82rem;">
+              <span id="miniTrackArtist" class="bz-hover-white" style="cursor:pointer;">Artista</span>
+              <span class="mx-1 opacity-50">•</span>
+              <span id="miniTrackAlbum" class="bz-hover-white" style="cursor:pointer;">Álbum</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Centro: Controles con Orbe Vinilo Giratorio -->
+        <div class="d-flex align-items-center gap-2 gap-lg-3">
+          <button id="miniShuffleBtn" type="button" class="bz-icon-action fs-5" title="Aleatorio (A)"><i class="bi bi-shuffle"></i></button>
+          <button id="miniPrevBtn" type="button" class="bz-icon-action fs-4 text-white" title="Anterior (←)"><i class="bi bi-skip-start-fill"></i></button>
+          <button id="miniPlayBtn" type="button" class="bz-vinyl-play-btn" title="Reproducir / Pausar (Espacio)" aria-label="Reproducir o pausar">
+            <span class="bz-vinyl-play-art"><img id="miniVinylArtImg" src="./assets/img/bitszone-icon.png" alt="" /></span>
+            <span class="bz-vinyl-play-frost"></span>
+            <span class="bz-vinyl-play-groove-1"></span>
+            <span class="bz-vinyl-play-groove-2"></span>
+            <span class="bz-vinyl-play-center-cap"></span>
+            <span id="miniPlayIconWrap" class="bz-vinyl-play-icon"><i class="bi bi-play-fill fs-4 ms-1"></i></span>
+          </button>
+          <button id="miniNextBtn" type="button" class="bz-icon-action fs-4 text-white" title="Siguiente (→)"><i class="bi bi-skip-end-fill"></i></button>
+          <button id="miniRepeatBtn" type="button" class="bz-icon-action fs-5" title="Repetir (R)"><i class="bi bi-repeat"></i></button>
+          <button id="miniFavBtn" type="button" class="bz-icon-action fs-5 ms-1" title="Favorito (S)"><i class="bi bi-heart"></i></button>
+        </div>
+
+        <!-- Derecha: Tiempo y Volumen -->
+        <div class="d-flex align-items-center justify-content-end gap-3" style="width: 30%; min-width: 220px;">
+          <span id="miniTimeText" class="font-mono-bz small text-white-50">0:00 / 0:00</span>
+          <div class="d-flex align-items-center gap-1">
+            <button id="miniMuteBtn" type="button" class="bz-icon-action text-white-50" title="Silenciar (M)"><i class="bi bi-volume-up-fill fs-5"></i></button>
+            <input id="miniVolumeRange" type="range" min="0" max="100" value="100" class="bz-volume-range" aria-label="Volumen" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Barra Compacta Móvil (< 768px) -->
+    <div id="mobMiniCard" class="d-flex d-md-none flex-column">
+      <div class="progress rounded-0" style="height: 2px; background: rgba(255,255,255,0.1);">
+        <div id="mobMiniProgress" class="progress-bar" style="width: 0%; background: linear-gradient(90deg, #a855f7, #ff9ffc);"></div>
+      </div>
+      <div class="d-flex align-items-center gap-2 px-3 py-2">
+        <img id="mobMiniCover" src="./assets/img/bitszone-icon.png" width="42" height="42" class="rounded-2 object-fit-cover flex-shrink-0" alt="" />
+        <div class="flex-grow-1 min-w-0">
+          <div id="mobMiniTitle" class="small fw-bold text-white text-truncate">Canción</div>
+          <div id="mobMiniArtist" class="text-white-50 text-truncate" style="font-size: 0.75rem;">Artista</div>
+        </div>
+        <button id="mobMiniPlayBtn" type="button" class="btn btn-light rounded-circle d-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+          <i class="bi bi-play-fill fs-5"></i>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Barra Inferior Móvil / Tablet (< 992px) -->
+  <nav class="bz-mobile-tabbar justify-content-around align-items-center py-2 px-2">
+    <button type="button" class="btn btn-link text-white-50 text-decoration-none d-flex flex-column align-items-center p-1 is-active" data-nav-view="catalog" style="font-size: 0.72rem;">
+      <i class="bi bi-house-door fs-5"></i><span>Inicio</span>
+    </button>
+    <button type="button" class="btn btn-link text-white-50 text-decoration-none d-flex flex-column align-items-center p-1" data-nav-view="library-favorites" style="font-size: 0.72rem;">
+      <i class="bi bi-collection fs-5"></i><span>Biblioteca</span>
+    </button>
+    <button type="button" class="btn btn-link text-white-50 text-decoration-none d-flex flex-column align-items-center p-1" data-nav-view="downloads" style="font-size: 0.72rem;">
+      <i class="bi bi-cloud-arrow-down fs-5"></i><span>Descargas</span>
+    </button>
+    <button type="button" class="btn btn-link text-decoration-none d-none flex-column align-items-center p-1" style="color: var(--bz-soft); font-size: 0.72rem;" data-nav-view="dashboard" data-admin-only>
+      <i class="bi bi-speedometer2 fs-5"></i><span>Dashboard</span>
+    </button>
+  </nav>
+
+  <!-- ======================================================================
+       MODALES BOOTSTRAP 5 (Liquid Glass)
+       ====================================================================== -->
+
+  <!-- Modal: Reproductor Gigante Fullscreen (Fiel a ImmersivePlayer.tsx) -->
+  <div class="modal fade bz-exp-modal" id="expandedPlayerModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-fullscreen">
+      <div class="modal-content">
+        <!-- Fondo ambiental desenfocado con la carátula -->
+        <div id="expBgGlow" class="bz-exp-ambient-bg" aria-hidden="true"></div>
+        <div class="bz-exp-ambient-scrim" aria-hidden="true"></div>
+        <div id="bzExpFloatingMenu" class="dropdown-menu bz-library-popover-menu" style="position: fixed; z-index: 1085; min-width: 245px;"></div>
+
+        <!-- Barra superior flotante -->
+        <div class="position-fixed top-0 start-0 end-0 p-3 p-md-4 d-flex align-items-center justify-content-between z-3 pe-none">
+          <button type="button" class="bz-exp-close-btn pe-auto" data-bs-dismiss="modal" title="Minimizar reproductor (Esc)" aria-label="Minimizar reproductor">
+            <i class="bi bi-chevron-down fs-5"></i>
+          </button>
+        </div>
+
+        <!-- Contenido Fullscreen de dos columnas -->
+        <div class="modal-body p-0 position-relative z-2 d-flex align-items-stretch" style="min-height: 100dvh;">
+          <div class="container-fluid px-3 px-md-5 py-4 d-flex align-items-center">
+            <div class="row g-4 g-lg-5 w-100 align-items-center justify-content-center my-auto">
+
+              <!-- COLUMNA IZQUIERDA: Volumen vertical + Carátula con Vinilo + WavyProgress + Orbe Giratorio -->
+              <div class="col-12 col-lg-6 position-relative d-flex flex-column align-items-center justify-content-center pt-4 pt-lg-0">
+
+                <!-- Control vertical de volumen de 20 barras (Solo desktop >= lg) -->
+                <div class="d-none d-lg-flex flex-column align-items-center position-absolute start-0 top-50 translate-middle-y ms-1" style="z-index: 15;">
+                  <button type="button" id="expVolMaxBtn" class="bz-icon-action text-white-50 mb-1" title="Volumen 100%">
+                    <i class="bi bi-volume-up fs-5"></i>
+                  </button>
+                  <div id="expVolBarsWrap" class="bz-vol-bars-wrap">
+                    <div id="expVolBubble" class="bz-vol-bubble">100%</div>
+                    <!-- 20 barras generadas por player.js o inline -->
+                  </div>
+                  <button type="button" id="expVolMuteBtn" class="bz-icon-action text-white-50 mt-1" title="Silenciar (M)">
+                    <i class="bi bi-volume-mute fs-5"></i>
+                  </button>
+                </div>
+
+                <!-- Carátula + Vinilo girando detrás + Dock de reacciones -->
+                <div class="bz-cover-vinyl-stage">
+                  <div class="bz-exp-vinyl-peek" aria-hidden="true">
+                    <div id="expVinylDisc" class="bz-exp-vinyl-disc">
+                      <div class="bz-exp-vinyl-sheen"></div>
+                      <div class="bz-exp-vinyl-label">
+                        <img id="expVinylLabelImg" src="./assets/img/bitszone-icon.png" alt="" />
+                      </div>
+                      <div class="bz-exp-vinyl-spindle"></div>
+                    </div>
+                  </div>
+
+                  <div class="bz-exp-cover-frame">
+                    <img id="expCoverImg" src="./assets/img/bitszone-icon.png" alt="Carátula" />
+                  </div>
+
+                  <!-- Dock Liquid Glass flotante sobre la esquina inferior derecha de la carátula -->
+                  <div class="bz-exp-cover-dock">
+                    <button id="expFavBtn" type="button" class="bz-icon-action text-white" title="Favorito (S)">
+                      <i class="bi bi-heart fs-5"></i>
+                    </button>
+                    <button id="expDlBtn" type="button" class="bz-icon-action text-white" title="Descargar MP3">
+                      <i class="bi bi-download fs-5"></i>
+                    </button>
+                    <button id="expMoreBtn" type="button" class="bz-icon-action text-white" aria-expanded="false" title="Más opciones (Cola / Playlist)">
+                      <i class="bi bi-three-dots fs-5"></i>
+                    </button>
+                  </div>
+                </div>
+
+                <!-- Título, Artista • Álbum -->
+                <div class="text-center w-100 mt-2 mb-3" style="max-width: 460px;">
+                  <h2 id="expTrackTitle" class="fw-bold text-white mb-1 text-truncate" style="font-size: clamp(1.35rem, 2.3vw, 2rem);">Canción</h2>
+                  <div class="text-white-50 text-truncate" style="font-size: 0.96rem;">
+                    <button type="button" id="expTrackArtist" class="btn btn-link p-0 text-white fw-medium text-decoration-none">Artista</button>
+                    <span class="mx-1 opacity-50">•</span>
+                    <button type="button" id="expAlbumName" class="btn btn-link p-0 text-white-50 text-decoration-none">Álbum</button>
+                  </div>
+                </div>
+
+                <!-- WavyProgress Interactiva del Reproductor Gigante -->
+                <div class="w-100 mb-3" style="max-width: 440px;">
+                  <div id="expSeekArea" class="bz-seek-bar-area" style="height: 26px; margin-top: 0;" title="Arrastra o haz clic para adelantar">
+                    <svg id="expWavySvg" class="w-100 h-100" style="overflow: visible;">
+                      <path id="expWavyUnplayed" fill="none" stroke="rgba(255,255,255,0.28)" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <path id="expWavyPlayed" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"></path>
+                      <circle id="expWavyDot" r="6" fill="#ffffff"></circle>
+                    </svg>
+                  </div>
+                  <div class="d-flex justify-content-between font-mono-bz small text-white-50 mt-1">
+                    <span id="expCurrentTime">0:00</span>
+                    <span id="expDurationTime">0:00</span>
+                  </div>
+                </div>
+
+                <!-- Botones de Control con Orbe Central de Vinilo Giratorio -->
+                <div class="d-flex align-items-center justify-content-center gap-3 gap-md-4 mb-2">
+                  <button id="expShuffleBtn" type="button" class="bz-icon-action fs-5" title="Aleatorio (A)"><i class="bi bi-shuffle"></i></button>
+                  <button id="expPrevBtn" type="button" class="bz-icon-action fs-3 text-white" title="Anterior (←)"><i class="bi bi-skip-start-fill"></i></button>
+                  <button id="expPlayBtn" type="button" class="bz-vinyl-play-btn is-lg" title="Reproducir / Pausar (Espacio)">
+                    <span class="bz-vinyl-play-art"><img id="expVinylOrbImg" src="./assets/img/bitszone-icon.png" alt="" /></span>
+                    <span class="bz-vinyl-play-frost"></span>
+                    <span class="bz-vinyl-play-groove-1"></span>
+                    <span class="bz-vinyl-play-groove-2"></span>
+                    <span class="bz-vinyl-play-center-cap"></span>
+                    <span id="expPlayIconWrap" class="bz-vinyl-play-icon"><i class="bi bi-play-fill fs-2 ms-1"></i></span>
+                  </button>
+                  <button id="expNextBtn" type="button" class="bz-icon-action fs-3 text-white" title="Siguiente (→)"><i class="bi bi-skip-end-fill"></i></button>
+                  <button id="expRepeatBtn" type="button" class="bz-icon-action fs-5" title="Repetir (R)"><i class="bi bi-repeat"></i></button>
+                </div>
+
+                <!-- Volumen compacto móvil/tablet (< lg) -->
+                <div class="d-flex d-lg-none align-items-center gap-2 mt-2">
+                  <i class="bi bi-volume-up text-white-50"></i>
+                  <input id="expVolRange" type="range" min="0" max="100" value="100" class="bz-volume-range" />
+                </div>
+              </div>
+
+              <!-- COLUMNA DERECHA: Tabs Liquid Glass Pistas / Letra / Cola -->
+              <div class="col-12 col-lg-6 d-flex flex-column" style="max-height: calc(100dvh - 80px);">
+                <div class="mb-3 d-flex align-items-center justify-content-between gap-2">
+                  <div class="bz-segmented-pill" style="background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.16); height: 42px;">
+                    <button type="button" class="bz-segmented-btn is-active" data-exp-tab="pistas">
+                      <i class="bi bi-music-note-list"></i><span>Pistas</span>
+                    </button>
+                    <button type="button" class="bz-segmented-btn" data-exp-tab="letra">
+                      <i class="bi bi-mic"></i><span>Letra</span>
+                    </button>
+                    <button type="button" class="bz-segmented-btn" data-exp-tab="cola">
+                      <i class="bi bi-list-ol"></i><span>Cola</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div id="expRightBody" class="bz-exp-right-scroll flex-grow-1"></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Atajos de Teclado (Liquid Glass flotante) -->
+  <div class="modal fade bz-modal-glass" id="shortcutsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+      <div class="modal-content p-4 position-relative">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar">
+          <i class="bi bi-x-lg"></i>
+        </button>
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <h4 class="font-serif-italic h2 text-white mb-0">Atajos de teclado</h4>
+          <button type="button" id="btnShortcutsToSettings" class="bz-icon-action text-white-50" title="Ir a configuración">
+            <i class="bi bi-sliders"></i>
+          </button>
+        </div>
+        <div class="d-grid gap-2 small">
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
+            <span class="text-white-50">Reproducir / Pausar</span>
+            <span class="bz-kbd">Espacio</span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
+            <span class="text-white-50">Canción anterior / siguiente</span>
+            <span class="d-flex gap-1"><span class="bz-kbd">←</span><span class="bz-kbd">→</span></span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
+            <span class="text-white-50">Subir / Bajar volumen</span>
+            <span class="d-flex gap-1"><span class="bz-kbd">↑</span><span class="bz-kbd">↓</span></span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
+            <span class="text-white-50">Abrir / minimizar reproductor gigante</span>
+            <span class="bz-kbd">F</span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
+            <span class="text-white-50">Mostrar pestaña de letra</span>
+            <span class="bz-kbd">L</span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
+            <span class="text-white-50">Agregar o quitar de favoritos</span>
+            <span class="bz-kbd">S</span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
+            <span class="text-white-50">Alternar repetición</span>
+            <span class="bz-kbd">R</span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
+            <span class="text-white-50">Alternar aleatorio</span>
+            <span class="bz-kbd">A</span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between py-2">
+            <span class="text-white-50">Silenciar / Activar sonido</span>
+            <span class="bz-kbd">M</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Perfil (Estructura de dos columnas con Estadísticas) -->
+  <div class="modal fade bz-modal-glass" id="profileModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content position-relative">
+        <button id="btnProfileCloseGuard" type="button" class="bz-modal-close-float" aria-label="Cerrar">
+          <i class="bi bi-x-lg"></i>
+        </button>
+
+        <div class="row g-0">
+          <!-- Sidebar Izquierda -->
+          <div class="col-12 col-md-5 p-4 text-center bz-col-divider-md d-flex flex-column align-items-center" style="background: rgba(255,255,255,0.03);">
+            <label for="profileAvatarInput" class="position-relative d-inline-block mb-3" style="cursor: pointer;" title="Cambiar foto de perfil">
+              <div id="profileAvatarPreview" class="rounded-circle overflow-hidden d-flex align-items-center justify-content-center border border-white border-opacity-25 shadow" style="width: 104px; height: 104px; background: rgba(0,0,0,0.35);">
+                <i class="bi bi-person-fill fs-1 text-white-50"></i>
+              </div>
+              <span class="position-absolute bottom-0 end-0 rounded-circle bg-dark border border-white border-opacity-25 d-flex align-items-center justify-content-center" style="width: 30px; height: 30px;">
+                <i class="bi bi-camera small text-white"></i>
+              </span>
+            </label>
+            <input id="profileAvatarInput" type="file" accept="image/*" hidden />
+
+            <h3 id="profileHeaderName" class="font-serif-italic h2 text-white mb-1">Usuario</h3>
+            <p id="profileEmailText" class="small text-white-50 mb-2">correo@bitszone.app</p>
+            <span id="profileRoleBadge" class="bz-admin-badge mb-3">USER</span>
+
+            <div class="w-100 text-start mt-2">
+              <label class="form-label small text-uppercase text-white-50" style="letter-spacing: 0.1em;">Nombre de usuario</label>
+              <input id="profileNameInput" type="text" class="form-control bz-input-dark mb-3" />
+              <button id="btnProfileSave" type="button" class="btn bz-btn-primary w-100 py-2 mb-2" disabled>Guardar cambios</button>
+              <button id="btnProfileSignOut" type="button" class="btn btn-outline-danger rounded-pill w-100 py-2 btn-sm">Cerrar sesión</button>
+            </div>
+          </div>
+
+          <!-- Cuerpo Derecho: Estadísticas Reales -->
+          <div class="col-12 col-md-7 p-4 p-md-5">
+            <h4 class="font-serif-italic h3 text-white mb-1">Tu actividad</h4>
+            <p class="small text-white-50 mb-4">Resumen calculado desde tu historial de reproducción.</p>
+            <div id="profileStatsArea"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Configuración Simplificada (Estructura de dos columnas) -->
+  <div class="modal fade bz-modal-glass" id="settingsModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content position-relative">
+        <button id="btnSettingsCloseGuard" type="button" class="bz-modal-close-float" aria-label="Cerrar">
+          <i class="bi bi-x-lg"></i>
+        </button>
+
+        <div class="row g-0">
+          <!-- Sidebar Izquierda con Acciones en la parte inferior -->
+          <div class="col-12 col-md-4 p-4 d-flex flex-column justify-content-between bz-col-divider-md" style="background: rgba(255,255,255,0.03);">
+            <div>
+              <span class="small text-uppercase text-white-50 font-mono-bz" style="letter-spacing: 0.14em;">Preferencias</span>
+              <h3 class="font-serif-italic h2 text-white mt-1 mb-3">Configuración</h3>
+              <p class="small text-white-50">Ajusta la escala visual, efectos de desenfoque y consulta los atajos del reproductor.</p>
+            </div>
+
+            <div class="d-grid gap-2 mt-4">
+              <button id="btnSettingsSave" type="button" class="btn bz-btn-primary py-2" disabled>Guardar cambios</button>
+              <button id="btnSettingsReset" type="button" class="btn bz-btn-subtle py-2 btn-sm" disabled>Restablecer</button>
+            </div>
+          </div>
+
+          <!-- Cuerpo Derecho -->
+          <div class="col-12 col-md-8 p-4 p-md-5 d-grid gap-4">
+            <div>
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <label for="setTextScaleRange" class="fw-semibold text-white">Escala de texto global</label>
+                <span id="setTextScaleVal" class="badge rounded-pill font-mono-bz" style="background: rgba(168,85,247,0.3);">100%</span>
+              </div>
+              <input id="setTextScaleRange" type="range" min="85" max="130" step="5" value="100" class="form-range" />
+              <div class="d-flex justify-content-between small text-white-50 font-mono-bz">
+                <span>85%</span><span>100%</span><span>130%</span>
+              </div>
+            </div>
+
+            <div class="d-grid gap-3 pt-2 border-top border-white border-opacity-10">
+              <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
+                <div>
+                  <div class="fw-semibold text-white">Reducir animaciones</div>
+                  <small class="text-white-50">Desactiva transiciones continuas y ondas SVG.</small>
+                </div>
+                <input id="setReduceMotion" class="form-check-input ms-3 fs-5" type="checkbox" role="switch" />
+              </div>
+
+              <div class="form-check form-switch d-flex justify-content-between align-items-center ps-0">
+                <div>
+                  <div class="fw-semibold text-white">Desactivar desenfoque (Blur)</div>
+                  <small class="text-white-50">Usa paneles sólidos para mejorar fluidez en PCs básicos.</small>
+                </div>
+                <input id="setDisableBlur" class="form-check-input ms-3 fs-5" type="checkbox" role="switch" />
+              </div>
+            </div>
+
+            <div class="pt-2 border-top border-white border-opacity-10">
+              <h6 class="text-white-50 text-uppercase small mb-2">Atajos de teclado rápidos</h6>
+              <div class="row g-2 small">
+                <div class="col-6"><span class="badge bg-white bg-opacity-10 font-mono-bz me-1">Espacio</span> Play / Pausa</div>
+                <div class="col-6"><span class="badge bg-white bg-opacity-10 font-mono-bz me-1">← / →</span> Pista Ant / Sig</div>
+                <div class="col-6"><span class="badge bg-white bg-opacity-10 font-mono-bz me-1">↑ / ↓</span> Volumen</div>
+                <div class="col-6"><span class="badge bg-white bg-opacity-10 font-mono-bz me-1">F / S / M</span> Expandir / Fav / Mute</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Aviso de Cambios sin Guardar -->
+  <div class="modal fade bz-modal-glass" id="unsavedGuardModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content p-4 text-center">
+        <i class="bi bi-exclamation-triangle fs-2 text-warning mb-2"></i>
+        <h5 class="fw-bold text-white mb-2">Cambios sin guardar</h5>
+        <p id="unsavedModalPrompt" class="small text-white-50 mb-4">Tienes cambios pendientes.</p>
+        <div class="d-grid gap-2">
+          <button id="btnUnsavedSaveExit" type="button" class="btn bz-btn-primary py-2">Guardar y salir</button>
+          <button id="btnUnsavedDiscardExit" type="button" class="btn bz-btn-subtle py-2">Salir sin guardar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Confirmación Genérica -->
+  <div class="modal fade bz-modal-glass" id="confirmActionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content p-4">
+        <h5 id="confirmActionTitle" class="fw-bold text-white mb-2">¿Confirmar?</h5>
+        <p id="confirmActionMessage" class="small text-white-50 mb-4"></p>
+        <div class="d-flex justify-content-end gap-2">
+          <button type="button" class="btn bz-btn-subtle btn-sm px-3" data-bs-dismiss="modal">Cancelar</button>
+          <button id="confirmActionOkBtn" type="button" class="btn btn-danger rounded-pill btn-sm px-3">Confirmar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Crear Nueva Playlist -->
+  <div class="modal fade bz-modal-glass" id="createPlaylistModal" data-bs-backdrop="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content p-4 position-relative">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+        <h4 class="font-serif-italic h3 text-white mb-3">Nueva Playlist</h4>
+        <form id="formCreatePlaylist">
+          <input id="inputNewPlaylistName" type="text" required class="form-control bz-input-dark mb-3" placeholder="Ej. Favoritas de viaje" />
+          <button type="submit" class="btn bz-btn-primary w-100 py-2">Crear lista</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Agregar canción a Playlist -->
+  <div class="modal fade bz-modal-glass" id="addToPlaylistModal" data-bs-backdrop="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content p-4 position-relative">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+        <h4 class="font-serif-italic h3 text-white mb-3">Añadir a Playlist</h4>
+        <div id="addToPlaylistBody" class="mb-3"></div>
+        <form id="formQuickCreatePlaylist" class="border-top border-white border-opacity-10 pt-3 d-flex gap-2">
+          <input id="inputQuickPlaylistName" type="text" required class="form-control bz-input-dark form-control-sm" placeholder="Nueva playlist..." />
+          <button type="submit" class="btn bz-btn-primary btn-sm px-3 flex-shrink-0"><i class="bi bi-plus-lg"></i></button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modales del Dashboard Admin Demo -->
+  <div class="modal fade bz-modal-glass" id="addAdminModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-4 position-relative">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+        <h4 class="font-serif-italic h3 text-white mb-2">Agregar Administrador (Demo)</h4>
+        <p class="small text-white-50 mb-3">Añade una cuenta administrativa dentro de la tabla demostrativa.</p>
+        <form id="formAddDemoAdmin" class="d-grid gap-3">
+          <input id="inputAddAdminEmail" type="text" required class="form-control bz-input-dark" placeholder="ej. colaborador@bitszone.app" />
+          <button type="submit" class="btn bz-btn-primary py-2">Asignar como Admin</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade bz-modal-glass" id="releaseDemoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-4 position-relative">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+        <h4 class="font-serif-italic h3 text-white mb-2">Registrar Lanzamiento (Demo)</h4>
+        <p class="small text-white-50 mb-3">Agrega un álbum demostrativo temporal al catálogo actual.</p>
+        <form id="formReleaseDemo" class="d-grid gap-3">
+          <input id="relTitleInput" type="text" required class="form-control bz-input-dark" placeholder="Título del álbum o pista" />
+          <input id="relArtistInput" type="text" required class="form-control bz-input-dark" placeholder="Artista o grupo" />
+          <button type="submit" class="btn bz-btn-primary py-2">Agregar al catálogo Demo</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade bz-modal-glass" id="catalogDiagModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content p-4 position-relative">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
+        <h4 class="font-serif-italic h3 text-white mb-3">Estado del Catálogo</h4>
+        <div id="catalogDiagBody" class="mb-3"></div>
+        <div class="text-end">
+          <button type="button" class="btn bz-btn-primary px-4 py-2" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts (Orden estricto sin bundlers ni ES modules para compatibilidad universal) -->
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script defer src="./js/auth.js"></script>
+  <script defer src="./js/storage.js"></script>
+  <script defer src="./js/catalog.js"></script>
+  <script defer src="./js/dashboard.js"></script>
+  <script defer src="./js/player.js"></script>
+</body>
+</html>

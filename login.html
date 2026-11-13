@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Iniciar Sesión | Bitszone</title>
+  <link rel="icon" type="image/svg+xml" href="./assets/img/favicon.svg" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+
+  <!-- Bootstrap 5.3.8 & Bootstrap Icons (CDN Oficial) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet" />
+
+  <!-- Estilos Bitszone -->
+  <link rel="stylesheet" href="./css/styles.css" />
+</head>
+<body>
+  <!-- Fondo Molten Nebula CSS Puro -->
+  <div class="bz-ambient-canvas" aria-hidden="true">
+    <div class="bz-molten-orb bz-molten-orb--1"></div>
+    <div class="bz-molten-orb bz-molten-orb--2"></div>
+    <div class="bz-molten-orb bz-molten-orb--3"></div>
+  </div>
+  <div class="bz-noise-overlay" aria-hidden="true"></div>
+
+  <!-- Botón Volver flotante -->
+  <a href="./index.html" class="bz-btn-subtle position-fixed top-0 start-0 m-3 m-md-4 px-3 py-2 text-decoration-none d-inline-flex align-items-center gap-2 z-3" title="Volver al inicio">
+    <i class="bi bi-arrow-left"></i>
+    <span class="small">Volver</span>
+  </a>
+
+  <main id="bzAuthRoot" class="bz-auth-wrapper">
+    <div class="bz-auth-card">
+      <!-- Switcher Superior Usuario / Administrador -->
+      <div class="px-4 pt-4 pb-0 d-flex justify-content-between align-items-center flex-wrap gap-2">
+        <a href="./index.html" class="text-decoration-none d-flex align-items-center gap-2">
+          <img src="./assets/img/bitszone-icon.png" alt="Bitszone" width="28" height="28" />
+          <span class="bz-brand-wordmark fs-4">Bitszone</span>
+        </a>
+        <div class="bz-dock-pills nav nav-pills" role="tablist">
+          <button id="btnRoleUser" class="nav-link active px-3 py-2 small" type="button">
+            <i class="bi bi-person me-1"></i> Oyente
+          </button>
+          <button id="btnRoleAdmin" class="nav-link px-3 py-2 small" type="button">
+            <i class="bi bi-shield-lock me-1"></i> Administrador
+          </button>
+        </div>
+      </div>
+
+      <div class="row g-0">
+        <!-- Columna Izquierda: Formularios -->
+        <div class="col-12 col-md-6 p-4 p-lg-5 d-flex flex-column justify-content-center">
+          <div id="authFlowContainer">
+            <!-- Panel Usuario / Oyente -->
+            <div id="paneUserAuth">
+              <div class="text-center mb-4">
+                <h1 id="userHeadingTitle" class="font-serif-italic display-5 fw-bold text-white mb-2">Bienvenido</h1>
+                <p id="userHeadingSub" class="text-white-50 mb-0">Inicia sesión para disfrutar de Bitszone.</p>
+              </div>
+
+              <form id="formUserAuth" class="d-grid gap-3">
+                <div id="userNameGroup" class="d-none position-relative">
+                  <i class="bi bi-person-badge position-absolute top-50 start-0 translate-middle-y ms-3 text-white-50"></i>
+                  <input id="userNameInput" type="text" class="form-control bz-input-dark bz-input-with-icon" placeholder="Nombre de usuario (3-24 letras)" />
+                </div>
+
+                <div class="position-relative">
+                  <i class="bi bi-envelope position-absolute top-50 start-0 translate-middle-y ms-3 text-white-50"></i>
+                  <input id="userEmailInput" type="email" required class="form-control bz-input-dark bz-input-with-icon" placeholder="Correo electrónico" />
+                </div>
+
+                <div class="position-relative">
+                  <i class="bi bi-key position-absolute top-50 start-0 translate-middle-y ms-3 text-white-50"></i>
+                  <input id="userPassInput" type="password" required class="form-control bz-input-dark bz-input-with-icon pe-5" placeholder="Contraseña" />
+                  <button type="button" data-toggle-password="userPassInput" class="btn btn-link position-absolute top-50 end-0 translate-middle-y text-white-50 text-decoration-none me-1" aria-label="Ver contraseña">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+
+                <div id="userAuthError" class="alert alert-danger py-2 px-3 small bg-danger bg-opacity-25 text-danger-emphasis border-danger border-opacity-50 d-none mb-0" role="alert"></div>
+
+                <button type="submit" class="btn bz-btn-primary py-3 mt-1">
+                  <span id="userSubmitLabel">Iniciar sesión</span>
+                </button>
+              </form>
+
+              <div class="text-center mt-3">
+                <button id="toggleAuthModeBtn" type="button" class="btn btn-link text-decoration-none small" style="color: var(--bz-soft);">
+                  ¿Nuevo en Bitszone? Crea una cuenta gratis
+                </button>
+              </div>
+
+              <div class="border-top border-white border-opacity-10 mt-3 pt-3 text-center">
+                <span class="d-block text-white-50 small mb-2">Prueba rápida de presentación:</span>
+                <button type="button" data-demo-login="user" class="btn bz-btn-subtle btn-sm px-3 py-2">
+                  <i class="bi bi-lightning-charge me-1 text-warning"></i> Entrar como Oyente Demo
+                </button>
+              </div>
+            </div>
+
+            <!-- Panel Administrador -->
+            <div id="paneAdminAuth" class="d-none">
+              <div class="text-center mb-4">
+                <h1 class="font-serif-italic h1 fw-bold text-white mb-2">Acceso Administrador</h1>
+                <p class="text-white-50 mb-0">Inicia sesión para abrir el Reproductor y Dashboard.</p>
+              </div>
+
+              <form id="formAdminAuth" class="d-grid gap-3">
+                <div class="position-relative">
+                  <i class="bi bi-envelope-check position-absolute top-50 start-0 translate-middle-y ms-3 text-white-50"></i>
+                  <input id="adminEmailInput" type="email" required value="bitszone.app@gmail.com" class="form-control bz-input-dark bz-input-with-icon" placeholder="Correo de Administrador" />
+                </div>
+
+                <div class="position-relative">
+                  <i class="bi bi-key position-absolute top-50 start-0 translate-middle-y ms-3 text-white-50"></i>
+                  <input id="adminPassInput" type="password" required value="admin123" class="form-control bz-input-dark bz-input-with-icon pe-5" placeholder="Contraseña" />
+                  <button type="button" data-toggle-password="adminPassInput" class="btn btn-link position-absolute top-50 end-0 translate-middle-y text-white-50 text-decoration-none me-1" aria-label="Ver contraseña">
+                    <i class="bi bi-eye"></i>
+                  </button>
+                </div>
+
+                <div class="rounded-3 p-2 small text-white-50" style="background: rgba(168,85,247,0.12); border: 1px solid rgba(192,132,252,0.28);">
+                  <strong class="text-white">Credenciales Superadmin Demo:</strong><br />
+                  Correo: <code class="text-white">bitszone.app@gmail.com</code> · Clave: <code class="text-white">admin123</code>
+                </div>
+
+                <div id="adminAuthError" class="alert alert-danger py-2 px-3 small bg-danger bg-opacity-25 text-danger-emphasis border-danger border-opacity-50 d-none mb-0" role="alert"></div>
+
+                <button type="submit" class="btn bz-btn-primary py-3">
+                  Entrar como Administrador
+                </button>
+              </form>
+
+              <div class="border-top border-white border-opacity-10 mt-3 pt-3 text-center d-flex justify-content-center gap-2 flex-wrap">
+                <button type="button" data-demo-login="superadmin" class="btn bz-btn-subtle btn-sm px-3 py-2">
+                  <i class="bi bi-award me-1 text-warning"></i> Acceso directo Superadmin
+                </button>
+                <button type="button" data-demo-login="admin" class="btn bz-btn-subtle btn-sm px-3 py-2">
+                  <i class="bi bi-shield-check me-1" style="color: var(--bz-lavender);"></i> Acceso Admin Demo
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado Éxito -->
+          <div id="authSuccessState" class="d-none text-center py-5">
+            <div class="mx-auto mb-4 rounded-circle d-flex align-items-center justify-content-center" style="width: 76px; height: 76px; background: rgba(168,85,247,0.22); border: 1px solid rgba(255,255,255,0.4); box-shadow: 0 0 38px rgba(187,56,248,0.45);">
+              <i class="bi bi-check-lg fs-1 text-white"></i>
+            </div>
+            <h2 class="font-serif-italic display-5 fw-bold text-white mb-2">¡Bienvenido!</h2>
+            <p id="welcomeRoleText" class="text-white-50 mb-0">Entrando a tu música…</p>
+          </div>
+        </div>
+
+        <!-- Columna Derecha: Flujo Visual -->
+        <div class="col-md-6 d-none d-md-flex flex-column justify-content-center align-items-center text-center p-5 bz-auth-right-panel">
+          <h2 class="font-serif-italic display-5 fw-bold text-white mb-3">
+            Bienvenidos a<br />Bitszone
+          </h2>
+          <p id="authRightSubtitle" class="text-white-50 mb-4 px-3">
+            Tu música favorita con catálogo conectado y biblioteca personal.
+          </p>
+
+          <ol class="list-unstyled text-start w-100 d-grid gap-3" style="max-width: 340px;">
+            <li class="d-flex align-items-center gap-3 p-3 rounded-4 border border-white border-opacity-25 bg-white bg-opacity-10">
+              <span class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0 border border-white text-white" style="width: 34px; height: 34px;">1</span>
+              <div>
+                <div id="authStep1Title" class="fw-semibold text-white">Elige o crea tu cuenta</div>
+                <small id="authStep1Desc" class="text-white-50">Acceso rápido en segundos.</small>
+              </div>
+            </li>
+            <li class="d-flex align-items-center gap-3 p-3 rounded-4 border border-white border-opacity-10">
+              <span class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0 border border-white border-opacity-50 text-white-50" style="width: 34px; height: 34px;">2</span>
+              <div>
+                <div id="authStep2Title" class="fw-semibold text-white">Explora el catálogo</div>
+                <small id="authStep2Desc" class="text-white-50">Escucha álbumes, artistas y arma playlists.</small>
+              </div>
+            </li>
+            <li class="d-flex align-items-center gap-3 p-3 rounded-4 border border-white border-opacity-10">
+              <span class="rounded-circle d-flex align-items-center justify-content-center fw-bold flex-shrink-0 border border-white border-opacity-50 text-white-50" style="width: 34px; height: 34px;">3</span>
+              <div>
+                <div id="authStep3Title" class="fw-semibold text-white">Listo, a escuchar</div>
+                <small id="authStep3Desc" class="text-white-50">Guarda favoritos y descargas en tu perfil.</small>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bootstrap JS Bundle -->
+  <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+  <script defer src="./js/auth.js"></script>
+</body>
+</html>
