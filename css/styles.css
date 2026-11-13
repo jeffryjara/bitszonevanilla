@@ -5775,3 +5775,16 @@ html, body {
   body.bz-theme-light #mobMiniCard .text-white-50 { color: rgba(15, 10, 30, 0.6) !important; }
   body.bz-theme-light #mobMiniPlayBtn { background: #1a1033; color: #fff; border-color: #1a1033; }
 }
+@media (max-width: 767.98px) {
+  /* Inicio según las capturas del original: 180px (375px) → 210px (~545px) en tarjetas,
+     150px → 180px en artistas, margen 16px → 20px y secciones un poco más juntas */
+  .bz-main-scroll {
+    padding-left: calc(2.38vw + 3px);
+    padding-right: calc(2.38vw + 3px);
+  }
+  .bz-horiz-row { gap: 12px; }
+  .bz-catalog-card { width: calc(17.86vw + 113px); }
+  .bz-artist-card { width: calc(17.86vw + 83px); }
+  .bz-main-scroll #bzMainStage > section.mb-5,
+  .bz-main-scroll #bzMainStage section.mb-5 { margin-bottom: 2.1rem !important; }
+}
