@@ -203,13 +203,13 @@
       };
       imgEl.src = sponsor.image || './assets/img/bitszone-icon.png';
     }
-    if (secLeftEl) secLeftEl.textContent = '15s';
+    var AD_DURATION_MS = 15000;
+    adState.startTime = Date.now();
+    adState.totalDurationMs = AD_DURATION_MS;
 
+    if (secLeftEl) secLeftEl.textContent = '15s';
     if (barEl) {
       barEl.style.transition = 'none';
-      barEl.style.width = '0%';
-      void barEl.offsetWidth;
-      barEl.style.transition = 'width 15s linear';
       barEl.style.width = '100%';
     }
 
@@ -231,28 +231,49 @@
       });
     }, 20);
 
-    if (adState.intervalId) clearInterval(adState.intervalId);
-    adState.intervalId = setInterval(function () {
-      adState.secondsLeft -= 1;
+    function updateAdCountdown() {
+      var elapsed = Date.now() - adState.startTime;
+      var remainingMs = Math.max(0, AD_DURATION_MS - elapsed);
+      var remainingSecs = Math.ceil(remainingMs / 1000);
+      var pct = Math.max(0, Math.min(100, (remainingMs / AD_DURATION_MS) * 100));
+
+      adState.secondsLeft = remainingSecs;
+
       if (secLeftEl) {
-        secLeftEl.textContent = Math.max(0, adState.secondsLeft) + 's';
+        secLeftEl.textContent = remainingSecs + 's';
       }
 
-      // Habilitar omitir cuando queden 5s o menos
-      if (adState.secondsLeft <= 5 && skipBtn) {
+      if (barEl) {
+        // La barra se achica de 100% a 0% de acuerdo a los segundos restantes
+        barEl.style.transition = 'width 0.08s linear';
+        barEl.style.width = pct.toFixed(2) + '%';
+      }
+
+      // Habilitar omitir cuando queden 5s o menos (a los 10s de anuncio)
+      if (remainingSecs <= 5 && skipBtn && skipBtn.classList.contains('d-none')) {
         skipBtn.classList.remove('d-none');
       }
 
-      if (adState.secondsLeft <= 0) {
+      if (remainingMs <= 0) {
         finishAdFlow();
       }
-    }, 1000);
+    }
+
+    if (adState.intervalId) clearInterval(adState.intervalId);
+    updateAdCountdown();
+    adState.intervalId = setInterval(updateAdCountdown, 80);
   }
 
   function finishAdFlow() {
     if (adState.intervalId) {
       clearInterval(adState.intervalId);
       adState.intervalId = null;
+    }
+
+    var barEl = document.getElementById('adProgressBar');
+    if (barEl) {
+      barEl.style.transition = 'none';
+      barEl.style.width = '0%';
     }
 
     adState.isActive = false;
