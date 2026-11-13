@@ -544,7 +544,7 @@
     var adminNavBtns = document.querySelectorAll('[data-admin-only]');
     if (adminBadge) {
       adminBadge.classList.toggle('d-none', !isAdmin);
-      adminBadge.textContent = Auth.isSuperAdmin(session) ? 'SUPERADMIN' : 'ADMIN';
+      adminBadge.textContent = 'ADMIN';
     }
     adminNavBtns.forEach(function (el) {
       el.classList.toggle('d-none', !isAdmin);
@@ -559,14 +559,18 @@
     if (session) {
       if (profileBtn) profileBtn.classList.remove('d-none');
       if (loginLink) loginLink.classList.add('d-none');
-      if (nameLabel) nameLabel.textContent = session.name;
+      var displayName = session.name || 'Oyente';
+      if (displayName.toUpperCase() === 'SUPERADMIN' || session.role === 'superadmin' || session.role === 'admin') {
+        displayName = (displayName.toUpperCase() === 'SUPERADMIN') ? 'Admin' : displayName;
+      }
+      if (nameLabel) nameLabel.textContent = displayName;
       if (avatarBox) {
         avatarBox.innerHTML = session.avatarUrl
           ? '<img src="' + esc(session.avatarUrl) + '" alt="" class="w-100 h-100 object-fit-cover" />'
           : '<i class="bi bi-person-fill"></i>';
       }
       if (topAuthLink) {
-        topAuthLink.innerHTML = '<i class="bi bi-person-circle me-1"></i> <span class="d-none d-sm-inline">' + esc(session.name) + '</span>';
+        topAuthLink.innerHTML = '<i class="bi bi-person-circle me-1"></i> <span class="d-none d-sm-inline">' + esc(displayName) + '</span>';
         topAuthLink.href = '#';
         topAuthLink.onclick = function (e) {
           e.preventDefault();
@@ -2397,9 +2401,9 @@
       previewTitle.textContent = nameInput.value.trim() || initialName;
     }
 
-    nameInput.value = s.name;
+    nameInput.value = (s.name && s.name.toUpperCase() === 'SUPERADMIN') ? 'Admin' : s.name;
     emailEl.textContent = s.email;
-    roleBadgeEl.textContent = s.role.toUpperCase();
+    roleBadgeEl.textContent = (s.role === 'superadmin' || s.role === 'admin') ? 'ADMIN' : 'OYENTE';
     updateAvatarPreview(currentAvatar);
     refreshProfileSaveState();
 

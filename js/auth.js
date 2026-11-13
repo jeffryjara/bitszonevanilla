@@ -552,9 +552,9 @@
           if (spinner) spinner.classList.add('d-none');
 
           var adminUser = {
-            id: isSuper ? 'superadmin-owner' : 'admin_' + Date.now(),
+            id: isSuper ? 'admin-owner' : 'admin_' + Date.now(),
             email: emailVal,
-            name: isSuper ? 'SUPERADMIN' : (emailVal.split('@')[0].toUpperCase()),
+            name: 'Admin',
             role: isSuper ? 'superadmin' : 'admin',
             avatarUrl: ''
           };
