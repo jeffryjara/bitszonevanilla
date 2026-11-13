@@ -156,11 +156,6 @@
   window.addEventListener('keydown', blockAdKeys, { capture: true });
 
   function triggerAdFlow(onComplete) {
-    if (isUserAuthenticated()) {
-      if (typeof onComplete === 'function') onComplete();
-      return;
-    }
-
     if (adState.isActive) return;
     adState.isActive = true;
     adState.onComplete = onComplete;
@@ -311,6 +306,67 @@
     }
   }
 
+  // ---- Modal de Invitación a Iniciar Sesión (Acciones Restringidas para Invitados) ----
+  var AUTH_MODAL_COPY = {
+    downloads: {
+      badge: 'DESCARGAS SIN CONEXIÓN',
+      icon: 'bi-cloud-arrow-down-fill',
+      title: 'Descarga música en alta calidad',
+      desc: 'Inicia sesión gratis para guardar tus canciones y álbumes favoritos y escucharlos sin conexión en cualquier momento.'
+    },
+    favorites: {
+      badge: 'TUS FAVORITOS',
+      icon: 'bi-heart-fill',
+      title: 'Guarda lo que más te gusta',
+      desc: 'Inicia sesión gratis para agregar canciones a tus favoritos y acceder a ellas instantáneamente desde tu biblioteca.'
+    },
+    licenses: {
+      badge: 'CANCIÓN CON LICENCIA',
+      icon: 'bi-star-fill',
+      title: 'Desbloquea licencias exclusivas',
+      desc: '¡Has escuchado esta canción 5 veces consecutivas! Inicia sesión gratis para reclamar y disfrutar de tu licencia exclusiva por 30 días.'
+    },
+    playlists: {
+      badge: 'LISTAS DE REPRODUCCIÓN',
+      icon: 'bi-music-note-list',
+      title: 'Crea tus propias playlists',
+      desc: 'Inicia sesión gratis para armar listas de reproducción personalizadas con tus canciones favoritas de Bitszone.'
+    },
+    default: {
+      badge: 'FUNCIÓN EXCLUSIVA',
+      icon: 'bi-person-lock',
+      title: 'Inicia sesión para disfrutar de todo Bitszone',
+      desc: 'Crea tu cuenta o inicia sesión gratis para habilitar descargas, listas de reproducción personalizadas, favoritos y licencias exclusivas.'
+    }
+  };
+
+  function openAuthRequiredModal(actionName) {
+    var modalEl = document.getElementById('authRequiredModal');
+    if (!modalEl || !window.bootstrap || !window.bootstrap.Modal) return;
+
+    var copy = AUTH_MODAL_COPY[actionName] || AUTH_MODAL_COPY.default;
+    var badgeEl = document.getElementById('authModalBadge');
+    var iconEl = document.getElementById('authModalIcon');
+    var titleEl = document.getElementById('authModalTitle');
+    var descEl = document.getElementById('authModalDesc');
+
+    if (badgeEl) badgeEl.innerHTML = '<i class="bi bi-stars me-1 text-white-50"></i> ' + esc(copy.badge);
+    if (iconEl) iconEl.className = 'bi ' + copy.icon + ' text-white';
+    if (titleEl) titleEl.textContent = copy.title;
+    if (descEl) descEl.textContent = copy.desc;
+
+    window.bootstrap.Modal.getOrCreateInstance(modalEl).show();
+  }
+
+  function requireAuth(actionKey, callback) {
+    if (isUserAuthenticated()) {
+      if (typeof callback === 'function') callback();
+      return true;
+    }
+    openAuthRequiredModal(actionKey);
+    return false;
+  }
+
   // ---- Utilidades ----
   function esc(str) {
     return String(str == null ? '' : str).replace(/[&<>"']/g, function (m) {
@@ -430,12 +486,16 @@
     }
 
     seekArea.addEventListener('pointerdown', function (e) {
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
       held = true;
       isScrubbing = true;
       seekFromEvent(e);
       if (seekArea.setPointerCapture) {
         try { seekArea.setPointerCapture(e.pointerId); } catch (err) {}
       }
+    });
+    seekArea.addEventListener('click', function (e) {
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
     });
     seekArea.addEventListener('pointermove', function (e) {
       if (!isScrubbing || !held) return;
@@ -566,8 +626,8 @@
 
     var isGuest = !isUserAuthenticated();
 
-    // Si es invitado y ya estaba reproduciendo otra pista (cambio de canción), mostrar anuncio antes de reproducir la nueva
-    if (isGuest && !bypassAd && appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) !== Number(track.id)) {
+    // Si ya estaba reproduciendo otra pista (cambio de canción), mostrar anuncio entre canciones antes de reproducir la nueva
+    if (!bypassAd && appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) !== Number(track.id)) {
       triggerAdFlow(function () {
         playTrack(track, albumOrQueueList, queueList, forceIdx, true);
       });
@@ -1013,26 +1073,30 @@
       container.querySelectorAll('[data-exp-row-fav]').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
-          var t = list.find(function (x) { return Number(x.id) === Number(btn.getAttribute('data-exp-row-fav')); });
-          if (t) {
-            var added = Storage.toggleFavorite(t);
-            showToast(added ? 'Agregada a favoritos' : 'Quitada de favoritos');
-            updatePlayerBarsUI();
-            renderCurrentView();
-          }
+          requireAuth('favorites', function () {
+            var t = list.find(function (x) { return Number(x.id) === Number(btn.getAttribute('data-exp-row-fav')); });
+            if (t) {
+              var added = Storage.toggleFavorite(t);
+              showToast(added ? 'Agregada a favoritos' : 'Quitada de favoritos');
+              updatePlayerBarsUI();
+              renderCurrentView();
+            }
+          });
         });
       });
       container.querySelectorAll('[data-exp-row-dl]').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.stopPropagation();
-          var t = list.find(function (x) { return Number(x.id) === Number(btn.getAttribute('data-exp-row-dl')); });
-          if (t) {
-            var isNew = Storage.downloadTrack(t, false);
-            updateStorageMeterUI();
-            showToast(isNew ? 'Canción "' + t.title + '" guardada en Mis descargas' : 'La canción ya está en Mis descargas');
-            updatePlayerBarsUI();
-            renderCurrentView();
-          }
+          requireAuth('downloads', function () {
+            var t = list.find(function (x) { return Number(x.id) === Number(btn.getAttribute('data-exp-row-dl')); });
+            if (t) {
+              var isNew = Storage.downloadTrack(t, false);
+              updateStorageMeterUI();
+              showToast(isNew ? 'Canción "' + t.title + '" guardada en Mis descargas' : 'La canción ya está en Mis descargas');
+              updatePlayerBarsUI();
+              renderCurrentView();
+            }
+          });
         });
       });
       container.querySelectorAll('[data-exp-row-menu]').forEach(function (btn) {
@@ -1699,23 +1763,27 @@
     container.querySelectorAll('[data-quick-fav]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        var info = findTrackById(btn.getAttribute('data-quick-fav'));
-        if (!info) return;
-        var added = Storage.toggleFavorite(info.track);
-        showToast(added ? 'Canción \'' + info.track.title + '\' agregada a tu Biblioteca' : 'Canción \'' + info.track.title + '\' eliminada de tu Biblioteca');
-        updatePlayerBarsUI();
-        renderCurrentView();
+        requireAuth('favorites', function () {
+          var info = findTrackById(btn.getAttribute('data-quick-fav'));
+          if (!info) return;
+          var added = Storage.toggleFavorite(info.track);
+          showToast(added ? 'Canción \'' + info.track.title + '\' agregada a tu Biblioteca' : 'Canción \'' + info.track.title + '\' eliminada de tu Biblioteca');
+          updatePlayerBarsUI();
+          renderCurrentView();
+        });
       });
     });
     container.querySelectorAll('[data-quick-dl]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        var info = findTrackById(btn.getAttribute('data-quick-dl'));
-        if (!info) return;
-        var isNew = Storage.downloadTrack(info.track, false);
-        showToast(isNew ? 'Canción \'' + info.track.title + '\' descargada' : 'La canción ya está en Mis descargas');
-        updateStorageMeterUI();
-        renderCurrentView();
+        requireAuth('downloads', function () {
+          var info = findTrackById(btn.getAttribute('data-quick-dl'));
+          if (!info) return;
+          var isNew = Storage.downloadTrack(info.track, false);
+          showToast(isNew ? 'Canción \'' + info.track.title + '\' descargada' : 'La canción ya está en Mis descargas');
+          updateStorageMeterUI();
+          renderCurrentView();
+        });
       });
     });
     container.querySelectorAll('[data-open-album]').forEach(function (el) {
@@ -1876,25 +1944,29 @@
     if (favAllBtn) {
       favAllBtn.addEventListener('click', function () {
         if (!tracks.length) return;
-        var shouldRemove = tracks.every(function (t) { return Storage.isFavorite(t.id); });
-        tracks.forEach(function (t) {
-          var isFav = Storage.isFavorite(t.id);
-          if (shouldRemove && isFav) Storage.toggleFavorite(t);
-          else if (!shouldRemove && !isFav) Storage.toggleFavorite(t);
+        requireAuth('favorites', function () {
+          var shouldRemove = tracks.every(function (t) { return Storage.isFavorite(t.id); });
+          tracks.forEach(function (t) {
+            var isFav = Storage.isFavorite(t.id);
+            if (shouldRemove && isFav) Storage.toggleFavorite(t);
+            else if (!shouldRemove && !isFav) Storage.toggleFavorite(t);
+          });
+          showToast(shouldRemove ? 'Álbum quitado de favoritos' : 'Álbum "' + albumObj.title + '" guardado en favoritos');
+          updatePlayerBarsUI();
+          renderAlbumView(container, albumObj, isPlaylist);
         });
-        showToast(shouldRemove ? 'Álbum quitado de favoritos' : 'Álbum "' + albumObj.title + '" guardado en favoritos');
-        updatePlayerBarsUI();
-        renderAlbumView(container, albumObj, isPlaylist);
       });
     }
 
     var dlAll = document.getElementById('btnAlbumDownloadAll');
     if (dlAll) {
       dlAll.addEventListener('click', function () {
-        tracks.forEach(function (t) { Storage.downloadTrack(t, false); });
-        updateStorageMeterUI();
-        showToast('Álbum "' + albumObj.title + '" guardado en Mis descargas');
-        renderAlbumView(container, albumObj, isPlaylist);
+        requireAuth('downloads', function () {
+          tracks.forEach(function (t) { Storage.downloadTrack(t, false); });
+          updateStorageMeterUI();
+          showToast('Álbum "' + albumObj.title + '" guardado en Mis descargas');
+          renderAlbumView(container, albumObj, isPlaylist);
+        });
       });
     }
 
@@ -1915,11 +1987,13 @@
     var savePlBtn = document.getElementById('btnAlbumSaveAsPl');
     if (savePlBtn) {
       savePlBtn.addEventListener('click', function () {
-        var created = Storage.createPlaylist(albumObj.title);
-        if (created) {
-          tracks.forEach(function (t) { Storage.addTrackToPlaylist(created.id, t); });
-          showToast('Playlist "' + created.name + '" guardada en tu biblioteca');
-        }
+        requireAuth('playlists', function () {
+          var created = Storage.createPlaylist(albumObj.title);
+          if (created) {
+            tracks.forEach(function (t) { Storage.addTrackToPlaylist(created.id, t); });
+            showToast('Playlist "' + created.name + '" guardada en tu biblioteca');
+          }
+        });
       });
     }
 
@@ -1942,26 +2016,30 @@
     container.querySelectorAll('[data-row-fav]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        var tid = Number(btn.getAttribute('data-row-fav'));
-        var tr = tracks.find(function (x) { return Number(x.id) === tid; });
-        if (!tr) return;
-        var added = Storage.toggleFavorite(tr);
-        showToast(added ? 'Agregada a favoritos' : 'Quitada de favoritos');
-        updatePlayerBarsUI();
-        renderAlbumView(container, albumObj, isPlaylist);
+        requireAuth('favorites', function () {
+          var tid = Number(btn.getAttribute('data-row-fav'));
+          var tr = tracks.find(function (x) { return Number(x.id) === tid; });
+          if (!tr) return;
+          var added = Storage.toggleFavorite(tr);
+          showToast(added ? 'Agregada a favoritos' : 'Quitada de favoritos');
+          updatePlayerBarsUI();
+          renderAlbumView(container, albumObj, isPlaylist);
+        });
       });
     });
 
     container.querySelectorAll('[data-row-dl]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        var tid = Number(btn.getAttribute('data-row-dl'));
-        var tr = tracks.find(function (x) { return Number(x.id) === tid; });
-        if (!tr) return;
-        var isNew = Storage.downloadTrack(tr, false);
-        updateStorageMeterUI();
-        showToast(isNew ? 'Canción "' + tr.title + '" guardada en Mis descargas' : 'La canción ya está en Mis descargas');
-        renderAlbumView(container, albumObj, isPlaylist);
+        requireAuth('downloads', function () {
+          var tid = Number(btn.getAttribute('data-row-dl'));
+          var tr = tracks.find(function (x) { return Number(x.id) === tid; });
+          if (!tr) return;
+          var isNew = Storage.downloadTrack(tr, false);
+          updateStorageMeterUI();
+          showToast(isNew ? 'Canción "' + tr.title + '" guardada en Mis descargas' : 'La canción ya está en Mis descargas');
+          renderAlbumView(container, albumObj, isPlaylist);
+        });
       });
     });
 
@@ -2390,12 +2468,14 @@
     container.querySelectorAll('[data-col-file]').forEach(function (btn) {
       btn.addEventListener('click', function (e) {
         e.stopPropagation();
-        var tid = Number(btn.getAttribute('data-col-file'));
-        var tr = activeTracks.find(function (x) { return Number(x.id) === tid; });
-        if (tr) {
-          Storage.downloadTrack(tr, true);
-          showToast('Descargando MP3 de "' + tr.title + '"');
-        }
+        requireAuth('downloads', function () {
+          var tid = Number(btn.getAttribute('data-col-file'));
+          var tr = activeTracks.find(function (x) { return Number(x.id) === tid; });
+          if (tr) {
+            Storage.downloadTrack(tr, true);
+            showToast('Descargando MP3 de "' + tr.title + '"');
+          }
+        });
       });
     });
 
@@ -2468,7 +2548,7 @@
               '</div>' +
             '</div>' +
           '</div>' +
-          '<button type="button" class="btn bz-btn-primary btn-sm px-4 py-2" data-bs-toggle="modal" data-bs-target="#createPlaylistModal"><i class="bi bi-plus-lg me-1"></i>Nueva Playlist</button>' +
+          '<button type="button" id="btnLibraryNewPlaylist" class="btn bz-btn-primary btn-sm px-4 py-2"><i class="bi bi-plus-lg me-1"></i>Nueva Playlist</button>' +
         '</div>';
 
       var plBody = playlists.length === 0
@@ -2476,6 +2556,7 @@
             '<div class="bz-empty-orb is-playlists"><i class="bi bi-music-note-list"></i></div>' +
             '<h3 class="h4 fw-bold text-white mb-0">Aún no tienes listas</h3>' +
             '<p class="text-white-50 small mb-0" style="max-width:340px;">Crea una playlist personalizada para agrupar tus canciones favoritas.</p>' +
+            '<button type="button" class="btn bz-btn-primary btn-sm px-4 py-2 mt-3" data-empty-create-pl><i class="bi bi-plus-lg me-1"></i>Crear playlist</button>' +
           '</div>'
         : '<div class="row g-3 pt-2">' +
             playlists.map(function (p) {
@@ -2494,6 +2575,19 @@
 
       container.innerHTML = hero + plBody;
 
+      var newPlBtn = container.querySelector('#btnLibraryNewPlaylist');
+      if (newPlBtn) {
+        newPlBtn.addEventListener('click', function () {
+          openCreatePlaylistModal();
+        });
+      }
+      var emptyPlBtn = container.querySelector('[data-empty-create-pl]');
+      if (emptyPlBtn) {
+        emptyPlBtn.addEventListener('click', function () {
+          openCreatePlaylistModal();
+        });
+      }
+
       container.querySelectorAll('[data-switch-lib]').forEach(function (btn) {
         btn.addEventListener('click', function () {
           appState.libSelectedAlbumId = null;
@@ -2511,46 +2605,55 @@
     }
 
     if (appState.view === 'library-licenses') {
+      var isAuthLic = isUserAuthenticated();
       renderCollectionSection(container, {
         kind: 'licenses',
         libTab: 'licenses',
         kicker: 'BIBLIOTECA',
         title: 'Canciones con licencia',
         iconClass: 'bi-star',
-        tracks: Storage.getLicenses(),
+        tracks: isAuthLic ? Storage.getLicenses() : [],
         statePrefix: 'lib',
-        emptyTitle: 'No tienes canciones con licencia',
-        emptyText: 'Las canciones con licencia aparecen aquí y duran 30 días.',
+        emptyTitle: isAuthLic ? 'No tienes canciones con licencia' : 'Función para usuarios con cuenta',
+        emptyText: isAuthLic
+          ? 'Las canciones con licencia aparecen aquí tras escucharlas 5 veces consecutivas y duran 30 días.'
+          : 'Inicia sesión para desbloquear licencias de 30 días al escuchar tus canciones favoritas.',
         searchPlaceholder: 'Buscar en biblioteca'
       });
       return;
     }
 
+    var isAuthFav = isUserAuthenticated();
     renderCollectionSection(container, {
       kind: 'favorites',
       libTab: 'favorites',
       kicker: 'BIBLIOTECA',
       title: 'Canciones favoritas',
       iconClass: 'bi-heart',
-      tracks: Storage.getFavorites(),
+      tracks: isAuthFav ? Storage.getFavorites() : [],
       statePrefix: 'lib',
-      emptyTitle: 'Todavía no tienes favoritas',
-      emptyText: 'Toca el corazón de cualquier canción para guardarla aquí.',
+      emptyTitle: isAuthFav ? 'Todavía no tienes favoritas' : 'Tus canciones favoritas',
+      emptyText: isAuthFav
+        ? 'Toca el corazón de cualquier canción para guardarla aquí.'
+        : 'Inicia sesión gratis para guardar tus canciones favoritas y tenerlas siempre a mano.',
       searchPlaceholder: 'Buscar en biblioteca'
     });
   }
 
   // ---- Vista: Mis Descargas ----
   function renderDownloadsView(container) {
+    var isAuthDl = isUserAuthenticated();
     renderCollectionSection(container, {
       kind: 'downloads',
       kicker: 'MIS DESCARGAS',
       title: 'Canciones descargadas',
       iconClass: 'bi-cloud-arrow-down',
-      tracks: Storage.getDownloads(),
+      tracks: isAuthDl ? Storage.getDownloads() : [],
       statePrefix: 'dl',
-      emptyTitle: 'Aún no tienes descargas',
-      emptyText: 'Descarga canciones o álbumes con el botón de descarga y escúchalas aquí, sin conexión.',
+      emptyTitle: isAuthDl ? 'Aún no tienes descargas' : 'Descargas sin conexión',
+      emptyText: isAuthDl
+        ? 'Descarga canciones o álbumes con el botón de descarga y escúchalas aquí, sin conexión.'
+        : 'Inicia sesión gratis para descargar tus canciones favoritas y escucharlas sin conexión.',
       searchPlaceholder: 'Buscar en descargas'
     });
   }
@@ -2584,6 +2687,7 @@
   }
 
   function openCreatePlaylistModal(tracksList, suggestedName) {
+    if (!requireAuth('playlists')) return;
     appState.pendingCreatePlaylistTracks = Array.isArray(tracksList) && tracksList.length ? tracksList.slice() : null;
     var modalEl = document.getElementById('createPlaylistModal');
     var inp = document.getElementById('inputNewPlaylistName');
@@ -2597,6 +2701,7 @@
   }
 
   function openAddToPlaylistModal(track) {
+    if (!requireAuth('playlists')) return;
     appState.pendingPlaylistTrack = track;
     var listEl = document.getElementById('addToPlaylistBody');
     var pls = Storage.getPlaylists();
@@ -2885,6 +2990,7 @@
     syncVolumeControls();
     bindNestedModalBehavior(document.getElementById('addToPlaylistModal'));
     bindNestedModalBehavior(document.getElementById('createPlaylistModal'));
+    bindNestedModalBehavior(document.getElementById('authRequiredModal'));
 
     // Eventos del elemento <audio>
     var consecutivePlay = { trackId: null, count: 0 };
@@ -2910,11 +3016,7 @@
           else consecutivePlay = { trackId: cur.id, count: 1 };
 
           if (consecutivePlay.count === 5) {
-            if (Storage.addLicense(cur)) {
-              showToast('La canción "' + cur.title + '" se agregó a Canciones con licencia');
-              updatePlayerBarsUI();
-              renderCurrentView();
-            }
+            openAuthRequiredModal('licenses');
           }
         }
 
@@ -2954,35 +3056,29 @@
         else consecutivePlay = { trackId: cur.id, count: 1 };
 
         if (consecutivePlay.count === 5) {
-          if (Storage.addLicense(cur)) {
-            showToast('La canción "' + cur.title + '" se agregó a Canciones con licencia');
-            updatePlayerBarsUI();
-            renderCurrentView();
+          if (isUserAuthenticated()) {
+            if (Storage.addLicense(cur)) {
+              showToast('La canción "' + cur.title + '" se agregó a Canciones con licencia');
+              updatePlayerBarsUI();
+              renderCurrentView();
+            }
+          } else {
+            openAuthRequiredModal('licenses');
           }
         }
       }
 
-      var isGuest = !isUserAuthenticated();
-      if (isGuest) {
-        triggerAdFlow(function () {
-          if (appState.repeatMode === 'one') {
-            audioEl.currentTime = 0;
-            audioEl.play().catch(function () {});
-            appState.isPlaying = true;
-            updatePlayerBarsUI();
-          } else {
-            nextTrack(true);
-          }
-        });
-        return;
-      }
-
-      if (appState.repeatMode === 'one') {
-        audioEl.currentTime = 0;
-        audioEl.play().catch(function () {});
-      } else {
-        nextTrack();
-      }
+      // Anuncio entre canciones tanto para invitados como para usuarios con sesión
+      triggerAdFlow(function () {
+        if (appState.repeatMode === 'one') {
+          audioEl.currentTime = 0;
+          audioEl.play().catch(function () {});
+          appState.isPlaying = true;
+          updatePlayerBarsUI();
+        } else {
+          nextTrack(true);
+        }
+      });
     });
 
     // Botones de navegación (Sidebar, Offcanvas, Mobile TabBar)
@@ -3054,11 +3150,18 @@
     // Controles MiniPlayer & Gigante
     function bindClick(id, fn) {
       var el = document.getElementById(id);
-      if (el) el.addEventListener('click', fn);
+      if (el) {
+        el.addEventListener('click', function (e) {
+          if (e && typeof e.stopPropagation === 'function') {
+            e.stopPropagation();
+          }
+          return fn.apply(this, arguments);
+        });
+      }
     }
 
     bindClick('miniPlayBtn', togglePlay);
-    bindClick('mobMiniPlayBtn', function (e) { e.stopPropagation(); togglePlay(); });
+    bindClick('mobMiniPlayBtn', togglePlay);
     bindClick('expPlayBtn', togglePlay);
     bindClick('miniNextBtn', nextTrack);
     bindClick('expNextBtn', nextTrack);
@@ -3073,24 +3176,27 @@
     bindClick('expVolMuteBtn', function () { setVolume(0); });
 
     function toggleCurrentFavorite(e) {
-      if (e) e.stopPropagation();
+      if (e && typeof e.stopPropagation === 'function') e.stopPropagation();
       if (!appState.nowPlayingTrack) return;
-      var added = Storage.toggleFavorite(appState.nowPlayingTrack);
-      showToast(added ? 'Agregada a favoritos' : 'Quitada de favoritos');
-      updatePlayerBarsUI();
-      renderCurrentView();
+      requireAuth('favorites', function () {
+        var added = Storage.toggleFavorite(appState.nowPlayingTrack);
+        showToast(added ? 'Agregada a favoritos' : 'Quitada de favoritos');
+        updatePlayerBarsUI();
+        renderCurrentView();
+      });
     }
 
     bindClick('miniFavBtn', toggleCurrentFavorite);
     bindClick('expFavBtn', toggleCurrentFavorite);
 
-
     bindClick('expDlBtn', function () {
       if (!appState.nowPlayingTrack) return;
-      var isNew = Storage.downloadTrack(appState.nowPlayingTrack, false);
-      updateStorageMeterUI();
-      showToast(isNew ? 'Canción "' + appState.nowPlayingTrack.title + '" guardada en Mis descargas' : 'La canción ya está en Mis descargas');
-      updatePlayerBarsUI();
+      requireAuth('downloads', function () {
+        var isNew = Storage.downloadTrack(appState.nowPlayingTrack, false);
+        updateStorageMeterUI();
+        showToast(isNew ? 'Canción "' + appState.nowPlayingTrack.title + '" guardada en Mis descargas' : 'La canción ya está en Mis descargas');
+        updatePlayerBarsUI();
+      });
     });
 
     bindClick('expMoreBtn', function (e) {
@@ -3157,10 +3263,14 @@
       miniBarEl.addEventListener('click', function (e) {
         if (!appState.nowPlayingTrack) return;
         var tgt = e.target;
-        var interactive = tgt && tgt.closest
-          ? tgt.closest('button, a, input, [role="slider"], #bzSeekArea, #miniTrackArtist, #miniTrackAlbum')
+        // Si el elemento cliqueado ya no está conectado al DOM (ej: icono reemplazado en play/pause), ignorar
+        if (!tgt || !tgt.isConnected) return;
+        // Si el clic fue en un botón, control interactivo, enlace, seekbar, volumen o dropdown, NO abrir reproductor gigante
+        var interactive = tgt.closest
+          ? tgt.closest('button, a, input, select, textarea, [role="slider"], .bz-seek-bar-area, #bzSeekArea, #bzWavySvg, .bz-icon-action, .bz-vinyl-play-btn, #miniPlayBtn, #miniNextBtn, #miniPrevBtn, #miniShuffleBtn, #miniRepeatBtn, #miniFavBtn, #miniMuteBtn, #miniVolumeRange, #mobMiniPlayBtn, #miniTrackArtist, #miniTrackAlbum, .dropdown, .dropdown-menu, .btn')
           : null;
         if (interactive) return;
+        // Clic en espacios vacíos / fondo del mini reproductor (o carátula/título) abre el reproductor gigante
         openExpandedPlayer();
       });
     }
@@ -3202,6 +3312,7 @@
     if (formCreatePl) {
       formCreatePl.addEventListener('submit', function (e) {
         e.preventDefault();
+        if (!requireAuth('playlists')) return;
         var inp = document.getElementById('inputNewPlaylistName');
         var created = Storage.createPlaylist(inp.value);
         if (created) {
@@ -3227,6 +3338,7 @@
     if (quickPlForm) {
       quickPlForm.addEventListener('submit', function (e) {
         e.preventDefault();
+        if (!requireAuth('playlists')) return;
         var inp = document.getElementById('inputQuickPlaylistName');
         var created = Storage.createPlaylist(inp.value);
         if (created && appState.pendingPlaylistTrack) {
@@ -3385,12 +3497,21 @@
       console.warn('Error al cargar catálogo inicial:', err);
       hideLoadingScreen();
     });
+    window.addEventListener('storage', function (e) {
+      if (e.key === 'bz_vanilla_session_v1') {
+        updateSidebarAccountUI();
+        updatePlayerBarsUI();
+        renderCurrentView();
+      }
+    });
   });
 
   window.BitszonePlayer = {
     playTrack: playTrack,
     triggerAdFlow: triggerAdFlow,
     finishAdFlow: finishAdFlow,
+    openAuthRequiredModal: openAuthRequiredModal,
+    requireAuth: requireAuth,
     nextTrack: nextTrack,
     prevTrack: prevTrack,
     togglePlay: togglePlay,

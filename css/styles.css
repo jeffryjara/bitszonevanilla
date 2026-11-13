@@ -2409,7 +2409,8 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
 }
 
 #addToPlaylistModal,
-#createPlaylistModal {
+#createPlaylistModal,
+#authRequiredModal {
   z-index: 1090;
   background: rgba(5, 5, 10, 0.62);
   backdrop-filter: blur(8px);
@@ -2485,7 +2486,8 @@ body.bz-ad-locked #expandedPlayerModal {
 }
 
 /* Tarjeta Obsidian Liquid Glass: sobria, elegante, monocromática con micro-relieves */
-.bz-ad-modal .modal-content.bz-ad-card {
+.bz-ad-modal .modal-content.bz-ad-card,
+#authRequiredModal .modal-content.bz-ad-card {
   border-radius: 32px;
   background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 65%),
               linear-gradient(180deg, rgba(22, 22, 26, 0.96) 0%, rgba(10, 10, 12, 0.98) 100%);
