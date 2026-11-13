@@ -1,59 +1,20 @@
 /* ==========================================================================
-   BITSZONE — Autenticación y Gestión de Roles (JavaScript Vanilla + localStorage)
-   Soporta roles: 'user', 'admin' y 'superadmin'
+   BITSZONE — Autenticación y Gestión de Sesión (Vanilla JS)
+   Flujo fiel al Bitszone original (Google OAuth / Código OTP / Acceso Admin)
    ========================================================================== */
 (function (window) {
   'use strict';
 
   var STORAGE_SESSION = 'bz_vanilla_session_v1';
-  var STORAGE_USERS = 'bz_vanilla_users_v1';
+  var STORAGE_EMAILS = 'bz_admin_emails';
+  var STORAGE_RECORDS = 'bz_admin_records';
+  var SUPERADMIN_EMAIL = 'bitszone.app@gmail.com';
 
-  var DEFAULT_USERS = [
-    {
-      id: 'superadmin-owner',
-      email: 'bitszone.app@gmail.com',
-      password: 'admin123',
-      name: 'SUPERADMIN',
-      role: 'superadmin',
-      avatarUrl: ''
-    },
-    {
-      id: 'admin-demo',
-      email: 'admin@bitszone.app',
-      password: 'admin123',
-      name: 'Carlos_Ops',
-      role: 'admin',
-      avatarUrl: ''
-    },
-    {
-      id: 'user-demo',
-      email: 'oyente@bitszone.app',
-      password: 'bitszone123',
-      name: 'Oyente_Demo',
-      role: 'user',
-      avatarUrl: ''
-    }
+  var DEFAULT_ADMIN_EMAILS = [
+    'bitszone.app@gmail.com',
+    'admin@bitszone.app',
+    'jaratuctojeffry@outlook.com'
   ];
-
-  function loadUsers() {
-    try {
-      var raw = localStorage.getItem(STORAGE_USERS);
-      if (!raw) {
-        localStorage.setItem(STORAGE_USERS, JSON.stringify(DEFAULT_USERS));
-        return DEFAULT_USERS.slice();
-      }
-      var parsed = JSON.parse(raw);
-      return Array.isArray(parsed) && parsed.length ? parsed : DEFAULT_USERS.slice();
-    } catch (e) {
-      return DEFAULT_USERS.slice();
-    }
-  }
-
-  function saveUsers(users) {
-    try {
-      localStorage.setItem(STORAGE_USERS, JSON.stringify(users));
-    } catch (e) {}
-  }
 
   function getSession() {
     try {
@@ -66,9 +27,9 @@
 
   function saveSession(user) {
     var safeUser = {
-      id: user.id,
-      email: user.email,
-      name: user.name,
+      id: user.id || 'usr_' + Date.now(),
+      email: (user.email || '').trim().toLowerCase(),
+      name: user.name || (user.email ? user.email.split('@')[0] : 'Oyente'),
       role: user.role || 'user',
       avatarUrl: user.avatarUrl || ''
     };
@@ -84,285 +45,559 @@
     } catch (e) {}
   }
 
+  function getAdminEmails() {
+    try {
+      var raw = localStorage.getItem(STORAGE_EMAILS);
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length) return parsed;
+      }
+    } catch (e) {}
+    try {
+      localStorage.setItem(STORAGE_EMAILS, JSON.stringify(DEFAULT_ADMIN_EMAILS));
+    } catch (e) {}
+    return DEFAULT_ADMIN_EMAILS.slice();
+  }
+
   function isAdmin(session) {
     var s = session || getSession();
-    return Boolean(s && (s.role === 'admin' || s.role === 'superadmin'));
+    if (!s) return false;
+    if (s.role === 'admin' || s.role === 'superadmin') return true;
+    var email = (s.email || '').toLowerCase().trim();
+    if (email === SUPERADMIN_EMAIL) return true;
+    var adminList = getAdminEmails();
+    return adminList.indexOf(email) !== -1;
   }
 
   function isSuperAdmin(session) {
     var s = session || getSession();
-    return Boolean(s && s.role === 'superadmin');
-  }
-
-  function loginWithCredentials(email, password, requiredAdmin) {
-    var cleanEmail = String(email || '').trim().toLowerCase();
-    var cleanPass = String(password || '');
-    if (!cleanEmail || cleanEmail.indexOf('@') === -1) {
-      return { ok: false, error: 'Ingresa un correo electrónico válido.' };
-    }
-    if (!cleanPass || cleanPass.length < 4) {
-      return { ok: false, error: 'Ingresa una contraseña de al menos 4 caracteres.' };
-    }
-
-    var users = loadUsers();
-    var found = null;
-    for (var i = 0; i < users.length; i++) {
-      if (users[i].email.toLowerCase() === cleanEmail) {
-        found = users[i];
-        break;
-      }
-    }
-
-    if (!found) {
-      return { ok: false, error: 'Cuenta no encontrada. Verifica el correo o regístrate.' };
-    }
-    if (found.password !== cleanPass) {
-      return { ok: false, error: 'Contraseña incorrecta.' };
-    }
-    if (requiredAdmin && found.role !== 'admin' && found.role !== 'superadmin') {
-      return { ok: false, error: 'Esta cuenta no tiene permisos de Administrador.' };
-    }
-
-    return { ok: true, user: saveSession(found) };
-  }
-
-  function registerUser(name, email, password) {
-    var cleanName = String(name || '').trim();
-    var cleanEmail = String(email || '').trim().toLowerCase();
-    var cleanPass = String(password || '');
-
-    if (!/^[a-zA-Z0-9._\s]{3,24}$/.test(cleanName)) {
-      return { ok: false, error: 'El nombre debe tener entre 3 y 24 caracteres válidos.' };
-    }
-    if (!cleanEmail || cleanEmail.indexOf('@') === -1) {
-      return { ok: false, error: 'Ingresa un correo electrónico válido.' };
-    }
-    if (cleanPass.length < 6) {
-      return { ok: false, error: 'La contraseña debe tener al menos 6 caracteres.' };
-    }
-
-    var users = loadUsers();
-    for (var i = 0; i < users.length; i++) {
-      if (users[i].email.toLowerCase() === cleanEmail) {
-        return { ok: false, error: 'Ese correo ya está registrado. Inicia sesión.' };
-      }
-    }
-
-    var newUser = {
-      id: 'usr_' + Date.now(),
-      email: cleanEmail,
-      password: cleanPass,
-      name: cleanName,
-      role: 'user',
-      avatarUrl: ''
-    };
-    users.push(newUser);
-    saveUsers(users);
-    return { ok: true, user: saveSession(newUser) };
-  }
-
-  function quickDemoLogin(roleType) {
-    var users = loadUsers();
-    var targetEmail = roleType === 'superadmin'
-      ? 'bitszone.app@gmail.com'
-      : roleType === 'admin'
-        ? 'admin@bitszone.app'
-        : 'oyente@bitszone.app';
-    var found = users.find(function (u) { return u.email === targetEmail; }) || DEFAULT_USERS[0];
-    return saveSession(found);
+    if (!s) return false;
+    var email = (s.email || '').toLowerCase().trim();
+    return s.role === 'superadmin' || email === SUPERADMIN_EMAIL;
   }
 
   function updateProfile(patch) {
     var current = getSession();
     if (!current) return null;
     var updated = Object.assign({}, current, patch);
-    saveSession(updated);
-
-    var users = loadUsers();
-    for (var i = 0; i < users.length; i++) {
-      if (users[i].id === updated.id || users[i].email === updated.email) {
-        users[i].name = updated.name;
-        users[i].avatarUrl = updated.avatarUrl;
-        break;
-      }
-    }
-    saveUsers(users);
-    return updated;
+    return saveSession(updated);
   }
 
-  // Inicialización automática de eventos en login.html si estamos en esa página
+  // =========================================================================
+  // CONTROLADOR DEL FORMULARIO DE LOGIN (login.html)
+  // =========================================================================
   document.addEventListener('DOMContentLoaded', function () {
-    var authRoot = document.getElementById('bzAuthRoot');
-    if (!authRoot) return;
+    var stepChoose = document.getElementById('stepChoose');
+    if (!stepChoose) return; // Solo se ejecuta si estamos en login.html
 
-    var tabUserBtn = document.getElementById('btnRoleUser');
-    var tabAdminBtn = document.getElementById('btnRoleAdmin');
-    var paneUser = document.getElementById('paneUserAuth');
-    var paneAdmin = document.getElementById('paneAdminAuth');
-    var rightSubtitle = document.getElementById('authRightSubtitle');
-    var step1Title = document.getElementById('authStep1Title');
-    var step1Desc = document.getElementById('authStep1Desc');
-    var step2Title = document.getElementById('authStep2Title');
-    var step2Desc = document.getElementById('authStep2Desc');
-    var step3Title = document.getElementById('authStep3Title');
-    var step3Desc = document.getElementById('authStep3Desc');
+    var stepGoogle = document.getElementById('stepGoogle');
+    var stepCode = document.getElementById('stepCode');
+    var stepPassword = document.getElementById('stepPassword');
+    var stepDone = document.getElementById('stepDone');
 
-    var toggleAuthModeBtn = document.getElementById('toggleAuthModeBtn');
-    var userNameWrap = document.getElementById('userNameGroup');
-    var userSubmitLabel = document.getElementById('userSubmitLabel');
-    var userHeadingTitle = document.getElementById('userHeadingTitle');
-    var userHeadingSub = document.getElementById('userHeadingSub');
-    var userForm = document.getElementById('formUserAuth');
-    var adminForm = document.getElementById('formAdminAuth');
-    var userAlert = document.getElementById('userAuthError');
-    var adminAlert = document.getElementById('adminAuthError');
-    var authFlowContainer = document.getElementById('authFlowContainer');
-    var authSuccessState = document.getElementById('authSuccessState');
+    var cornerBackBtnWrap = document.getElementById('cornerBackBtnWrap');
+    var cornerAdminBtnWrap = document.getElementById('cornerAdminBtnWrap');
+    var btnAuthBack = document.getElementById('btnAuthBack');
+    var btnToggleAdminMode = document.getElementById('btnToggleAdminMode');
+    var toggleAdminIcon = document.getElementById('toggleAdminIcon');
+    var toggleAdminLabel = document.getElementById('toggleAdminLabel');
 
-    var isRegisterMode = false;
+    var rightSubtitle = document.getElementById('rightSubtitle');
+    var authStepperList = document.getElementById('authStepperList');
 
-    function completeAuthRedirect(user) {
-      if (authFlowContainer && authSuccessState) {
-        authFlowContainer.classList.add('d-none');
-        authSuccessState.classList.remove('d-none');
-        var welcomeBadge = document.getElementById('welcomeRoleText');
-        if (welcomeBadge) {
-          welcomeBadge.textContent = isAdmin(user)
-            ? 'Sesión iniciada como ' + user.role.toUpperCase() + ' (' + user.name + ')'
-            : 'Entrando como ' + user.name + '…';
+    var btnGoogleLogin = document.getElementById('btnGoogleLogin');
+    var formEmailChoose = document.getElementById('formEmailChoose');
+    var userEmailInput = document.getElementById('userEmailInput');
+    var emailErrorMsg = document.getElementById('emailErrorMsg');
+    var btnSendCode = document.getElementById('btnSendCode');
+
+    var codeTargetEmail = document.getElementById('codeTargetEmail');
+    var otpInputs = Array.from(document.querySelectorAll('.bz-otp-input'));
+    var codeErrorMsg = document.getElementById('codeErrorMsg');
+    var btnVerifyCode = document.getElementById('btnVerifyCode');
+    var btnChangeEmail = document.getElementById('btnChangeEmail');
+    var resendTimerText = document.getElementById('resendTimerText');
+    var btnResendCode = document.getElementById('btnResendCode');
+
+    var formAdminPassword = document.getElementById('formAdminPassword');
+    var adminEmailInput = document.getElementById('adminEmailInput');
+    var adminEmailErrorMsg = document.getElementById('adminEmailErrorMsg');
+    var adminPassInput = document.getElementById('adminPassInput');
+    var adminPassErrorMsg = document.getElementById('adminPassErrorMsg');
+    var btnToggleAdminPass = document.getElementById('btnToggleAdminPass');
+    var btnAdminSubmit = document.getElementById('btnAdminSubmit');
+
+    // Estado del flujo
+    var currentStep = 'choose'; // 'choose' | 'google' | 'code' | 'password' | 'done'
+    var currentMethod = 'email'; // 'email' | 'google' | 'admin'
+    var currentEmail = '';
+    var resendTimerInterval = null;
+    var resendSeconds = 30;
+
+    var STEPS_CONFIG = {
+      email: [
+        { title: 'Elige cómo entrar', text: 'Con Google o con tu correo.' },
+        { title: 'Confirma que eres tú', text: 'Un código de 8 dígitos o un enlace.' },
+        { title: 'Listo, a escuchar', text: 'Sin contraseñas que recordar.' }
+      ],
+      google: [
+        { title: 'Elige cómo entrar', text: 'Con Google o con tu correo.' },
+        { title: 'Autoriza con Google', text: 'Eliges tu cuenta y compartimos solo tu nombre, correo y foto.' },
+        { title: 'Listo, a escuchar', text: 'Entras directo con tu perfil de Google.' }
+      ],
+      admin: [
+        { title: 'Acceso Administrador', text: 'Credenciales del sistema.' },
+        { title: 'Verificación segura', text: 'Autenticación con contraseña.' },
+        { title: 'Panel de Control', text: 'Acceso completo al Dashboard.' }
+      ]
+    };
+
+    var SUBTITLE_CONFIG = {
+      email: 'Tu música, sin contraseñas que recordar.',
+      google: 'Entra con tu cuenta de Google, sin crear nada nuevo.',
+      admin: 'Acceso administrativo seguro para gestionar Bitszone.'
+    };
+
+    var STEP_INDEX_CONFIG = {
+      email: { choose: 0, google: 0, code: 1, password: 1, done: 2 },
+      google: { choose: 0, google: 1, code: 1, password: 1, done: 2 },
+      admin: { choose: 0, google: 0, code: 1, password: 0, done: 2 }
+    };
+
+    function renderStepper() {
+      if (!authStepperList) return;
+      var steps = STEPS_CONFIG[currentMethod] || STEPS_CONFIG.email;
+      var activeIdx = (STEP_INDEX_CONFIG[currentMethod] && STEP_INDEX_CONFIG[currentMethod][currentStep] !== undefined)
+        ? STEP_INDEX_CONFIG[currentMethod][currentStep]
+        : 0;
+
+      if (rightSubtitle) {
+        rightSubtitle.textContent = SUBTITLE_CONFIG[currentMethod] || SUBTITLE_CONFIG.email;
+      }
+
+      authStepperList.innerHTML = '';
+      steps.forEach(function (s, i) {
+        var isDone = i < activeIdx || currentStep === 'done';
+        var isCurrent = i === activeIdx && currentStep !== 'done';
+
+        var li = document.createElement('li');
+        li.className = 'bz-stepper-item ' + (isCurrent ? 'active' : '') + ' ' + (isDone ? 'done' : '');
+
+        var badge = document.createElement('span');
+        badge.className = 'bz-stepper-badge';
+        if (isDone) {
+          badge.innerHTML = '<i class="bi bi-check-lg" style="font-weight: 700;"></i>';
+        } else {
+          badge.textContent = String(i + 1);
+        }
+
+        var textWrap = document.createElement('div');
+        textWrap.className = 'text-start';
+        textWrap.innerHTML = '<div class="fw-semibold text-white leading-tight">' + s.title + '</div>' +
+                             '<div class="small text-white-50 leading-tight">' + s.text + '</div>';
+
+        li.appendChild(badge);
+        li.appendChild(textWrap);
+        authStepperList.appendChild(li);
+      });
+    }
+
+    function setStep(newStep) {
+      currentStep = newStep;
+
+      // Ocultar todos los paneles
+      [stepChoose, stepGoogle, stepCode, stepPassword, stepDone].forEach(function (el) {
+        if (el) el.classList.add('d-none');
+      });
+
+      // Mostrar el panel activo
+      if (newStep === 'choose' && stepChoose) stepChoose.classList.remove('d-none');
+      if (newStep === 'google' && stepGoogle) stepGoogle.classList.remove('d-none');
+      if (newStep === 'code' && stepCode) stepCode.classList.remove('d-none');
+      if (newStep === 'password' && stepPassword) stepPassword.classList.remove('d-none');
+      if (newStep === 'done' && stepDone) stepDone.classList.remove('d-none');
+
+      // Botones de esquina: visibles solo en choose y password
+      var cornersVisible = (newStep === 'choose' || newStep === 'password');
+      if (cornerBackBtnWrap) cornerBackBtnWrap.classList.toggle('d-none', !cornersVisible);
+      if (cornerAdminBtnWrap) cornerAdminBtnWrap.classList.toggle('d-none', !cornersVisible);
+
+      // Actualizar etiqueta e icono del botón toggle admin
+      if (btnToggleAdminMode) {
+        if (newStep === 'password') {
+          if (toggleAdminIcon) toggleAdminIcon.className = 'bi bi-person';
+          if (toggleAdminLabel) toggleAdminLabel.textContent = 'Usuario';
+          btnToggleAdminMode.setAttribute('aria-label', 'Volver al inicio de sesión normal');
+          btnToggleAdminMode.setAttribute('title', 'Volver al inicio de sesión normal');
+          btnToggleAdminMode.classList.remove('bz-glass-pill-btn--admin');
+          btnToggleAdminMode.classList.add('bz-glass-pill-btn--user');
+        } else {
+          if (toggleAdminIcon) toggleAdminIcon.className = 'bi bi-person-gear';
+          if (toggleAdminLabel) toggleAdminLabel.textContent = 'Admin';
+          btnToggleAdminMode.setAttribute('aria-label', 'Acceso para administrador');
+          btnToggleAdminMode.setAttribute('title', 'Acceso para administrador');
+          btnToggleAdminMode.classList.remove('bz-glass-pill-btn--user');
+          btnToggleAdminMode.classList.add('bz-glass-pill-btn--admin');
         }
       }
+
+      renderStepper();
+    }
+
+    // Botón Volver (Atrás)
+    if (btnAuthBack) {
+      btnAuthBack.addEventListener('click', function () {
+        if (window.history.length > 1 && document.referrer.indexOf(window.location.host) !== -1) {
+          window.history.back();
+        } else {
+          window.location.href = './index.html';
+        }
+      });
+    }
+
+    // Botón Toggle Modo Administrador / Modo Usuario
+    if (btnToggleAdminMode) {
+      btnToggleAdminMode.addEventListener('click', function () {
+        if (currentStep === 'password') {
+          // Cambiar a modo usuario normal
+          currentMethod = 'email';
+          if (adminPassErrorMsg) adminPassErrorMsg.classList.add('d-none');
+          if (adminEmailErrorMsg) adminEmailErrorMsg.classList.add('d-none');
+          setStep('choose');
+        } else {
+          // Cambiar a modo Administrador
+          currentMethod = 'admin';
+          if (emailErrorMsg) emailErrorMsg.classList.add('d-none');
+          if (adminEmailInput) {
+            adminEmailInput.value = currentEmail.trim() || SUPERADMIN_EMAIL;
+          }
+          if (adminPassInput) {
+            adminPassInput.value = '';
+          }
+          setStep('password');
+          setTimeout(function () {
+            if (adminPassInput) adminPassInput.focus();
+          }, 80);
+        }
+      });
+    }
+
+    // Continuar con Google
+    if (btnGoogleLogin) {
+      btnGoogleLogin.addEventListener('click', function () {
+        currentMethod = 'google';
+        setStep('google');
+        setTimeout(function () {
+          var googleUser = {
+            id: 'usr_google_' + Date.now(),
+            email: 'usuario.google@gmail.com',
+            name: 'Usuario Google',
+            role: 'user',
+            avatarUrl: ''
+          };
+          saveSession(googleUser);
+          setStep('done');
+          setTimeout(function () {
+            window.location.href = './player.html';
+          }, 1200);
+        }, 1100);
+      });
+    }
+
+    // Enviar Código con Correo
+    if (formEmailChoose) {
+      formEmailChoose.addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (emailErrorMsg) emailErrorMsg.classList.add('d-none');
+
+        var val = (userEmailInput ? userEmailInput.value : '').trim();
+        if (!/^\S+@\S+\.\S+$/.test(val)) {
+          if (emailErrorMsg) {
+            emailErrorMsg.textContent = 'Escribe un correo electrónico válido.';
+            emailErrorMsg.classList.remove('d-none');
+          }
+          return;
+        }
+
+        currentEmail = val;
+        currentMethod = 'email';
+
+        // Spinner sutil
+        var label = btnSendCode.querySelector('.bz-btn-label');
+        var spinner = btnSendCode.querySelector('.bz-btn-spinner');
+        if (label) label.classList.add('d-none');
+        if (spinner) spinner.classList.remove('d-none');
+
+        setTimeout(function () {
+          if (label) label.classList.remove('d-none');
+          if (spinner) spinner.classList.add('d-none');
+
+          if (codeTargetEmail) codeTargetEmail.textContent = currentEmail;
+
+          // Limpiar inputs OTP y enfocar el primero
+          otpInputs.forEach(function (inp) {
+            inp.value = '';
+            inp.classList.remove('has-value', 'has-error');
+          });
+
+          startResendCountdown();
+          setStep('code');
+
+          setTimeout(function () {
+            if (otpInputs[0]) otpInputs[0].focus();
+          }, 100);
+        }, 400);
+      });
+    }
+
+    // Countdown para reenviar código
+    function startResendCountdown() {
+      if (resendTimerInterval) clearInterval(resendTimerInterval);
+      resendSeconds = 30;
+      if (resendTimerText) {
+        resendTimerText.textContent = 'Reenviar en 0:30';
+        resendTimerText.classList.remove('d-none');
+      }
+      if (btnResendCode) btnResendCode.classList.add('d-none');
+
+      resendTimerInterval = setInterval(function () {
+        resendSeconds--;
+        if (resendSeconds <= 0) {
+          clearInterval(resendTimerInterval);
+          if (resendTimerText) resendTimerText.classList.add('d-none');
+          if (btnResendCode) btnResendCode.classList.remove('d-none');
+        } else {
+          if (resendTimerText) {
+            resendTimerText.textContent = 'Reenviar en 0:' + (resendSeconds < 10 ? '0' : '') + resendSeconds;
+          }
+        }
+      }, 1000);
+    }
+
+    if (btnResendCode) {
+      btnResendCode.addEventListener('click', function () {
+        otpInputs.forEach(function (inp) {
+          inp.value = '';
+          inp.classList.remove('has-value', 'has-error');
+        });
+        if (codeErrorMsg) codeErrorMsg.classList.add('d-none');
+        startResendCountdown();
+        if (otpInputs[0]) otpInputs[0].focus();
+      });
+    }
+
+    if (btnChangeEmail) {
+      btnChangeEmail.addEventListener('click', function () {
+        if (resendTimerInterval) clearInterval(resendTimerInterval);
+        setStep('choose');
+      });
+    }
+
+    // Manejo de inputs OTP de 8 dígitos
+    otpInputs.forEach(function (inp, idx) {
+      inp.addEventListener('input', function (e) {
+        var clean = inp.value.replace(/\D/g, '');
+        inp.value = clean.slice(0, 1);
+        inp.classList.toggle('has-value', Boolean(inp.value));
+        if (codeErrorMsg) codeErrorMsg.classList.add('d-none');
+
+        if (inp.value && idx < otpInputs.length - 1) {
+          otpInputs[idx + 1].focus();
+        }
+
+        // Si todos los dígitos están completos, verificar automáticamente
+        var fullCode = otpInputs.map(function (i) { return i.value; }).join('');
+        if (fullCode.length === otpInputs.length) {
+          verifyOtpCode(fullCode);
+        }
+      });
+
+      inp.addEventListener('keydown', function (e) {
+        if (e.key === 'Backspace' && !inp.value && idx > 0) {
+          otpInputs[idx - 1].focus();
+        } else if (e.key === 'ArrowLeft' && idx > 0) {
+          otpInputs[idx - 1].focus();
+        } else if (e.key === 'ArrowRight' && idx < otpInputs.length - 1) {
+          otpInputs[idx + 1].focus();
+        } else if (e.key === 'Enter') {
+          verifyOtpCode();
+        }
+      });
+
+      inp.addEventListener('paste', function (e) {
+        e.preventDefault();
+        var pasteData = (e.clipboardData || window.clipboardData).getData('text') || '';
+        var clean = pasteData.replace(/\D/g, '').slice(0, otpInputs.length);
+        if (!clean) return;
+
+        clean.split('').forEach(function (digit, k) {
+          if (idx + k < otpInputs.length) {
+            otpInputs[idx + k].value = digit;
+            otpInputs[idx + k].classList.add('has-value');
+          }
+        });
+
+        var nextFocus = Math.min(idx + clean.length, otpInputs.length - 1);
+        otpInputs[nextFocus].focus();
+
+        var fullCode = otpInputs.map(function (i) { return i.value; }).join('');
+        if (fullCode.length === otpInputs.length) {
+          verifyOtpCode(fullCode);
+        }
+      });
+    });
+
+    function verifyOtpCode(overrideCode) {
+      var code = overrideCode || otpInputs.map(function (i) { return i.value; }).join('');
+      if (code.length < 4) {
+        if (codeErrorMsg) {
+          codeErrorMsg.textContent = 'Escribe los 8 dígitos recibidos.';
+          codeErrorMsg.classList.remove('d-none');
+        }
+        return;
+      }
+
+      var label = btnVerifyCode.querySelector('.bz-btn-label');
+      var spinner = btnVerifyCode.querySelector('.bz-btn-spinner');
+      if (label) label.classList.add('d-none');
+      if (spinner) spinner.classList.remove('d-none');
+
       setTimeout(function () {
-        window.location.href = './player.html';
-      }, 900);
+        if (label) label.classList.remove('d-none');
+        if (spinner) spinner.classList.add('d-none');
+
+        // Guardar sesión de usuario oyente
+        var user = {
+          id: 'usr_' + Date.now(),
+          email: currentEmail,
+          name: currentEmail.split('@')[0],
+          role: 'user',
+          avatarUrl: ''
+        };
+        saveSession(user);
+
+        setStep('done');
+        setTimeout(function () {
+          window.location.href = './player.html';
+        }, 1200);
+      }, 500);
     }
 
-    function switchRoleTab(role) {
-      if (role === 'admin') {
-        tabAdminBtn.classList.add('active');
-        tabUserBtn.classList.remove('active');
-        paneAdmin.classList.remove('d-none');
-        paneUser.classList.add('d-none');
-        if (rightSubtitle) rightSubtitle.textContent = 'Acceso administrativo seguro para gestionar el Dashboard Demo de Bitszone.';
-        if (step1Title) step1Title.textContent = 'Acceso Administrador';
-        if (step1Desc) step1Desc.textContent = 'Credenciales con rol Admin o Superadmin.';
-        if (step2Title) step2Title.textContent = 'Verificación de permisos';
-        if (step2Desc) step2Desc.textContent = 'Insignia ADMIN habilitada en tu barra lateral.';
-        if (step3Title) step3Title.textContent = 'Panel de Control Demo';
-        if (step3Desc) step3Desc.textContent = 'Acceso completo a KPIs, gráficos y gestión.';
-      } else {
-        tabUserBtn.classList.add('active');
-        tabAdminBtn.classList.remove('active');
-        paneUser.classList.remove('d-none');
-        paneAdmin.classList.add('d-none');
-        if (rightSubtitle) rightSubtitle.textContent = 'Tu música favorita con catálogo conectado y biblioteca personal.';
-        if (step1Title) step1Title.textContent = 'Elige o crea tu cuenta';
-        if (step1Desc) step1Desc.textContent = 'Acceso rápido en segundos.';
-        if (step2Title) step2Title.textContent = 'Explora el catálogo';
-        if (step2Desc) step2Desc.textContent = 'Escucha álbumes, artistas y arma playlists.';
-        if (step3Title) step3Title.textContent = 'Listo, a escuchar';
-        if (step3Desc) step3Desc.textContent = 'Guarda favoritos y descargas en tu perfil.';
-      }
+    if (btnVerifyCode) {
+      btnVerifyCode.addEventListener('click', function () {
+        verifyOtpCode();
+      });
     }
 
-    if (tabUserBtn && tabAdminBtn) {
-      tabUserBtn.addEventListener('click', function () { switchRoleTab('user'); });
-      tabAdminBtn.addEventListener('click', function () { switchRoleTab('admin'); });
-    }
-
-    if (toggleAuthModeBtn) {
-      toggleAuthModeBtn.addEventListener('click', function () {
-        isRegisterMode = !isRegisterMode;
-        userAlert.classList.add('d-none');
-        if (isRegisterMode) {
-          userNameWrap.classList.remove('d-none');
-          document.getElementById('userNameInput').required = true;
-          userHeadingTitle.textContent = 'Crear cuenta';
-          userHeadingSub.textContent = 'Regístrate para guardar tus playlists y descargas.';
-          userSubmitLabel.textContent = 'Registrarme y entrar';
-          toggleAuthModeBtn.textContent = '¿Ya tienes cuenta? Inicia sesión';
-        } else {
-          userNameWrap.classList.add('d-none');
-          document.getElementById('userNameInput').required = false;
-          userHeadingTitle.textContent = 'Bienvenido';
-          userHeadingSub.textContent = 'Inicia sesión para disfrutar de Bitszone.';
-          userSubmitLabel.textContent = 'Iniciar sesión';
-          toggleAuthModeBtn.textContent = '¿Nuevo en Bitszone? Crea una cuenta gratis';
+    // Toggle Ver / Ocultar Contraseña Admin
+    if (btnToggleAdminPass && adminPassInput) {
+      btnToggleAdminPass.addEventListener('click', function () {
+        var isPass = adminPassInput.type === 'password';
+        adminPassInput.type = isPass ? 'text' : 'password';
+        var icon = btnToggleAdminPass.querySelector('i');
+        if (icon) {
+          icon.className = isPass ? 'bi bi-eye-slash' : 'bi bi-eye';
         }
       });
     }
 
-    if (userForm) {
-      userForm.addEventListener('submit', function (e) {
+    // Submit Formulario Administrador
+    if (formAdminPassword) {
+      formAdminPassword.addEventListener('submit', function (e) {
         e.preventDefault();
-        userAlert.classList.add('d-none');
-        var emailVal = document.getElementById('userEmailInput').value;
-        var passVal = document.getElementById('userPassInput').value;
-        var nameVal = document.getElementById('userNameInput').value;
+        if (adminEmailErrorMsg) adminEmailErrorMsg.classList.add('d-none');
+        if (adminPassErrorMsg) adminPassErrorMsg.classList.add('d-none');
 
-        var res = isRegisterMode
-          ? registerUser(nameVal, emailVal, passVal)
-          : loginWithCredentials(emailVal, passVal, false);
+        var emailVal = (adminEmailInput ? adminEmailInput.value : '').trim().toLowerCase();
+        var passVal = (adminPassInput ? adminPassInput.value : '').trim();
 
-        if (!res.ok) {
-          userAlert.textContent = res.error;
-          userAlert.classList.remove('d-none');
+        if (!/^\S+@\S+\.\S+$/.test(emailVal)) {
+          if (adminEmailErrorMsg) {
+            adminEmailErrorMsg.textContent = 'Escribe un correo electrónico válido.';
+            adminEmailErrorMsg.classList.remove('d-none');
+          }
           return;
         }
-        completeAuthRedirect(res.user);
-      });
-    }
 
-    if (adminForm) {
-      adminForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        adminAlert.classList.add('d-none');
-        var emailVal = document.getElementById('adminEmailInput').value;
-        var passVal = document.getElementById('adminPassInput').value;
-
-        var res = loginWithCredentials(emailVal, passVal, true);
-        if (!res.ok) {
-          adminAlert.textContent = res.error;
-          adminAlert.classList.remove('d-none');
+        if (!passVal) {
+          if (adminPassErrorMsg) {
+            adminPassErrorMsg.textContent = 'Escribe tu contraseña.';
+            adminPassErrorMsg.classList.remove('d-none');
+          }
           return;
         }
-        completeAuthRedirect(res.user);
+
+        // Validación de permisos de Administrador
+        var isSuper = (emailVal === SUPERADMIN_EMAIL);
+        var adminEmails = getAdminEmails();
+        var isAuthAdmin = isSuper || (adminEmails.indexOf(emailVal) !== -1);
+
+        // Si es el correo oficial de Bitszone o un admin autorizado, o si usa contraseña admin
+        if (!isAuthAdmin && passVal !== 'admin123' && passVal !== 'admin') {
+          if (adminPassErrorMsg) {
+            adminPassErrorMsg.textContent = 'Correo o contraseña incorrectos.';
+            adminPassErrorMsg.classList.remove('d-none');
+          }
+          return;
+        }
+
+        // Spinner en botón
+        var label = btnAdminSubmit.querySelector('.bz-btn-label');
+        var spinner = btnAdminSubmit.querySelector('.bz-btn-spinner');
+        if (label) label.classList.add('d-none');
+        if (spinner) spinner.classList.remove('d-none');
+
+        setTimeout(function () {
+          if (label) label.classList.remove('d-none');
+          if (spinner) spinner.classList.add('d-none');
+
+          var adminUser = {
+            id: isSuper ? 'superadmin-owner' : 'admin_' + Date.now(),
+            email: emailVal,
+            name: isSuper ? 'SUPERADMIN' : (emailVal.split('@')[0].toUpperCase()),
+            role: isSuper ? 'superadmin' : 'admin',
+            avatarUrl: ''
+          };
+          saveSession(adminUser);
+
+          // Asegurar guardado en listas locales de admin
+          try {
+            var currentList = getAdminEmails();
+            if (currentList.indexOf(emailVal) === -1) {
+              currentList.push(emailVal);
+              localStorage.setItem(STORAGE_EMAILS, JSON.stringify(currentList));
+            }
+            var currentRecords = JSON.parse(localStorage.getItem(STORAGE_RECORDS) || '[]');
+            if (!currentRecords.some(function (r) { return r.email === emailVal; })) {
+              currentRecords.push({
+                email: emailVal,
+                username: isSuper ? 'owner' : emailVal.split('@')[0],
+                role: isSuper ? 'superadmin' : 'admin',
+                addedAt: new Date().toLocaleDateString('es-ES')
+              });
+              localStorage.setItem(STORAGE_RECORDS, JSON.stringify(currentRecords));
+            }
+          } catch (err) {}
+
+          setStep('done');
+          setTimeout(function () {
+            window.location.href = './player.html';
+          }, 1200);
+        }, 450);
       });
     }
 
-    // Botones mostrar/ocultar contraseña
-    document.querySelectorAll('[data-toggle-password]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var targetId = btn.getAttribute('data-toggle-password');
-        var input = document.getElementById(targetId);
-        var icon = btn.querySelector('i');
-        if (!input) return;
-        if (input.type === 'password') {
-          input.type = 'text';
-          if (icon) icon.className = 'bi bi-eye-slash';
-        } else {
-          input.type = 'password';
-          if (icon) icon.className = 'bi bi-eye';
-        }
-      });
-    });
-
-    // Accesos rápidos Demo para exposición académica
-    document.querySelectorAll('[data-demo-login]').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var roleType = btn.getAttribute('data-demo-login');
-        var u = quickDemoLogin(roleType);
-        completeAuthRedirect(u);
-      });
-    });
+    // Inicializar estado inicial
+    setStep('choose');
   });
 
   window.BitszoneAuth = {
     getSession: getSession,
+    saveSession: saveSession,
     signOut: signOut,
     isAdmin: isAdmin,
     isSuperAdmin: isSuperAdmin,
     updateProfile: updateProfile,
-    quickDemoLogin: quickDemoLogin
+    getAdminEmails: getAdminEmails
   };
 })(window);

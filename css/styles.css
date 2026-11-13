@@ -772,49 +772,335 @@ h1, h2, h3, h4, h5, h6 {
 /* ==========================================================================
    LOGIN PAGE (login.html)
    ========================================================================== */
+body.bz-auth-body {
+  background-color: #05050A;
+  color: #ffffff;
+  min-height: 100svh;
+  overflow-x: hidden;
+  position: relative;
+}
+
+.bz-auth-vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(ellipse 120% 95% at 50% 15%, transparent 45%, rgba(5, 5, 10, 0.22) 80%, rgba(5, 5, 10, 0.72) 100%);
+}
+
 .bz-auth-wrapper {
   min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
+  position: relative;
+  z-index: 2;
 }
 
 .bz-auth-card {
   width: 100%;
-  max-width: 940px;
-  border-radius: 1.75rem;
+  max-width: 960px;
+  min-height: min(600px, calc(100vh - 2rem));
+  border-radius: 1.5rem;
   overflow: hidden;
-  background: rgba(12, 8, 22, 0.56);
-  border: 1px solid rgba(216, 180, 254, 0.2);
-  backdrop-filter: blur(26px);
-  -webkit-backdrop-filter: blur(26px);
-  box-shadow: 0 28px 70px -15px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  background: rgba(12, 8, 22, 0.58);
+  border: 1px solid rgba(216, 180, 254, 0.18);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.65), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.bz-auth-left-inner {
+  max-width: 26rem;
+  width: 100%;
+}
+
+.bz-auth-title {
+  font-family: 'DM Serif Display', serif;
+  font-style: italic;
+  font-weight: 700;
+  color: #ffffff;
+  font-size: 2.85rem;
+  line-height: 1.15;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.45);
+}
+
+.bz-auth-subtitle {
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 1rem;
 }
 
 .bz-auth-right-panel {
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.14), rgba(88, 28, 135, 0.08));
+  background: rgba(0, 0, 0, 0.3) linear-gradient(135deg, rgba(168, 85, 247, 0.12), rgba(88, 28, 135, 0.05));
   border-left: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+/* Botón flotante cápsula Liquid Glass (BackButton y ToggleAdmin) */
+.bz-glass-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  width: 44px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+  cursor: pointer;
+  overflow: hidden;
+  user-select: none;
+  transition: width 0.32s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  white-space: nowrap;
+  padding: 0;
+}
+.bz-glass-pill-btn:hover {
+  background: rgba(0, 0, 0, 0.65);
+  border-color: rgba(255, 255, 255, 0.6);
+  color: #ffffff;
+  box-shadow: 0 10px 35px rgba(187, 56, 248, 0.35);
+}
+.bz-glass-pill-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #c084fc;
+}
+.bz-glass-pill-btn .bz-pill-icon {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.15rem;
+}
+.bz-glass-pill-btn .bz-pill-text {
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 0.2s ease 0.06s, transform 0.2s ease 0.06s;
+  font-size: 0.9rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  padding-right: 14px;
+}
+.bz-glass-pill-btn:hover .bz-pill-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.bz-glass-pill-btn--reverse {
+  flex-direction: row-reverse;
+}
+.bz-glass-pill-btn--reverse .bz-pill-text {
+  padding-right: 0;
+  padding-left: 14px;
+  transform: translateX(4px);
+}
+.bz-glass-pill-btn--reverse:hover .bz-pill-text {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.bz-glass-pill-btn--back:hover {
+  width: 98px;
+}
+.bz-glass-pill-btn--admin:hover {
+  width: 106px;
+}
+.bz-glass-pill-btn--user:hover {
+  width: 118px;
+}
+
+/* Botón Continuar con Google */
+.bz-btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  height: 56px;
+  border-radius: 0.85rem;
+  background: rgba(255, 255, 255, 0.92);
+  color: #1f1f1f;
+  font-weight: 600;
+  font-size: 0.98rem;
+  border: none;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+.bz-btn-google:hover {
+  background: #ffffff;
+  color: #111111;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}
+.bz-btn-google:active {
+  transform: scale(0.99);
+}
+.bz-google-icon {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+}
+
+/* Botón Liquid Glass de Bitszone */
+.bz-btn-liquid {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 1rem;
+  letter-spacing: 0.01em;
+  transition: all 0.25s ease;
+  cursor: pointer;
+}
+.bz-btn-liquid:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 10px 35px rgba(168, 85, 247, 0.25);
+  color: #ffffff;
+}
+.bz-btn-liquid:active {
+  transform: scale(0.99);
+}
+
+.bz-divider-line {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.bz-otp-input {
+  width: 100%;
+  min-width: 0;
+  height: 60px;
+  padding: 0;
+  font-size: 1.5rem;
+  line-height: 1;
+  font-weight: 600;
+  text-align: center;
+  border-radius: 0.75rem;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+.bz-otp-input:focus {
+  outline: none;
+  border-color: #c084fc;
+  box-shadow: 0 0 0 2px rgba(192, 132, 252, 0.35);
+}
+.bz-otp-input.has-value {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+.bz-otp-input.has-error {
+  border-color: rgba(244, 114, 182, 0.7);
+}
+
+.bz-pulse-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background-color: #ffffff;
+  animation: bzPulse 1s ease-in-out infinite;
+}
+.bz-pulse-dot:nth-child(2) {
+  animation-delay: 0.18s;
+}
+.bz-pulse-dot:nth-child(3) {
+  animation-delay: 0.36s;
+}
+@keyframes bzPulse {
+  0%, 100% { opacity: 0.25; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+.bz-check-glow {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 0 40px rgba(187, 56, 248, 0.45);
+}
+
+.bz-auth-tip-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* Stepper del panel derecho */
+.bz-stepper-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  border-radius: 1rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid transparent;
+  transition: all 0.45s ease;
+  opacity: 0.55;
+}
+.bz-stepper-item.active {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.35);
+}
+.bz-stepper-item.done {
+  opacity: 0.9;
+}
+.bz-stepper-badge {
+  width: 36px;
+  height: 36px;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.88rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: rgba(255, 255, 255, 0.85);
+  transition: all 0.45s ease;
+}
+.bz-stepper-item.active .bz-stepper-badge {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+.bz-stepper-item.done .bz-stepper-badge {
+  background: #ffffff;
+  color: #581c87;
+  border-color: #ffffff;
 }
 
 .bz-input-dark {
-  background-color: rgba(0, 0, 0, 0.36) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  background-color: rgba(0, 0, 0, 0.32) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
   color: #ffffff !important;
   border-radius: 0.85rem !important;
-  padding: 0.78rem 1rem !important;
+  padding: 0.95rem 1rem !important;
+  font-size: 1rem !important;
 }
 .bz-input-dark::placeholder {
-  color: rgba(255, 255, 255, 0.55) !important;
+  color: rgba(255, 255, 255, 0.7) !important;
 }
 .bz-input-dark:focus {
-  border-color: var(--bz-lavender) !important;
-  box-shadow: 0 0 0 0.2rem rgba(168, 85, 247, 0.28) !important;
-  background-color: rgba(0, 0, 0, 0.52) !important;
+  border-color: #c084fc !important;
+  box-shadow: 0 0 0 1px #c084fc !important;
+  background-color: rgba(0, 0, 0, 0.45) !important;
 }
 
 .bz-input-with-icon {
-  padding-left: 2.75rem !important;
+  padding-left: 3rem !important;
 }
 
 /* ==========================================================================
