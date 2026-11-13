@@ -18,7 +18,7 @@
   <!-- Estilos Bitszone -->
   <link rel="stylesheet" href="./css/styles.css" />
 </head>
-<body>
+<body class="bz-landing">
   <!-- Fondo Molten Nebula CSS Puro -->
   <div class="bz-ambient-canvas" aria-hidden="true">
     <div class="bz-molten-orb bz-molten-orb--1"></div>
@@ -27,169 +27,85 @@
   </div>
   <div class="bz-noise-overlay" aria-hidden="true"></div>
 
-  <!-- Header Bootstrap Responsivo -->
-  <header id="landingHeader" class="bz-landing-header py-3">
-    <nav class="navbar navbar-expand-md navbar-dark px-3 px-md-5 mx-auto" style="max-width: 1440px;">
-      <a href="./index.html" class="navbar-brand d-flex align-items-center gap-2 text-decoration-none">
-        <img src="./assets/img/bitszone-icon.png" alt="Bitszone" width="30" height="30" />
-        <span class="bz-brand-wordmark fs-2">Bitszone</span>
-      </a>
+  <div id="bzStarfield" class="bz-starfield" aria-hidden="true"></div>
 
-      <button class="navbar-toggler border border-white border-opacity-25 rounded-pill px-3 py-1" type="button" data-bs-toggle="collapse" data-bs-target="#landingNav" aria-controls="landingNav" aria-expanded="false" aria-label="Menú">
-        <i class="bi bi-list text-white fs-5"></i>
-      </button>
-
-      <div class="collapse navbar-collapse justify-content-end" id="landingNav">
-        <ul class="navbar-nav align-items-md-center gap-2 gap-md-3 mt-3 mt-md-0">
-          <li class="nav-item">
-            <a class="nav-link text-white-50 px-2" href="#features">Catálogo</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-white-50 px-2" href="#benefits">Funciones</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link text-white-50 px-2" href="#faq">Preguntas</a>
-          </li>
-          <li class="nav-item">
-            <a class="btn bz-btn-subtle btn-sm px-3 py-2" href="./login.html">
-              <i class="bi bi-person me-1"></i> Acceder
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="btn bz-btn-primary btn-sm px-3 py-2" href="./player.html">
-              <i class="bi bi-play-circle-fill me-1"></i> Abrir Player
-            </a>
-          </li>
-        </ul>
-      </div>
-    </nav>
+  <!-- Header: solo logo -->
+  <header class="bz-landing-header text-center pt-4">
+    <a href="./index.html" class="bz-landing-logo text-decoration-none">Bitszone</a>
   </header>
 
   <main>
     <!-- SECCIÓN 1: HERO -->
-    <section class="bz-hero-section container text-center px-3">
-      <div class="mx-auto" style="max-width: 1120px;">
-        <div class="d-inline-flex align-items-center gap-2 px-3 py-1 rounded-pill mb-4 small" style="background: rgba(168,85,247,0.14); border: 1px solid rgba(216,180,254,0.3); color: var(--bz-soft);">
-          <i class="bi bi-disc-fill"></i>
-          <span>Streaming Hi-Res & Biblioteca Offline</span>
-        </div>
-
-        <h1 class="bz-hero-title text-white mb-0">
-          Tus músicas sin conexión
-        </h1>
-        <p class="bz-hero-subtitle-line bz-liquid-metal-text mb-4">
-          descarga sin límites
-        </p>
-
-        <p class="lead text-white-50 mx-auto mb-5" style="max-width: 620px;">
-          Organiza álbumes, artistas y playlists personalizadas con una interfaz Liquid Glass rápida, limpia y pensada para escucharse en cualquier momento.
-        </p>
-
-        <div class="d-flex flex-column flex-sm-row align-items-center justify-content-center gap-3">
-          <a href="./player.html" class="bz-btn-glass px-4 py-3 fs-6">
-            <span>Explorar catálogo</span>
-            <i class="bi bi-arrow-right fs-5"></i>
-          </a>
-          <a href="./login.html" class="btn bz-btn-subtle px-4 py-3 fs-6">
-            <i class="bi bi-shield-check me-1"></i> Iniciar sesión
-          </a>
-        </div>
+    <section id="hero" class="bz-hero-section text-center px-3">
+      <div id="heroContent" class="mx-auto" style="max-width: 1500px;">
+        <h1 class="bz-hero-h1 text-white mb-0">Tus músicas sin conexión</h1>
+        <svg class="bz-outline-svg" role="img" aria-label="descarga sin límites">
+          <defs>
+            <linearGradient id="bzOutlineGrad" x1="0" x2="1" y1="0" y2="0">
+              <stop offset="0" stop-color="#7C4DFF" />
+              <stop offset="0.55" stop-color="#FF9FFC" />
+              <stop offset="1" stop-color="#FFFFFF" />
+            </linearGradient>
+          </defs>
+          <text x="50%" y="0.86em" text-anchor="middle">descarga sin límites</text>
+        </svg>
+        <a href="./player.html" class="bz-btn-beam">
+          <span>Explorar catálogo</span>
+          <i class="bi bi-arrow-right"></i>
+        </a>
       </div>
 
-      <a href="#features" class="bz-scroll-cue d-none d-sm-inline-block">
-        Descubre más <i class="bi bi-chevron-down ms-1"></i>
-      </a>
+      <a href="#features" id="scrollCue" class="bz-scroll-cue">Descubre más</a>
     </section>
 
-    <!-- SECCIÓN 2: SHOWCASE DE ÁLBUMES & VISTA PREVIA DEL PLAYER -->
-    <section id="features" class="py-5 my-4 position-relative">
-      <div class="container text-center mb-4">
-        <h2 class="display-4 fw-bold text-white mb-2">
-          El que busca,<br />
-          <span class="bz-liquid-metal-text">encuentra su ritmo</span>
+    <!-- SECCIÓN 2: SECUENCIA FIJA "EL QUE BUSCA" (controlada por scroll) -->
+    <section id="features" class="bz-seek">
+      <div class="bz-seek-sticky">
+        <h2 id="seekTitle" class="bz-seek-title">
+          <span class="text-white">El que busca,</span>
+          <span class="bz-seek-pink">encuentra su ritmo</span>
         </h2>
-        <p class="text-white-50 mx-auto" style="max-width: 560px;">
-          Explora éxitos de rock, pop, salsa, electrónica y más en un reproductor diseñado para enfocarse en la música.
-        </p>
-      </div>
 
-      <!-- Carrusel Marquee 3D CSS -->
-      <div class="bz-showcase-ring-wrap mb-5">
-        <div id="showcaseMarqueeTrack" class="bz-showcase-marquee"></div>
-      </div>
+        <div id="seekRingWrap" class="bz-ring-wrap" aria-hidden="true"><div id="seekRing" class="bz-ring"></div></div>
+        <div id="seekGlow" class="bz-seek-glow" aria-hidden="true"></div>
 
-      <!-- Preview del Reproductor Liquid Glass con Grid de Bootstrap -->
-      <div class="container px-3">
-        <div class="bz-player-preview-shell">
-          <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom border-white border-opacity-10" style="background: rgba(0,0,0,0.45);">
-            <div class="d-flex align-items-center gap-2">
-              <span class="rounded-circle d-inline-block" style="width:10px;height:10px;background:#ef4444;"></span>
-              <span class="rounded-circle d-inline-block" style="width:10px;height:10px;background:#f59e0b;"></span>
-              <span class="rounded-circle d-inline-block" style="width:10px;height:10px;background:#10b981;"></span>
-            </div>
-            <span class="font-mono-bz small text-white-50">bitszone · web player</span>
-            <a href="./player.html" class="badge rounded-pill text-decoration-none" style="background: rgba(168,85,247,0.28); color: #f0abfc;">Abrir ahora →</a>
+        <div id="seekBrowser" class="bz-seek-browser" aria-label="Vista previa del reproductor Bitszone">
+          <div class="bz-mock-bar">
+            <div class="d-flex gap-2"><span class="bz-dot" style="background:#ff5f57"></span><span class="bz-dot" style="background:#febc2e"></span><span class="bz-dot" style="background:#28c840"></span></div>
+            <div class="bz-mock-url"><i class="bi bi-search"></i> bitszone.app/player</div>
+            <div class="d-none d-md-flex gap-2 text-white-50 small"><i class="bi bi-box-arrow-up"></i><i class="bi bi-plus-lg"></i><i class="bi bi-stack"></i></div>
           </div>
-
-          <div class="row g-0">
-            <!-- Mini Sidebar Preview -->
-            <div class="col-md-3 d-none d-md-flex flex-column justify-content-between p-3 border-end border-white border-opacity-10" style="background: rgba(0,0,0,0.35);">
+          <div class="bz-mock-top">
+            <i class="bi bi-list text-white-50"></i>
+            <span class="bz-landing-logo bz-mock-logo">Bitszone</span>
+            <span class="bz-mock-login"><i class="bi bi-person"></i><span class="d-none d-sm-inline"> Acceder</span></span>
+          </div>
+          <div class="bz-mock-body">
+            <aside class="bz-mock-side d-none d-md-flex">
               <div>
-                <div class="fw-bold fs-5 text-white mb-3">Bits<span class="text-white-50">zone</span></div>
-                <div class="d-grid gap-1 small">
-                  <div class="px-3 py-2 rounded-3 bg-white bg-opacity-10 text-white"><i class="bi bi-house-door me-2"></i>Inicio</div>
-                  <div class="px-3 py-2 rounded-3 text-white-50"><i class="bi bi-collection-play me-2"></i>Biblioteca</div>
-                  <div class="px-3 py-2 rounded-3 text-white-50"><i class="bi bi-cloud-download me-2"></i>Mis descargas</div>
-                  <div class="px-3 py-2 rounded-3" style="color: var(--bz-soft);"><i class="bi bi-speedometer2 me-2"></i>Dashboard</div>
-                </div>
+                <div class="bz-mock-nav is-active"><i class="bi bi-house-door"></i>Inicio</div><div class="bz-mock-nav"><i class="bi bi-collection-play"></i>Biblioteca</div><div class="bz-mock-nav"><i class="bi bi-cloud-download"></i>Mis descargas</div>
               </div>
-              <div class="mt-4 pt-3 border-top border-white border-opacity-10 small">
-                <div class="d-flex justify-content-between text-white-50 mb-1">
-                  <span>Espacio libre</span>
-                  <span class="font-mono-bz text-white">4.82 GB</span>
-                </div>
-                <div class="progress" style="height: 5px; background: rgba(255,255,255,0.1);">
-                  <div class="progress-bar" style="width: 18%; background: linear-gradient(90deg, #7c3aed, #ff9ffc);"></div>
-                </div>
+              <div>
+                <div class="bz-mock-nav"><i class="bi bi-keyboard"></i>Atajos</div><div class="bz-mock-nav"><i class="bi bi-gear"></i>Configuración</div>
+                <div class="bz-mock-store"><small><i class="bi bi-hdd"></i> Almacenamiento</small><b>4.94GB <span>de 5.00GB</span></b><div><i></i></div></div>
               </div>
-            </div>
-
-            <!-- Mini Catalog Preview -->
-            <div class="col-12 col-md-9 p-4">
+            </aside>
+            <div class="bz-mock-main">
               <div class="d-flex justify-content-between align-items-center mb-3">
-                <h5 class="mb-0 text-white fw-bold">Canciones del momento</h5>
-                <span class="small text-white-50">Catálogo en vivo</span>
+                <h3 class="bz-mock-h">Canciones del momento</h3>
+                <span class="bz-mock-more">Mostrar todo</span>
               </div>
-              <div class="row g-3">
-                <div class="col-6 col-sm-3">
-                  <a href="./player.html" class="text-decoration-none d-block">
-                    <img src="https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/500x500bb.jpg" alt="Thriller" class="w-100 rounded-3 mb-2 shadow" style="aspect-ratio:1/1;object-fit:cover;" />
-                    <div class="text-white small fw-semibold text-truncate">Billie Jean</div>
-                    <div class="text-white-50" style="font-size: 0.75rem;">Michael Jackson</div>
-                  </a>
-                </div>
-                <div class="col-6 col-sm-3">
-                  <a href="./player.html" class="text-decoration-none d-block">
-                    <img src="https://is1-ssl.mzstatic.com/image/thumb/Features125/v4/dd/7d/72/dd7d7259-d27f-5b3e-ce64-9e304d2cb40f/dj.rxzrauer.jpg/500x500bb.jpg" alt="Meteora" class="w-100 rounded-3 mb-2 shadow" style="aspect-ratio:1/1;object-fit:cover;" />
-                    <div class="text-white small fw-semibold text-truncate">Numb</div>
-                    <div class="text-white-50" style="font-size: 0.75rem;">LINKIN PARK</div>
-                  </a>
-                </div>
-                <div class="col-6 col-sm-3 d-none d-sm-block">
-                  <a href="./player.html" class="text-decoration-none d-block">
-                    <img src="https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/6c/13/27/6c13279a-399b-2631-3cb2-6233a91d7a53/19UMGIM78325.rgb.jpg/500x500bb.jpg" alt="Hollywood's Bleeding" class="w-100 rounded-3 mb-2 shadow" style="aspect-ratio:1/1;object-fit:cover;" />
-                    <div class="text-white small fw-semibold text-truncate">Circles</div>
-                    <div class="text-white-50" style="font-size: 0.75rem;">Post Malone</div>
-                  </a>
-                </div>
-                <div class="col-6 col-sm-3 d-none d-sm-block">
-                  <a href="./player.html" class="text-decoration-none d-block">
-                    <img src="https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/04/31/61/0431617b-8479-58fe-3cc3-9fbfef175a71/20UMGIM06593.rgb.jpg/500x500bb.jpg" alt="CALM" class="w-100 rounded-3 mb-2 shadow" style="aspect-ratio:1/1;object-fit:cover;" />
-                    <div class="text-white small fw-semibold text-truncate">Best Years</div>
-                    <div class="text-white-50" style="font-size: 0.75rem;">5 Seconds of Summer</div>
-                  </a>
-                </div>
+              <div id="seekSongs" class="bz-mock-row mb-4"></div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="bz-mock-h">Artistas populares</h3>
+                <span class="bz-mock-more">Mostrar todo</span>
               </div>
+              <div id="seekArtists" class="bz-mock-row mb-4"></div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h3 class="bz-mock-h">Álbumes destacados</h3>
+                <span class="bz-mock-more">Mostrar todo</span>
+              </div>
+              <div id="seekAlbums" class="bz-mock-row"></div>
             </div>
           </div>
         </div>
@@ -199,21 +115,14 @@
     <!-- SECCIÓN 3: HAY UNA FUNCIÓN PARA ESO (Bootstrap Tabs + Grid 3 Columnas) -->
     <section id="benefits" class="py-5 my-5 container">
       <div class="text-center mb-4">
-        <h2 class="display-5 fw-bold text-white lh-sm mb-3">
+        <h2 class="bz-benefits-title text-white">
           Hay una función para eso.<br />
           Controla tu
-          <span class="bz-text-scroller">
-            <span class="bz-text-scroller-inner">
-              <span>biblioteca offline.</span>
-              <span>experiencia sonora.</span>
-              <span>colección musical.</span>
-              <span>gestión de pistas.</span>
-            </span>
-          </span>
+          <span id="rotatingWord" class="bz-rotator"><span class="bz-rotator-word is-active">biblioteca offline.</span><span class="bz-rotator-word" aria-hidden="true">experiencia sonora.</span><span class="bz-rotator-word" aria-hidden="true">colección musical.</span><span class="bz-rotator-word" aria-hidden="true">gestión de pistas.</span></span>
         </h2>
 
         <!-- Segmented Dock Bootstrap Pills -->
-        <ul class="nav nav-pills bz-dock-pills mt-3" id="benefitsTab" role="tablist">
+        <ul class="nav nav-pills bz-dock-pills" id="benefitsTab" role="tablist">
           <li class="nav-item" role="presentation">
             <button class="nav-link active" id="tab-playback-btn" data-bs-toggle="pill" data-bs-target="#tab-playback" type="button" role="tab">
               Reproducción
@@ -227,10 +136,10 @@
         </ul>
       </div>
 
-      <div class="tab-content mt-4">
+      <div class="tab-content bz-benefits-cards mx-auto">
         <!-- TAB 1: REPRODUCCIÓN -->
         <div class="tab-pane fade show active" id="tab-playback" role="tabpanel">
-          <div class="row g-4">
+          <div class="row g-4 justify-content-lg-center bz-card-rail">
             <div class="col-12 col-lg-4">
               <div class="fx-card p-4 d-flex flex-column justify-content-between h-100">
                 <div class="fx-icon-tile mb-3"><i class="bi bi-cloud-slash fs-5"></i></div>
@@ -243,59 +152,60 @@
                   <div class="fx-panel p-3 d-flex align-items-center gap-3">
                     <img src="https://is1-ssl.mzstatic.com/image/thumb/Features125/v4/dd/7d/72/dd7d7259-d27f-5b3e-ce64-9e304d2cb40f/dj.rxzrauer.jpg/500x500bb.jpg" alt="Meteora" width="48" height="48" class="rounded-3 object-fit-cover" />
                     <div class="flex-grow-1 min-w-0">
-                      <div class="text-white fw-semibold small text-truncate">In The End</div>
-                      <div class="text-white-50" style="font-size: 0.75rem;">LINKIN PARK · Meteora</div>
+                      <div class="text-white fw-semibold small text-truncate">Somewhere I Belong</div>
+                      <div class="text-white-50 text-truncate" style="font-size: 0.75rem;">LINKIN PARK · Meteora</div>
+                      <div class="bz-mini-progress mt-2"><span></span></div>
+                      <div class="d-flex justify-content-between font-mono-bz text-white-50 mt-1" style="font-size: 0.66rem;"><span>1:24</span><span>3:33</span></div>
                     </div>
                     <div class="fx-eq"><i></i><i></i><i></i><i></i><i></i></div>
                   </div>
                 </div>
-                <div class="mt-3">
-                  <h3 class="h5 text-white fw-bold">Cero cortes</h3>
-                  <p class="small text-white-50 mb-0">Si pierdes la señal, Bitszone pasa a modo respaldo. La canción sigue exactamente donde iba.</p>
+                <div class="fx-card-info">
+                  <div>
+                    <h3 class="fx-card-title">Cero cortes</h3>
+                    <p class="fx-card-text">Si pierdes la señal, Bitszone pasa solo a modo offline. La canción sigue exactamente donde iba.</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="col-12 col-lg-4">
               <div class="fx-card p-4 d-flex flex-column justify-content-between h-100">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                  <div class="fx-icon-tile"><i class="bi bi-soundwave fs-5"></i></div>
-                  <span class="badge rounded-pill bg-white bg-opacity-10 text-light font-mono-bz">FLAC · 24-bit</span>
-                </div>
-                <div class="fx-panel p-4 my-auto text-center">
-                  <div class="fx-spectrum">
-                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                <div class="fx-icon-tile mb-3"><i class="bi bi-soundwave fs-5"></i></div>
+                <div class="my-auto text-center">
+                  <div class="fx-spectrum fx-spectrum--wide">
+                    <i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+                  </div>
+                  <div class="d-flex justify-content-center gap-2 mt-3">
+                    <span class="bz-chip">Calidad original</span>
+                    <span class="bz-chip">Sin recompresión</span>
                   </div>
                 </div>
-                <div class="mt-3">
-                  <h3 class="h5 text-white fw-bold">Alta fidelidad</h3>
-                  <p class="small text-white-50 mb-0">Reproducción directa y nítida sin compresión agresiva en tus pistas favoritas.</p>
+                <div class="fx-card-info">
+                  <div>
+                    <h3 class="fx-card-title">Alta fidelidad</h3>
+                    <p class="fx-card-text">Tus pistas offline conservan el archivo original, sin compresión extra.</p>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="col-12 col-lg-4">
               <div class="fx-card p-4 d-flex flex-column justify-content-between h-100">
-                <div class="fx-icon-tile mb-3"><i class="bi bi-hdd-network fs-5"></i></div>
-                <div class="fx-panel p-3 my-auto d-grid gap-2">
-                  <div class="d-flex align-items-center justify-content-between p-2 rounded-3 bg-white bg-opacity-10">
-                    <div>
-                      <div class="text-white small fw-semibold">Billie Jean</div>
-                      <div style="font-size:0.72rem;color:#c4b5fd;"><i class="bi bi-check-circle-fill me-1"></i>Listo en tu equipo</div>
-                    </div>
-                    <span class="badge rounded-pill font-mono-bz" style="background: rgba(168,85,247,0.35);">4.2 MB</span>
-                  </div>
-                  <div class="d-flex align-items-center justify-content-between p-2 rounded-3 border border-white border-opacity-10 opacity-75">
-                    <div>
-                      <div class="text-white-50 small fw-semibold">Circles</div>
-                      <div class="text-white-50" style="font-size:0.72rem;"><i class="bi bi-cloud me-1"></i>Solo en la nube</div>
-                    </div>
-                    <span class="badge rounded-pill bg-secondary bg-opacity-25 text-white-50 font-mono-bz">Online</span>
-                  </div>
+                <div class="fx-icon-tile mb-3">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 10h.01M15 10h.01M12 2a8 8 0 0 0-8 8v12l3-3 2.5 2.5L12 19l2.5 2.5L17 19l3 3V10a8 8 0 0 0-8-8z"/></svg>
                 </div>
-                <div class="mt-3">
-                  <h3 class="h5 text-white fw-bold">Estado claro de pistas</h3>
-                  <p class="small text-white-50 mb-0">Distingue al instante lo que ya guardaste en tu equipo de lo que sigue en la nube.</p>
+                <div class="fx-panel p-2 my-auto d-grid gap-1">
+                  <div class="bz-offline-row"><span>In the Air Tonight</span><small><i class="bi bi-check2"></i> Offline</small></div>
+                  <div class="bz-offline-row is-cloud"><span>Brujería</span><small><i class="bi bi-cloud"></i> Nube</small></div>
+                  <div class="bz-offline-row"><span>Hollywood's Bleeding</span><small><i class="bi bi-check2"></i> Offline</small></div>
+                  <div class="bz-offline-row is-cloud"><span>Persona Ideal</span><small><i class="bi bi-cloud"></i> Nube</small></div>
+                </div>
+                <div class="fx-card-info">
+                  <div>
+                    <h3 class="fx-card-title">Archivos fantasma</h3>
+                    <p class="fx-card-text">Distingue de un vistazo lo que está en tu equipo de lo que sigue en la nube.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -304,60 +214,63 @@
 
         <!-- TAB 2: DESCARGAS Y ESPACIO -->
         <div class="tab-pane fade" id="tab-downloads" role="tabpanel">
-          <div class="row g-4">
+          <div class="row g-4 justify-content-lg-center bz-card-rail">
             <div class="col-12 col-lg-4">
-              <div class="fx-card p-4 d-flex flex-column justify-content-between h-100">
-                <div class="fx-icon-tile mb-3"><i class="bi bi-clock-history fs-5"></i></div>
-                <div class="fx-panel p-3 my-auto d-grid gap-2 small">
-                  <div class="d-flex justify-content-between text-white"><span>Thriller · M. Jackson</span><span class="font-mono-bz" style="color: var(--bz-soft);">28d</span></div>
-                  <div class="progress" style="height: 5px; background: rgba(255,255,255,0.08);"><div class="progress-bar" style="width:93%;background:#a855f7;"></div></div>
-                  <div class="d-flex justify-content-between text-white mt-2"><span>CALM · 5SOS</span><span class="font-mono-bz text-warning">4d</span></div>
-                  <div class="progress" style="height: 5px; background: rgba(255,255,255,0.08);"><div class="progress-bar bg-warning" style="width:18%;"></div></div>
+              <div class="fx-card p-4 d-flex flex-column h-100">
+                <div class="fx-icon-tile mb-3"><i class="bi bi-clock fs-5"></i></div>
+                <div class="fx-panel p-3 my-auto d-grid gap-3">
+                  <div class="bz-lic-row"><img src="https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/32/4f/fd/324ffda2-9e51-8f6a-0c2d-c6fd2b41ac55/074643811224.jpg/100x100bb.jpg" alt="" width="34" height="34" /><div class="min-w-0 flex-grow-1"><b>Billie Jean</b><small>Michael Jackson</small></div><span class="bz-ring" style="--p:93" aria-label="28 días restantes">28d</span></div>
+                  <div class="bz-lic-row"><img src="https://is1-ssl.mzstatic.com/image/thumb/Music114/v4/04/31/61/0431617b-8479-58fe-3cc3-9fbfef175a71/20UMGIM06593.rgb.jpg/100x100bb.jpg" alt="" width="34" height="34" /><div class="min-w-0 flex-grow-1"><b>Best Years</b><small>5 Seconds of Summer</small></div><span class="bz-ring" style="--p:40" aria-label="12 días restantes">12d</span></div>
+                  <div class="bz-lic-row"><img src="https://is1-ssl.mzstatic.com/image/thumb/Music211/v4/29/df/5c/29df5c2d-3dee-1e74-9a38-0740459035f6/25CRGIM48251.rgb.jpg/100x100bb.jpg" alt="" width="34" height="34" /><div class="min-w-0 flex-grow-1"><b>Here I Go Again</b><small>Whitesnake</small></div><span class="bz-ring is-warn" style="--p:10" aria-label="3 días restantes">3d</span></div>
                 </div>
-                <div class="mt-3">
-                  <h3 class="h5 text-white fw-bold">Control de biblioteca</h3>
-                  <p class="small text-white-50 mb-0">Administra fácilmente las canciones descargadas y favoritos desde un mismo lugar.</p>
+                <div class="fx-card-info">
+                  <div>
+                    <h3 class="fx-card-title">Licencias vigentes</h3>
+                    <p class="fx-card-text">Cada descarga dura 30 días. Te avisamos antes de que expire para que nunca te quedes sin tu música.</p>
+                  </div>
                 </div>
               </div>
             </div>
-
             <div class="col-12 col-lg-4">
-              <div class="fx-card p-4 d-flex flex-column justify-content-between h-100">
-                <div class="fx-icon-tile mb-3"><i class="bi bi-cloud-arrow-down fs-5"></i></div>
-                <div class="fx-panel p-3 my-auto d-grid gap-2 small">
-                  <div class="d-flex justify-content-between text-white"><span>Descargando Meteora</span><span class="font-mono-bz text-white-50">84%</span></div>
-                  <div class="progress" style="height: 6px; background: rgba(255,255,255,0.08);"><div class="progress-bar progress-bar-striped progress-bar-animated" style="width:84%;background:linear-gradient(90deg,#7c3aed,#ff9ffc);"></div></div>
-                  <div class="d-flex justify-content-between text-white-50 mt-2"><span>Best Years.mp3</span><span class="text-success"><i class="bi bi-check2-all"></i> Completo</span></div>
+              <div class="fx-card p-4 d-flex flex-column h-100">
+                <div class="fx-icon-tile mb-3"><i class="bi bi-download fs-5"></i></div>
+                <div id="demoQueue" class="fx-panel p-3 my-auto d-grid gap-3">
+                  <div class="bz-queue-row"><img src="https://is1-ssl.mzstatic.com/image/thumb/Music126/v4/d2/d8/d6/d2d8d6ad-85d4-7024-9726-e1f312beb522/603497889754.jpg/100x100bb.jpg" alt="" width="40" height="40" /><div class="flex-grow-1 min-w-0"><div class="d-flex justify-content-between align-items-baseline gap-2"><b class="text-truncate">Face Value <span>· 12</span></b><span class="bz-queue-pct" data-start="43">43%</span></div><div class="bz-queue-bar"><i style="width:43%"></i></div></div></div>
+                  <div class="bz-queue-row"><img src="https://is1-ssl.mzstatic.com/image/thumb/Music115/v4/6c/13/27/6c13279a-399b-2631-3cb2-6233a91d7a53/19UMGIM78325.rgb.jpg/100x100bb.jpg" alt="" width="40" height="40" /><div class="flex-grow-1 min-w-0"><div class="d-flex justify-content-between align-items-baseline gap-2"><b class="text-truncate">Hollywood's Bleeding <span>· 17</span></b><span class="bz-queue-pct" data-start="10">10%</span></div><div class="bz-queue-bar"><i style="width:10%"></i></div></div></div>
+                  <div class="bz-queue-row"><img src="https://is1-ssl.mzstatic.com/image/thumb/Music116/v4/ac/f9/f2/acf9f236-eae7-023a-120d-6c071797512d/cover.jpg/100x100bb.jpg" alt="" width="40" height="40" /><div class="flex-grow-1 min-w-0"><div class="d-flex justify-content-between align-items-baseline gap-2"><b class="text-truncate">Ahora Más Que Nunca <span>· 10</span></b><span class="bz-queue-pct" data-start="0">0%</span></div><div class="bz-queue-bar"><i style="width:0%"></i></div></div></div>
                 </div>
-                <div class="mt-3">
-                  <h3 class="h5 text-white fw-bold">Descarga directa MP3</h3>
-                  <p class="small text-white-50 mb-0">Baja canciones sueltas o álbumes completos mientras sigues escuchando tu cola.</p>
+                <div class="fx-card-info">
+                  <div>
+                    <h3 class="fx-card-title">Cola de descargas</h3>
+                    <p class="fx-card-text">Encola álbumes completos y se descargan en segundo plano mientras escuchas.</p>
+                  </div>
                 </div>
               </div>
             </div>
-
             <div class="col-12 col-lg-4">
-              <div class="fx-card p-4 d-flex flex-column justify-content-between h-100">
-                <div class="fx-icon-tile mb-3"><i class="bi bi-hdd fs-5"></i></div>
-                <div class="fx-panel p-3 my-auto">
-                  <div class="d-flex justify-content-between align-items-baseline mb-2">
-                    <span class="fw-bold text-white h5 mb-0">2.42 GB</span>
-                    <span class="small text-white-50 font-mono-bz">de 5.00 GB</span>
+              <div class="fx-card p-4 d-flex flex-column h-100">
+                <div class="fx-icon-tile mb-3"><i class="bi bi-device-hdd fs-5"></i></div>
+                <div class="my-auto">
+                  <div class="d-flex align-items-baseline gap-2 mb-3">
+                    <span class="bz-space-total">3.24GB</span>
+                    <span class="small text-white-50">de 5.00GB</span>
+                    <span class="ms-auto small text-white-50">1.76GB libres</span>
                   </div>
-                  <div class="progress-stacked mb-3" style="height: 10px; background: rgba(255,255,255,0.08);">
-                    <div class="progress" style="width: 24%;"><div class="progress-bar" style="background:#5227ff;"></div></div>
-                    <div class="progress" style="width: 15%;"><div class="progress-bar" style="background:#a855f7;"></div></div>
-                    <div class="progress" style="width: 9%;"><div class="progress-bar" style="background:#ff9ffc;"></div></div>
+                  <div class="bz-space-bar mb-3" role="img" aria-label="3.24 GB usados de 5 GB">
+                    <i style="width:28.4%;background:#a855f7"></i><i style="width:18.8%;background:#f0abfc"></i><i style="width:12.2%;background:#6366f1"></i><i style="width:5.4%;background:#94a3b8"></i>
                   </div>
-                  <div class="d-flex justify-content-between small text-white-50">
-                    <span><i class="bi bi-circle-fill me-1" style="color:#5227ff;"></i>Rock</span>
-                    <span><i class="bi bi-circle-fill me-1" style="color:#a855f7;"></i>Pop</span>
-                    <span><i class="bi bi-circle-fill me-1" style="color:#ff9ffc;"></i>Salsa</span>
+                  <div class="bz-space-legend">
+                    <span><i style="background:#a855f7"></i>Rock <code>1.42GB</code></span>
+                    <span><i style="background:#f0abfc"></i>Salsa <code>0.94GB</code></span>
+                    <span><i style="background:#6366f1"></i>Pop <code>0.61GB</code></span>
+                    <span><i style="background:#94a3b8"></i>Otros <code>0.27GB</code></span>
                   </div>
                 </div>
-                <div class="mt-3">
-                  <h3 class="h5 text-white fw-bold">Medidor de 5 GB</h3>
-                  <p class="small text-white-50 mb-0">Visualiza el almacenamiento utilizado por tus descargas y libera espacio al instante.</p>
+                <div class="fx-card-info">
+                  <div>
+                    <h3 class="fx-card-title">Control de espacio</h3>
+                    <p class="fx-card-text">Mira cuánto ocupa tu biblioteca por género y libera espacio cuando lo necesites.</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -367,46 +280,46 @@
     </section>
 
     <!-- SECCIÓN 4: FAQ INTERACTIVO -->
-    <section id="faq" class="py-5 my-5 container">
-      <div class="text-center mb-5">
-        <h2 class="display-4 fw-bold text-white mb-2">
+    <section id="faq" class="bz-faq-section container">
+      <div class="text-center bz-faq-head">
+        <h2 class="bz-faq-title text-white">
           Tu música.<br />
-          <span class="bz-liquid-metal-text">Nuestras respuestas.</span>
+          <span class="bz-faq-title-glow">Nuestras respuestas.</span>
         </h2>
-        <p class="text-white-50">Toca un número para ver su respuesta o deja que avancen solas.</p>
+        <p class="bz-faq-sub">Toca una bolita para ver su respuesta, o deja que avancen solas.</p>
       </div>
 
-      <div class="row g-4 align-items-center">
+      <div class="row g-4 align-items-center bz-faq-body">
         <!-- Clúster de 7 Orbes -->
-        <div class="col-12 col-lg-5 position-relative d-flex flex-column align-items-center justify-content-center py-4">
+        <div class="col-12 col-lg-5 bz-faq-cluster-col position-relative d-flex flex-column align-items-center justify-content-center py-4 mb-4 mb-lg-0">
           <div id="faqClusterHalo" class="position-absolute rounded-circle" style="width: 280px; height: 280px; filter: blur(45px); pointer-events: none; background: radial-gradient(circle, rgba(82,39,255,0.35), transparent 70%);"></div>
-          <span class="font-mono-bz small text-uppercase text-white-50 mb-4" style="letter-spacing: 0.18em;">Selecciona una pregunta</span>
+          <span class="bz-faq-label font-mono-bz text-uppercase">Selecciona una pregunta</span>
           <div id="faqOrbCluster" class="bz-faq-orb-cluster position-relative z-2"></div>
         </div>
 
         <!-- Visor de Respuestas Liquid Glass -->
         <div class="col-12 col-lg-7">
-          <div id="faqViewerCard" class="bz-glass-card p-4 p-md-5 position-relative overflow-hidden" style="min-height: 410px;">
+          <div id="faqViewerCard" class="bz-glass-card bz-faq-viewer p-4 p-md-5 position-relative overflow-hidden">
             <div id="faqViewerGlow" class="position-absolute bottom-0 end-0 rounded-circle pe-none" style="width: 380px; height: 380px; transform: translate(35%, 35%); filter: blur(75px); opacity: 0.25;"></div>
 
             <!-- Barra segmentada superior -->
-            <div id="faqSegments" class="d-flex gap-2 mb-4 position-relative z-2"></div>
+            <div id="faqSegments" class="d-flex gap-2 mb-5 position-relative z-2"></div>
 
             <div class="d-flex align-items-center justify-content-between mb-4 position-relative z-2">
-              <div id="faqActiveBadge" class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white" style="width: 46px; height: 46px; font-family: var(--bz-font-display);">1</div>
-              <span id="faqCounter" class="font-mono-bz small text-white-50">01 / 07</span>
+              <div id="faqActiveBadge" class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white" style="width: 48px; height: 48px; font-family: var(--bz-font-display);">1</div>
+              <span id="faqCounter" class="font-mono-bz small" style="color: rgba(255,255,255,0.35);">01 / 07</span>
             </div>
 
             <div class="position-relative z-2 my-3">
-              <h3 id="faqQuestion" class="h2 fw-bold text-white mb-3"></h3>
-              <p id="faqAnswer" class="lead text-white-50 mb-0" style="font-size: 1.08rem; line-height: 1.7;"></p>
+              <h3 id="faqQuestion" class="bz-faq-question text-white"></h3>
+              <p id="faqAnswer" class="bz-faq-answer mb-0"></p>
             </div>
 
-            <div class="d-flex justify-content-end gap-2 mt-4 pt-3 border-top border-white border-opacity-10 position-relative z-2">
-              <button id="faqPrevBtn" type="button" class="btn bz-btn-subtle rounded-circle" style="width: 42px; height: 42px;" aria-label="Pregunta anterior">
+            <div class="d-flex justify-content-end gap-2 mt-5 pt-4 border-top border-white border-opacity-10 position-relative z-2">
+              <button id="faqPrevBtn" type="button" class="btn bz-btn-subtle rounded-circle" style="width: 44px; height: 44px;" aria-label="Pregunta anterior">
                 <i class="bi bi-arrow-left"></i>
               </button>
-              <button id="faqNextBtn" type="button" class="btn bz-btn-subtle rounded-circle" style="width: 42px; height: 42px;" aria-label="Pregunta siguiente">
+              <button id="faqNextBtn" type="button" class="btn bz-btn-subtle rounded-circle" style="width: 44px; height: 44px;" aria-label="Pregunta siguiente">
                 <i class="bi bi-arrow-right"></i>
               </button>
             </div>
@@ -417,54 +330,62 @@
   </main>
 
   <!-- FOOTER CINEMÁTICO -->
-  <footer class="bz-footer pt-5 mt-5">
+  <footer class="bz-footer">
     <div class="bz-footer-grid"></div>
 
-    <!-- Band Marquee Diagonal -->
-    <div class="bz-footer-marquee-band py-3 my-4 position-relative z-2">
-      <div class="bz-footer-marquee-track font-mono-bz small text-uppercase text-white-50" style="letter-spacing: 0.28em;">
-        <span class="px-4">BITSZONE • MÚSICA SIN CONEXIÓN • ALTA FIDELIDAD • MODO OFFLINE •</span>
-        <span class="px-4">BITSZONE • MÚSICA SIN CONEXIÓN • ALTA FIDELIDAD • MODO OFFLINE •</span>
-        <span class="px-4">BITSZONE • MÚSICA SIN CONEXIÓN • ALTA FIDELIDAD • MODO OFFLINE •</span>
+    <!-- Franja inclinada con texto en desplazamiento infinito -->
+    <div class="bz-footer-marquee-band position-relative z-2" aria-hidden="true">
+      <div class="bz-footer-marquee-track text-uppercase">
+        <div class="bz-marquee-group"><span>SINCRONIZACIÓN TRANSPARENTE</span><i class="bz-spark is-blue">✦</i><span>ALTA FIDELIDAD</span><i class="bz-spark is-violet">✦</i><span>CONTROL LOCAL</span><i class="bz-spark is-blue">✦</i><span>PRIVACIDAD ABSOLUTA</span><i class="bz-spark is-violet">✦</i><span>LIBRERÍA OFFLINE</span><i class="bz-spark is-violet">✦</i></div>
+        <div class="bz-marquee-group"><span>SINCRONIZACIÓN TRANSPARENTE</span><i class="bz-spark is-blue">✦</i><span>ALTA FIDELIDAD</span><i class="bz-spark is-violet">✦</i><span>CONTROL LOCAL</span><i class="bz-spark is-blue">✦</i><span>PRIVACIDAD ABSOLUTA</span><i class="bz-spark is-violet">✦</i><span>LIBRERÍA OFFLINE</span><i class="bz-spark is-violet">✦</i></div>
       </div>
     </div>
 
-    <div class="container text-center py-5 position-relative z-2">
-      <h2 class="display-3 fw-bold text-white mb-4" style="font-weight: 800;">¿Listo para empezar?</h2>
+    <div class="container text-center bz-footer-cta position-relative z-2">
+      <h2 class="bz-footer-cta-title">¿Listo para empezar?</h2>
 
-      <div class="d-flex flex-wrap justify-content-center gap-3 mb-4">
-        <a href="./player.html" class="bz-footer-pill px-4 py-3 fw-semibold d-inline-flex align-items-center gap-2">
-          <i class="bi bi-play-circle text-white-50"></i> abrir web player
-        </a>
-        <a href="./login.html" class="bz-footer-pill px-4 py-3 fw-semibold d-inline-flex align-items-center gap-2">
-          <i class="bi bi-person-check text-white-50"></i> acceder / panel admin
-        </a>
+      <div class="row g-3 g-md-4 justify-content-center bz-footer-ctas">
+        <div class="col-12 col-sm-auto">
+          <a href="#benefits" class="bz-footer-pill bz-footer-pill--lg w-100 justify-content-center text-nowrap">
+            <i class="bi bi-layers"></i> explorar características
+          </a>
+        </div>
+        <div class="col-12 col-sm-auto">
+          <a href="#faq" class="bz-footer-pill bz-footer-pill--lg w-100 justify-content-center text-nowrap">
+            <i class="bi bi-question-circle"></i> resolviendo dudas
+          </a>
+        </div>
       </div>
 
-      <div class="d-flex flex-wrap justify-content-center gap-2 mb-5">
-        <button type="button" class="btn bz-footer-pill btn-sm px-3 py-2 text-white-50" data-bs-toggle="modal" data-bs-target="#infoLegalModal" data-legal-title="Política de privacidad" data-legal-body="Bitszone almacena tus preferencias, playlists, favoritos y sesión localmente en tu navegador (localStorage) y consulta únicamente el catálogo público de canciones.">
+      <div class="row row-cols-1 row-cols-sm-auto g-2 g-md-3 justify-content-center">
+        <div class="col"><button type="button" class="btn bz-footer-pill bz-footer-pill--sm text-nowrap w-100" data-bs-toggle="modal" data-bs-target="#infoLegalModal" data-legal-title="Política de privacidad" data-legal-body="Bitszone almacena tus preferencias, playlists, favoritos y sesión localmente en tu navegador (localStorage) y consulta únicamente el catálogo público de canciones.">
           política de privacidad
-        </button>
-        <button type="button" class="btn bz-footer-pill btn-sm px-3 py-2 text-white-50" data-bs-toggle="modal" data-bs-target="#infoLegalModal" data-legal-title="Términos de servicio" data-legal-body="Proyecto académico de Ingeniería de Sistemas desarrollado con HTML5, CSS3, JavaScript y Bootstrap 5 para fines demostrativos y educativos.">
+        </button></div>
+        <div class="col"><button type="button" class="btn bz-footer-pill bz-footer-pill--sm text-nowrap w-100" data-bs-toggle="modal" data-bs-target="#infoLegalModal" data-legal-title="Términos de servicio" data-legal-body="Proyecto académico de Ingeniería de Sistemas desarrollado con HTML5, CSS3, JavaScript y Bootstrap 5 para fines demostrativos y educativos.">
           términos de servicio
-        </button>
-        <button type="button" class="btn bz-footer-pill btn-sm px-3 py-2 text-white-50" data-bs-toggle="modal" data-bs-target="#infoLegalModal" data-legal-title="Soporte Técnico" data-legal-body="Para pruebas de administrador ingresa a Acceder -> Administrador usando bitszone.app@gmail.com (clave: admin123).">
+        </button></div>
+        <div class="col"><button type="button" class="btn bz-footer-pill bz-footer-pill--sm text-nowrap w-100" data-bs-toggle="modal" data-bs-target="#infoLegalModal" data-legal-title="Soporte Técnico" data-legal-body="¿Tienes algún problema o sugerencia? Escríbenos desde la sección de ayuda del reproductor y te responderemos lo antes posible.">
           soporte
-        </button>
+        </button></div>
       </div>
 
-      <div class="bz-footer-giant-text mt-3">BITSZONE</div>
     </div>
+
+    <div class="bz-footer-giant-text" aria-hidden="true">BITSZONE</div>
 
     <!-- Barra Inferior -->
-    <div class="position-relative z-2 py-4 px-3 px-md-5 border-top border-white border-opacity-10" style="background: rgba(2,2,4,0.92);">
-      <div class="container-fluid d-flex flex-column flex-md-row align-items-center justify-content-between gap-3 text-center text-md-start">
-        <a href="./index.html" class="bz-brand-wordmark fs-4 text-decoration-none">Bitszone</a>
-        <div class="small text-white-50 font-mono-bz" style="letter-spacing: 0.12em;">
-          © <span id="footerYear">2026</span> bitszone. todos los derechos reservados.
-        </div>
-        <div class="small text-white-50">
-          desarrollado por <strong class="text-white">j3t &amp; juanhp</strong>
+    <div class="bz-footer-bar position-relative z-2 px-3 px-md-5">
+      <div class="container-fluid">
+        <div class="row align-items-center g-2">
+          <div class="col-12 col-md-3 text-center text-md-start">
+            <a href="./index.html" class="bz-landing-logo bz-footer-logo text-decoration-none">Bitszone</a>
+          </div>
+          <div class="col-12 col-md-6 text-center bz-footer-meta">
+            © <span id="footerYear">2026</span> bitszone. todos los derechos reservados.
+          </div>
+          <div class="col-12 col-md-3 text-center text-md-end bz-footer-meta" style="color: rgba(255,255,255,0.8);">
+            desarrollado por <strong class="bz-footer-devs">j3t &amp; juanhp</strong>
+          </div>
         </div>
       </div>
     </div>
