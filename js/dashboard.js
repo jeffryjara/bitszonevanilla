@@ -178,38 +178,26 @@
       return matchesQ && matchesR;
     });
 
-    // 1. Header profesional sin la píldora de "Modo Demo Académico"
+    // 1. Header limpio sin texto superior ni botón agregar admin
     var headerHtml =
       '<div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between gap-3 mb-4">' +
         '<div>' +
-          '<div class="d-flex align-items-center gap-2 mb-1">' +
-            '<span class="small text-white-50 text-uppercase fw-semibold tracking-wider" style="letter-spacing: 0.05em;">Panel de Control</span>' +
-            '<span class="text-white-50">·</span>' +
-            '<span class="small d-inline-flex align-items-center gap-1 font-mono-bz" style="color: #34d399;">' +
-              '<span class="d-inline-block rounded-circle" style="width: 7px; height: 7px; background-color: #34d399; box-shadow: 0 0 8px #34d399;"></span>' +
-              'Supabase 24ms (Óptimo)' +
-            '</span>' +
-          '</div>' +
           '<h1 class="display-6 fw-bold text-white mb-0">Dashboard de Administración</h1>' +
         '</div>' +
         '<div class="d-flex flex-wrap gap-2">' +
-          '<button type="button" class="btn bz-btn-primary btn-sm px-3 py-2" data-bs-toggle="modal" data-bs-target="#addAdminModal">' +
-            '<i class="bi bi-person-plus me-1"></i> Agregar Admin' +
-          '</button>' +
           '<button id="btnDashBack" type="button" class="btn bz-btn-subtle btn-sm px-3 py-2">' +
             '<i class="bi bi-arrow-left me-1"></i> Volver al Catálogo' +
           '</button>' +
         '</div>' +
       '</div>';
 
-    // 2. Tabs Dock
+    // 2. Tabs Dock (sin pestaña Herramientas)
     var tabsHtml =
       '<div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">' +
         '<div class="bz-dock-pills nav nav-pills overflow-auto" role="tablist">' +
           '<button class="nav-link ' + (state.activeTab === 'overview' ? 'active' : '') + '" data-dash-tab="overview"><i class="bi bi-activity me-1"></i>Visión General</button>' +
           '<button class="nav-link ' + (state.activeTab === 'users' ? 'active' : '') + '" data-dash-tab="users"><i class="bi bi-shield-check me-1"></i>Admins (' + state.users.length + ')</button>' +
           '<button class="nav-link ' + (state.activeTab === 'music' ? 'active' : '') + '" data-dash-tab="music"><i class="bi bi-music-note-beamed me-1"></i>Música (380)</button>' +
-          '<button class="nav-link ' + (state.activeTab === 'tools' ? 'active' : '') + '" data-dash-tab="tools"><i class="bi bi-sliders me-1"></i>Herramientas</button>' +
         '</div>' +
       '</div>';
 
@@ -520,35 +508,6 @@
             }).join('') +
           '</div>' +
         '</div>';
-
-    } else if (state.activeTab === 'tools') {
-      bodyHtml =
-        '<div class="row g-4">' +
-          '<div class="col-12 col-md-6">' +
-            '<div class="bz-glass-card p-4 h-100 d-flex flex-column justify-content-between">' +
-              '<div>' +
-                '<div class="fx-icon-tile mb-3"><i class="bi bi-stars fs-5"></i></div>' +
-                '<h4 class="h5 fw-bold text-white mb-2">Nuevo Lanzamiento</h4>' +
-                '<p class="small text-white-50 mb-4">Registra o programa nuevas pistas y álbumes en el catálogo de Bitszone.</p>' +
-              '</div>' +
-              '<button type="button" class="btn bz-btn-primary w-100 py-2" data-bs-toggle="modal" data-bs-target="#releaseDemoModal">' +
-                '<i class="bi bi-plus-circle me-1"></i> Registrar Lanzamiento' +
-              '</button>' +
-            '</div>' +
-          '</div>' +
-          '<div class="col-12 col-md-6">' +
-            '<div class="bz-glass-card p-4 h-100 d-flex flex-column justify-content-between">' +
-              '<div>' +
-                '<div class="fx-icon-tile mb-3"><i class="bi bi-disc fs-5"></i></div>' +
-                '<h4 class="h5 fw-bold text-white mb-2">Estado del Catálogo</h4>' +
-                '<p class="small text-white-50 mb-4">Origen activo: <strong>' + (catalogStats.source === 'supabase' ? 'Supabase REST (En línea)' : 'Respaldo Local') + '</strong> · ' + catalogStats.albumsCount + ' álbumes / ' + catalogStats.tracksCount + ' pistas cargadas.</p>' +
-              '</div>' +
-              '<button type="button" class="btn bz-btn-subtle w-100 py-2" data-bs-toggle="modal" data-bs-target="#catalogDiagModal">' +
-                '<i class="bi bi-arrow-repeat me-1"></i> Verificar Estado de Catálogo' +
-              '</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
     }
 
     container.innerHTML = '<div class="container-fluid px-0 px-md-2 pb-4">' + headerHtml + tabsHtml + bodyHtml + '</div>';
@@ -606,151 +565,6 @@
       });
     });
 
-    ensureModals(notify);
-  }
-
-  function ensureModals(notify) {
-    if (document.getElementById('addAdminModal')) return;
-
-    var modalWrapper = document.createElement('div');
-    modalWrapper.innerHTML =
-      // Modal Agregar Admin
-      '<div class="modal fade" id="addAdminModal" tabindex="-1" aria-hidden="true">' +
-        '<div class="modal-dialog modal-dialog-centered">' +
-          '<div class="modal-content bz-glass-modal border-0">' +
-            '<div class="modal-header border-0 pb-0">' +
-              '<h5 class="modal-title fw-bold text-white"><i class="bi bi-person-plus me-2" style="color:var(--bz-lavender);"></i>Agregar Administrador</h5>' +
-              '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>' +
-            '</div>' +
-            '<div class="modal-body">' +
-              '<form id="formAddAdminSubmit" class="d-grid gap-3">' +
-                '<div>' +
-                  '<label class="form-label small text-white-50">Nombre de Usuario o Alias</label>' +
-                  '<input id="newAdminName" type="text" required class="form-control bz-input-dark" placeholder="Ej. Martin_Music" />' +
-                '</div>' +
-                '<div>' +
-                  '<label class="form-label small text-white-50">Correo Electrónico</label>' +
-                  '<input id="newAdminEmail" type="email" required class="form-control bz-input-dark" placeholder="admin@bitszone.net" />' +
-                '</div>' +
-                '<button type="submit" class="btn bz-btn-primary py-2 mt-2">Guardar Administrador</button>' +
-              '</form>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-
-      // Modal Nuevo Lanzamiento
-      '<div class="modal fade" id="releaseDemoModal" tabindex="-1" aria-hidden="true">' +
-        '<div class="modal-dialog modal-dialog-centered">' +
-          '<div class="modal-content bz-glass-modal border-0">' +
-            '<div class="modal-header border-0 pb-0">' +
-              '<h5 class="modal-title fw-bold text-white"><i class="bi bi-stars me-2" style="color:var(--bz-lavender);"></i>Nuevo Lanzamiento</h5>' +
-              '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>' +
-            '</div>' +
-            '<div class="modal-body">' +
-              '<form id="formReleaseDemoSubmit" class="d-grid gap-3">' +
-                '<div>' +
-                  '<label class="form-label small text-white-50">Título de la Canción</label>' +
-                  '<input id="releaseTrackTitle" type="text" required class="form-control bz-input-dark" placeholder="Ej. Starlight Echoes" />' +
-                '</div>' +
-                '<div>' +
-                  '<label class="form-label small text-white-50">Artista</label>' +
-                  '<input id="releaseTrackArtist" type="text" required class="form-control bz-input-dark" placeholder="Ej. Neon Pulse" />' +
-                '</div>' +
-                '<div>' +
-                  '<label class="form-label small text-white-50">Álbum</label>' +
-                  '<input id="releaseTrackAlbum" type="text" required class="form-control bz-input-dark" placeholder="Ej. Future Horizons (2026)" />' +
-                '</div>' +
-                '<button type="submit" class="btn bz-btn-primary py-2 mt-2">Publicar Lanzamiento</button>' +
-              '</form>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-
-      // Modal Diagnóstico de Catálogo
-      '<div class="modal fade" id="catalogDiagModal" tabindex="-1" aria-hidden="true">' +
-        '<div class="modal-dialog modal-dialog-centered">' +
-          '<div class="modal-content bz-glass-modal border-0">' +
-            '<div class="modal-header border-0 pb-0">' +
-              '<h5 class="modal-title fw-bold text-white"><i class="bi bi-hdd-network me-2" style="color:var(--bz-lavender);"></i>Diagnóstico de Catálogo</h5>' +
-              '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>' +
-            '</div>' +
-            '<div class="modal-body">' +
-              '<p class="small text-white-50">El catálogo de Bitszone está conectado con Supabase REST API y cuenta con respaldo offline en memoria.</p>' +
-              '<div class="p-3 rounded-3 mb-3" style="background: rgba(255,255,255,0.05);">' +
-                '<div class="d-flex justify-content-between small text-white mb-1"><span>Conectividad Supabase:</span><strong class="text-success"><i class="bi bi-wifi me-1"></i>En línea (24ms)</strong></div>' +
-                '<div class="d-flex justify-content-between small text-white mb-1"><span>Álbumes cargados:</span><strong>24</strong></div>' +
-                '<div class="d-flex justify-content-between small text-white"><span>Pistas de audio activas:</span><strong>380 canciones</strong></div>' +
-              '</div>' +
-              '<button id="btnResyncCatalog" type="button" class="btn bz-btn-primary w-100 py-2">Resincronizar Catálogo Ahora</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-
-    document.body.appendChild(modalWrapper);
-
-    var addForm = document.getElementById('formAddAdminSubmit');
-    if (addForm) {
-      addForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var name = document.getElementById('newAdminName').value.trim();
-        var email = document.getElementById('newAdminEmail').value.trim();
-        if (!name || !email) return;
-
-        state.users.push({
-          id: 'admin_' + Date.now(),
-          username: name,
-          email: email,
-          role: 'admin',
-          status: 'online',
-          playedSongsCount: 0,
-          downloadedCount: 0,
-          avatar_url: ''
-        });
-        saveDemoUsers();
-
-        // Cerrar modal
-        var inst = window.bootstrap.Modal.getInstance(document.getElementById('addAdminModal'));
-        if (inst) inst.hide();
-        addForm.reset();
-        notify('Nuevo administrador ' + name + ' agregado.');
-      });
-    }
-
-    var relForm = document.getElementById('formReleaseDemoSubmit');
-    if (relForm) {
-      relForm.addEventListener('submit', function (e) {
-        e.preventDefault();
-        var title = document.getElementById('releaseTrackTitle').value.trim();
-        var artist = document.getElementById('releaseTrackArtist').value.trim();
-        var album = document.getElementById('releaseTrackAlbum').value.trim();
-
-        DEMO_POPULAR_TRACKS.unshift({
-          id: Date.now(),
-          title: title,
-          artist: artist,
-          album: album,
-          plays: 1,
-          downloads: 0
-        });
-
-        var inst = window.bootstrap.Modal.getInstance(document.getElementById('releaseDemoModal'));
-        if (inst) inst.hide();
-        relForm.reset();
-        notify('Lanzamiento "' + title + '" registrado.');
-      });
-    }
-
-    var resyncBtn = document.getElementById('btnResyncCatalog');
-    if (resyncBtn) {
-      resyncBtn.addEventListener('click', function () {
-        var inst = window.bootstrap.Modal.getInstance(document.getElementById('catalogDiagModal'));
-        if (inst) inst.hide();
-        notify('Catálogo resincronizado con éxito.');
-      });
-    }
   }
 
   window.BitszoneDashboard = {
