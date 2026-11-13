@@ -2638,6 +2638,10 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
 /* ==========================================================================
    REPRODUCTOR GIGANTE FULLSCREEN (Fiel a ImmersivePlayer.tsx)
    ========================================================================== */
+.bz-exp-modal {
+  z-index: 1060 !important;
+}
+
 .bz-exp-modal .modal-content {
   background: #050505;
   color: #ffffff;
@@ -3139,28 +3143,29 @@ body.bz-ad-locked #expandedPlayerModal {
 
 /* Modal Intersticial de Anuncios (Liquid Glass Ad Player) */
 .bz-ad-modal {
-  z-index: 1095 !important;
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  z-index: 2200 !important;
   overflow-x: hidden !important;
   overflow-y: auto !important;
   touch-action: none;
-}
-
-/* Fondo / Backdrop específico de anuncios con desenfoque extremo */
-.modal-backdrop.bz-ad-backdrop {
-  z-index: 1090 !important;
   background-color: rgba(6, 2, 14, 0.92) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
   transition: opacity 0.25s ease-out;
 }
 
-.modal-backdrop.bz-ad-backdrop.show {
+.bz-ad-modal.is-active,
+.bz-ad-modal.show {
+  display: flex !important;
   opacity: 1 !important;
-}
-
-.modal-backdrop.bz-ad-backdrop:not(.show) {
-  opacity: 0 !important;
-  pointer-events: none !important;
 }
 
 /* Tarjeta Obsidian Liquid Glass: sobria, elegante, monocromática con micro-relieves */

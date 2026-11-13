@@ -116,8 +116,8 @@
   function blockAdScroll(e) {
     if (!adState.isActive) return;
     var modal = document.getElementById('adInterstitialModal');
-    // Auto-recuperación: si el modal no existe o no tiene clase 'show', desbloquear estado
-    if (!modal || !modal.classList.contains('show')) {
+    // Auto-recuperación: si el modal no existe o no tiene clase 'show' o 'is-active', desbloquear estado
+    if (!modal || (!modal.classList.contains('show') && !modal.classList.contains('is-active'))) {
       adState.isActive = false;
       document.documentElement.classList.remove('bz-ad-locked');
       document.body.classList.remove('bz-ad-locked');
@@ -135,17 +135,17 @@
   function blockAdKeys(e) {
     if (!adState.isActive) return;
     var modal = document.getElementById('adInterstitialModal');
-    if (!modal || !modal.classList.contains('show')) {
+    if (!modal || (!modal.classList.contains('show') && !modal.classList.contains('is-active'))) {
       adState.isActive = false;
       document.documentElement.classList.remove('bz-ad-locked');
       document.body.classList.remove('bz-ad-locked');
       return;
     }
     var blocked = [
-      'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
+      'Escape', 'Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight',
       'PageUp', 'PageDown', 'Home', 'End', 'Tab', 'KeyF', 'KeyM', 'KeyA', 'KeyR', 'KeyS'
     ];
-    if (blocked.indexOf(e.code) !== -1 || e.key === 'Tab') {
+    if (blocked.indexOf(e.code) !== -1 || e.key === 'Tab' || e.key === 'Escape') {
       e.preventDefault();
       e.stopPropagation();
       return false;
@@ -176,7 +176,7 @@
     adState.currentSponsorIdx += 1;
 
     var modalEl = document.getElementById('adInterstitialModal');
-    if (!modalEl || !window.bootstrap || !window.bootstrap.Modal) {
+    if (!modalEl) {
       finishAdFlow();
       return;
     }
@@ -216,16 +216,9 @@
       };
     }
 
-    var bsModal = window.bootstrap.Modal.getOrCreateInstance(modalEl);
-    bsModal.show();
-
-    // Etiquetar el backdrop con clase bz-ad-backdrop
-    setTimeout(function () {
-      var backdrops = document.querySelectorAll('.modal-backdrop');
-      backdrops.forEach(function (b) {
-        b.classList.add('bz-ad-backdrop');
-      });
-    }, 20);
+    modalEl.classList.add('is-active', 'show');
+    modalEl.style.display = 'flex';
+    modalEl.setAttribute('aria-hidden', 'false');
 
     function updateAdCountdown() {
       var elapsed = Date.now() - adState.startTime;
@@ -277,25 +270,15 @@
     // Desbloquear scroll e interacción
     document.documentElement.classList.remove('bz-ad-locked');
     document.body.classList.remove('bz-ad-locked');
-    document.body.classList.remove('modal-open');
-    document.body.style.removeProperty('overflow');
-    document.body.style.removeProperty('padding-right');
 
     var modalEl = document.getElementById('adInterstitialModal');
     if (modalEl) {
-      modalEl.classList.remove('show');
+      modalEl.classList.remove('is-active', 'show');
       modalEl.style.display = 'none';
       modalEl.setAttribute('aria-hidden', 'true');
-      modalEl.removeAttribute('aria-modal');
-      var bsModal = window.bootstrap && window.bootstrap.Modal ? window.bootstrap.Modal.getInstance(modalEl) : null;
-      if (bsModal) {
-        try {
-          bsModal.hide();
-        } catch (e) {}
-      }
     }
 
-    // Limpieza explícita de backdrop para evitar pantallas oscuras residuales
+    // Limpieza de seguridad de backdrops de anuncios
     document.querySelectorAll('.modal-backdrop.bz-ad-backdrop').forEach(function (b) {
       b.remove();
     });
@@ -303,7 +286,19 @@
     var cb = adState.onComplete;
     adState.onComplete = null;
     if (typeof cb === 'function') {
-      cb();
+      try {
+        cb();
+      } catch (err) {
+        console.error('Error al reanudar tras anuncio:', err);
+      }
+    }
+
+    // Si expandedPlayerModal sigue abierto, asegurar que el body mantenga modal-open y se refresquen sus vistas
+    var expEl = document.getElementById('expandedPlayerModal');
+    if (expEl && expEl.classList.contains('show')) {
+      document.body.classList.add('modal-open');
+      updatePlayerBarsUI();
+      renderExpRightPanel();
     }
   }
 
@@ -772,7 +767,9 @@
 
   function playAtQueueIndex(qIdx) {
     if (qIdx < 0 || qIdx >= appState.queue.length) return;
-    playTrack(appState.queue[qIdx], appState.nowPlayingAlbum, appState.queue, qIdx);
+    var targetTrack = appState.queue[qIdx];
+    var album = findAlbumById(targetTrack.albumId) || appState.nowPlayingAlbum;
+    playTrack(targetTrack, album, appState.queue, qIdx);
   }
 
   function playTrackNext(track, album) {
@@ -1837,8 +1834,6 @@
     if (expTitle) expTitle.innerHTML = (isLic ? '<i class="bi bi-star-fill text-warning me-2 fs-5"></i>' : '') + esc(track.title);
     if (expArtist) expArtist.textContent = track.artist;
     if (expAlbum) expAlbum.textContent = track.albumTitle || album.title;
-    if (expCur) expCur.textContent = formatTime(appState.currentSecs);
-    if (expDur) expDur.textContent = formatTime(appState.durationSecs);
 
     if (expPlay) expPlay.classList.toggle('is-playing', appState.isPlaying && !appState.isAudioLoading);
     if (expPlayIcon) {
@@ -2314,6 +2309,8 @@
         '</div>' +
       '</div>';
 
+    var isAuth = isUserAuthenticated();
+
     var rightColHtml =
       '<div class="col-12 col-lg-7">' +
         (tracks.length === 0
@@ -2324,6 +2321,7 @@
                 var fav = Storage.isFavorite(t.id);
                 var dl = Storage.isDownloaded(t.id);
                 var lic = Storage.isLicensed(t.id);
+                var timeDisplay = isAuth ? formatDurationMs(t.duration) : '30s preview';
                 return (
                   '<div class="bz-album-track-row ' + (playing ? 'is-playing' : '') + '" data-row-play-idx="' + i + '">' +
                     '<div class="bz-row-idx-wrap text-white-50 font-mono-bz small">' +
@@ -2345,7 +2343,7 @@
                         '<button type="button" class="bz-icon-action ' + (fav ? 'is-favorited' : '') + '" data-row-fav="' + t.id + '" title="Favorito"><i class="bi ' + (fav ? 'bi-heart-fill' : 'bi-heart') + '"></i></button>' +
                         (isPlaylist ? '<button type="button" class="bz-icon-action text-danger" data-row-rmpl="' + t.id + '" title="Quitar de playlist"><i class="bi bi-x-circle"></i></button>' : '') +
                       '</div>' +
-                      '<span class="font-mono-bz small text-white-50 text-end" style="min-width:42px;">' + formatDurationMs(t.duration) + '</span>' +
+                      '<span class="font-mono-bz small text-white-50 text-end text-nowrap" style="min-width:' + (isAuth ? '42px' : '78px') + ';">' + timeDisplay + '</span>' +
                     '</div>' +
                   '</div>'
                 );
@@ -3705,8 +3703,19 @@
       if (forceTab) appState.expTab = forceTab;
       toggleSideLyricsPanel(false);
       updatePlayerBarsUI();
+      renderExpRightPanel();
       var el = document.getElementById('expandedPlayerModal');
       if (el && window.bootstrap) {
+        var inst = window.bootstrap.Modal.getInstance(el);
+        if (inst) {
+          inst._isTransitioning = false;
+          if (!el.classList.contains('show')) {
+            inst._isShown = false;
+          }
+          if (inst._backdrop) {
+            inst._backdrop._isTransitioning = false;
+          }
+        }
         window.bootstrap.Modal.getOrCreateInstance(el).show();
       }
     }
@@ -3716,7 +3725,10 @@
       if (!el || !appState.nowPlayingTrack) return;
       if (el.classList.contains('show')) {
         var inst = window.bootstrap.Modal.getInstance(el);
-        if (inst) inst.hide();
+        if (inst) {
+          inst._isTransitioning = false;
+          inst.hide();
+        }
       } else {
         openExpandedPlayer();
       }
