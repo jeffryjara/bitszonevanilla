@@ -1768,6 +1768,46 @@
     }
   }
 
+  function updateSideLyricsHeader() {
+    var headerEl = document.getElementById('sideLyricsHeader');
+    var iconEl = document.getElementById('sideLyricsIcon');
+    var titleEl = document.getElementById('sideLyricsTitle');
+    if (!headerEl || !titleEl) return;
+
+    var track = appState.nowPlayingTrack;
+    if (!track) {
+      // Estado sin canción reproduciéndose: "Letra" de manera sutil y opaca con icono de letra y sin línea divisoria
+      headerEl.classList.remove('border-bottom', 'border-white', 'border-opacity-10');
+      headerEl.style.borderBottom = 'none';
+      if (iconEl) {
+        iconEl.className = 'bi bi-mic text-white-50 opacity-50';
+        iconEl.style.color = '';
+      }
+      titleEl.className = 'text-white-50 small text-truncate';
+      titleEl.style.color = 'rgba(255, 255, 255, 0.45)';
+      titleEl.style.fontWeight = '500';
+      titleEl.style.letterSpacing = 'normal';
+      titleEl.style.textTransform = 'none';
+      titleEl.textContent = 'Letra';
+      titleEl.removeAttribute('title');
+    } else {
+      // Estado con canción reproduciéndose: "Letra de (nombre de la canción)" con línea divisoria
+      headerEl.classList.add('border-bottom', 'border-white', 'border-opacity-10');
+      headerEl.style.borderBottom = '';
+      if (iconEl) {
+        iconEl.className = 'bi bi-mic-fill';
+        iconEl.style.color = 'var(--bz-lavender, #c084fc)';
+      }
+      titleEl.className = 'text-white small text-truncate fw-semibold';
+      titleEl.style.color = '';
+      titleEl.style.fontWeight = '600';
+      titleEl.style.letterSpacing = 'normal';
+      titleEl.style.textTransform = 'none';
+      titleEl.textContent = 'Letra de ' + (track.title || 'canción');
+      titleEl.title = 'Letra de ' + (track.title || 'canción');
+    }
+  }
+
   function toggleSideLyricsPanel(forceState) {
     var panel = document.getElementById('bzSideLyricsPanel');
     if (!panel) return;
@@ -1779,6 +1819,7 @@
     } else {
       panel.classList.remove('is-open');
     }
+    updateSideLyricsHeader();
     updatePlayerBarsUI();
   }
 
@@ -1786,11 +1827,18 @@
     var panel = document.getElementById('bzSideLyricsPanel');
     var container = document.getElementById('sideLyricsBody');
     if (!panel || !container) return;
+
+    updateSideLyricsHeader();
+
     if (!panel.classList.contains('is-open')) return;
 
     var track = appState.nowPlayingTrack;
     if (!track) {
-      container.innerHTML = '<div class="text-white-50 text-center py-5 small">No hay ninguna canción en reproducción</div>';
+      container.innerHTML =
+        '<div class="d-flex flex-column align-items-center justify-content-center py-5 text-center px-3 flex-grow-1 my-auto" style="min-height: 260px;">' +
+          '<i class="bi bi-mic text-white-50 opacity-25 mb-3" style="font-size: 2.2rem;"></i>' +
+          '<p class="text-white-50 small mb-0" style="max-width: 240px;">No hay ninguna canción en reproducción</p>' +
+        '</div>';
       return;
     }
 
@@ -2176,6 +2224,7 @@
     var track = appState.nowPlayingTrack;
     var album = appState.nowPlayingAlbum;
 
+    updateSideLyricsHeader();
     if (!mini) return;
     if (!track || !album) {
       mini.classList.add('d-none');
