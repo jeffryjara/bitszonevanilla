@@ -2450,6 +2450,12 @@
       currentAvatar = pendingAvatar;
       updateSidebarAccountUI();
       refreshProfileSaveState();
+
+      // Si el usuario está viendo el dashboard, re-renderizar de inmediato para reflejar el cambio
+      if (appState.view === 'dashboard') {
+        renderCurrentView();
+      }
+
       showToast('Perfil actualizado correctamente');
       return true;
     }

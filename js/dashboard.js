@@ -129,20 +129,75 @@
     users: []
   };
 
+  function getActiveSession() {
+    try {
+      if (window.BitszoneAuth && typeof window.BitszoneAuth.getSession === 'function') {
+        var s = window.BitszoneAuth.getSession();
+        if (s) return s;
+      }
+      var raw = localStorage.getItem('bz_vanilla_session_v1');
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function syncSessionWithUsers(list) {
+    var session = getActiveSession();
+    if (!session) return list;
+
+    var sEmail = (session.email || '').toLowerCase().trim();
+    var sName = (session.name || '').trim();
+    if (sName.toUpperCase() === 'SUPERADMIN') sName = 'Admin';
+    var sAvatar = session.avatarUrl || '';
+
+    if (!sName) return list;
+
+    var matched = false;
+    for (var i = 0; i < list.length; i++) {
+      var u = list[i];
+      var uEmail = (u.email || '').toLowerCase().trim();
+      if ((sEmail && uEmail && uEmail === sEmail) || u.id === 'demo-1' || u.id === session.id) {
+        u.username = sName;
+        if (sAvatar) u.avatar_url = sAvatar;
+        if (sEmail) u.email = sEmail;
+        matched = true;
+        break;
+      }
+    }
+
+    if (!matched && (session.role === 'admin' || session.role === 'superadmin' || sEmail === 'bitszone.app@gmail.com')) {
+      list.unshift({
+        id: session.id || 'demo-1',
+        username: sName,
+        email: sEmail || 'bitszone.app@gmail.com',
+        role: 'admin',
+        status: 'online',
+        playedSongsCount: 842,
+        downloadedCount: 124,
+        avatar_url: sAvatar
+      });
+    }
+
+    return list;
+  }
+
   function loadDemoUsers() {
+    var list = INITIAL_DEMO_USERS.map(function (u) { return Object.assign({}, u); });
     try {
       var raw = localStorage.getItem(STORAGE_DEMO_USERS);
       if (raw) {
         var parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length) {
-          return parsed.map(function (u) {
+          list = parsed.map(function (u) {
             if (u.username === 'SUPERADMIN') u.username = 'Admin';
-            return u;
+            return Object.assign({}, u);
           });
         }
       }
     } catch (e) {}
-    return INITIAL_DEMO_USERS.slice();
+    list = syncSessionWithUsers(list);
+    return list;
   }
 
   function saveDemoUsers() {
@@ -163,6 +218,10 @@
     var notify = ctx.notify || function () {};
     var onBack = ctx.onBack || function () {};
     var catalogStats = ctx.catalogStats || { albumsCount: 24, tracksCount: 380, source: 'supabase', latencyMs: 24 };
+
+    // Sincronizar siempre con el perfil y sesión activa antes de computar métricas y renderizar
+    state.users = syncSessionWithUsers(loadDemoUsers());
+    saveDemoUsers();
 
     var adminCount = state.users.filter(function (u) {
       return u.role === 'admin' || u.role === 'superadmin';
@@ -305,10 +364,11 @@
                   '<h4 class="h5 fw-bold text-white mb-1"><i class="bi bi-graph-up-arrow me-2" style="color:var(--bz-lavender);"></i>Tráfico y Reproducciones</h4>' +
                   '<p class="small text-white-50 mb-0">Picos de actividad y telemetría de streaming</p>' +
                 '</div>' +
-                '<div class="btn-group btn-group-sm">' +
+                '<div class="bz-segmented-dock">' +
                   ['24h', '7d', '30d'].map(function (r) {
                     var label = r === '24h' ? '24 Horas' : r === '7d' ? '7 Días' : '30 Días';
-                    return '<button type="button" class="btn ' + (state.timeRange === r ? 'btn-light text-dark fw-semibold' : 'bz-btn-subtle') + '" data-dash-range="' + r + '">' + label + '</button>';
+                    var activeCls = state.timeRange === r ? 'active' : '';
+                    return '<button type="button" class="bz-segmented-btn ' + activeCls + '" data-dash-range="' + r + '">' + label + '</button>';
                   }).join('') +
                 '</div>' +
               '</div>' +
@@ -435,11 +495,14 @@
                 '<input id="dashUserSearch" type="text" class="form-control bz-input-dark bz-input-with-icon" placeholder="Buscar administrador o correo..." value="' + escHtml(state.searchQuery) + '" />' +
               '</div>' +
             '</div>' +
-            '<div class="col-12 col-md-6 d-flex justify-content-md-end gap-2 flex-wrap">' +
-              ['all', 'admin'].map(function (roleKey) {
-                var txt = roleKey === 'all' ? 'Todos' : 'Admins';
-                return '<button type="button" class="btn btn-sm ' + (state.userFilter === roleKey ? 'btn-light text-dark fw-semibold' : 'bz-btn-subtle') + '" data-dash-role="' + roleKey + '">' + txt + '</button>';
-              }).join('') +
+            '<div class="col-12 col-md-6 d-flex justify-content-md-end">' +
+              '<div class="bz-segmented-dock">' +
+                ['all', 'admin'].map(function (roleKey) {
+                  var txt = roleKey === 'all' ? 'Todos' : 'Admins';
+                  var activeCls = state.userFilter === roleKey ? 'active' : '';
+                  return '<button type="button" class="bz-segmented-btn ' + activeCls + '" data-dash-role="' + roleKey + '">' + txt + '</button>';
+                }).join('') +
+              '</div>' +
             '</div>' +
           '</div>' +
           '<div class="table-responsive">' +
@@ -568,6 +631,24 @@
   }
 
   window.BitszoneDashboard = {
-    renderDashboard: renderDashboard
+    renderDashboard: renderDashboard,
+    syncSessionUser: function (updatedSession) {
+      state.users = syncSessionWithUsers(loadDemoUsers());
+      if (updatedSession) {
+        var sEmail = (updatedSession.email || '').toLowerCase().trim();
+        var sName = (updatedSession.name || '').trim();
+        if (sName.toUpperCase() === 'SUPERADMIN') sName = 'Admin';
+        for (var i = 0; i < state.users.length; i++) {
+          var u = state.users[i];
+          var uEmail = (u.email || '').toLowerCase().trim();
+          if ((sEmail && uEmail && uEmail === sEmail) || u.id === 'demo-1') {
+            if (sName) u.username = sName;
+            if (updatedSession.avatarUrl !== undefined) u.avatar_url = updatedSession.avatarUrl;
+            break;
+          }
+        }
+      }
+      saveDemoUsers();
+    }
   };
 })(window);

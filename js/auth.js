@@ -80,7 +80,37 @@
     var current = getSession();
     if (!current) return null;
     var updated = Object.assign({}, current, patch);
-    return saveSession(updated);
+    var saved = saveSession(updated);
+
+    // Sincronizar directamente con la persistencia de administradores en el dashboard
+    try {
+      var rawAdmins = localStorage.getItem('bz_vanilla_demo_admins_v1');
+      if (rawAdmins) {
+        var admins = JSON.parse(rawAdmins);
+        if (Array.isArray(admins)) {
+          var sEmail = (saved.email || '').toLowerCase().trim();
+          var sName = (saved.name || '').trim();
+          if (sName.toUpperCase() === 'SUPERADMIN') sName = 'Admin';
+          for (var i = 0; i < admins.length; i++) {
+            var a = admins[i];
+            var aEmail = (a.email || '').toLowerCase().trim();
+            if ((sEmail && aEmail && aEmail === sEmail) || a.id === 'demo-1' || a.id === saved.id) {
+              if (sName) a.username = sName;
+              if (saved.avatarUrl !== undefined) a.avatar_url = saved.avatarUrl;
+              break;
+            }
+          }
+          localStorage.setItem('bz_vanilla_demo_admins_v1', JSON.stringify(admins));
+        }
+      }
+    } catch (e) {}
+
+    // Notificar al Dashboard si está montado
+    if (window.BitszoneDashboard && typeof window.BitszoneDashboard.syncSessionUser === 'function') {
+      window.BitszoneDashboard.syncSessionUser(saved);
+    }
+
+    return saved;
   }
 
   // =========================================================================
@@ -551,12 +581,25 @@
           if (label) label.classList.remove('d-none');
           if (spinner) spinner.classList.add('d-none');
 
+          var existingName = 'Admin';
+          var existingAvatar = '';
+          try {
+            var rawPrevSession = localStorage.getItem(STORAGE_SESSION);
+            if (rawPrevSession) {
+              var prevObj = JSON.parse(rawPrevSession);
+              if (prevObj && prevObj.email === emailVal) {
+                if (prevObj.name) existingName = prevObj.name;
+                if (prevObj.avatarUrl) existingAvatar = prevObj.avatarUrl;
+              }
+            }
+          } catch (e) {}
+
           var adminUser = {
             id: isSuper ? 'admin-owner' : 'admin_' + Date.now(),
             email: emailVal,
-            name: 'Admin',
+            name: existingName,
             role: isSuper ? 'superadmin' : 'admin',
-            avatarUrl: ''
+            avatarUrl: existingAvatar
           };
           saveSession(adminUser);
 
