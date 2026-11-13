@@ -5874,8 +5874,8 @@ html, body {
   .bz-detail-viewport { padding-bottom: 0; }
   /* Filas de 64px con 4px de separación: número, título/artista y menú "..." */
   .bz-album-track-row {
-    grid-template-columns: 28px minmax(0, 1fr) 28px;
-    gap: 8px;
+    grid-template-columns: 28px minmax(0, 1fr) auto auto;
+    gap: 4px;
     padding: 9px 8px;
     min-height: 64px;
   }
@@ -5892,7 +5892,11 @@ html, body {
     line-height: 19px;
     margin-top: 3px;
   }
-  .bz-album-track-row .bz-row-hover-actions { display: none !important; }
+  /* Sin hover en móvil: el corazón queda siempre visible; el resto va en el menú "..." */
+  .bz-album-track-row .bz-row-hover-actions { display: inline-flex !important; opacity: 1 !important; }
+  .bz-album-track-row .bz-row-hover-actions [data-row-addpl],
+  .bz-album-track-row .bz-row-hover-actions [data-row-dl] { display: none; }
+  .bz-album-track-row .bz-row-hover-actions [data-row-fav] { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.6); font-size: 1.05rem; }
   .bz-row-more .bz-icon-action { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.6); font-size: 1.125rem; }
   .bz-row-more .dropdown-menu { z-index: 1080; }
 }
@@ -5900,3 +5904,24 @@ html, body {
 
 /* Efecto resorte: el contenido se desplaza con un rebote suave al llegar al tope; se evita el rebote nativo para que no se duplique */
 .bz-main-scroll, #expandedPlayerModal { overscroll-behavior-y: none; }
+
+/* Menús desplegables: cristal translúcido sin contorno, reflejan lo que hay detrás */
+.bz-library-popover-menu,
+.dropdown-menu.bz-library-popover-menu {
+  background: rgba(20, 16, 30, 0.55) !important;
+  border: 0 !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5) !important;
+}
+/* Mini reproductor móvil: cristal plano y sin borde, como la referencia */
+@media (max-width: 991.98px) {
+  #mobMiniCard {
+    background: rgba(18, 14, 26, 0.55);
+    border: 0;
+    border-radius: 16px;
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+}
