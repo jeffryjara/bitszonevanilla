@@ -986,7 +986,8 @@
     }
     if (badge) {
       badge.textContent = String(dlCount);
-      badge.classList.toggle('d-none', dlCount === 0);
+      var isDownloadsView = appState.view === 'downloads';
+      badge.classList.toggle('d-none', dlCount === 0 || isDownloadsView);
     }
   }
 
@@ -2311,6 +2312,14 @@
       btn.classList.toggle('is-active', isAct);
     });
 
+    // Ocultar indicador de descargas al entrar a la sección Mis descargas
+    var dlBadge = document.getElementById('downloadsCountBadge');
+    if (dlBadge) {
+      var isDownloads = viewName === 'downloads';
+      var dlCount = Storage.getDownloads ? Storage.getDownloads().length : 0;
+      dlBadge.classList.toggle('d-none', isDownloads || dlCount === 0);
+    }
+
     // Cerrar offcanvas móvil si estaba abierto
     var offcanvasEl = document.getElementById('mobileOffcanvas');
     if (offcanvasEl && window.bootstrap) {
@@ -3221,9 +3230,9 @@
           '</ul>' +
         '</div>' +
         '<div class="bz-search-pill-wrap">' +
-          '<i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-3 text-white-50 small pe-none"></i>' +
+          '<i class="bi bi-search" style="position: absolute; left: 16px; top: 50%; transform: translateY(-50%); z-index: 10; pointer-events: none; color: rgba(255, 255, 255, 0.55); font-size: 0.88rem;"></i>' +
           '<input id="colSearchInput" type="text" class="bz-search-pill-input" placeholder="' + esc(cfg.searchPlaceholder) + '" value="' + esc(appState[searchKey] || '') + '" />' +
-          (search ? '<button type="button" id="colSearchClear" class="btn btn-link position-absolute top-50 end-0 translate-middle-y text-white-50 p-1 me-1 text-decoration-none"><i class="bi bi-x"></i></button>' : '') +
+          (search ? '<button type="button" id="colSearchClear" class="btn btn-link position-absolute top-50 end-0 translate-middle-y text-white-50 p-1 me-1 text-decoration-none" style="z-index: 10;"><i class="bi bi-x"></i></button>' : '') +
         '</div>' +
       '</div>';
 
@@ -3671,12 +3680,12 @@
 
     if (listEl) {
       listEl.innerHTML = pls.length === 0
-        ? '<p class="text-white-50 small mb-0">No tienes playlists todavía. Crea una abajo rápido:</p>'
+        ? '<div class="text-center py-3 text-white-50 small"><i class="bi bi-music-note-beamed d-block fs-3 mb-2 opacity-50"></i>No tienes playlists todavía. Crea una abajo rápido:</div>'
         : pls.map(function (p) {
             return (
-              '<button type="button" data-pick-pl="' + esc(p.id) + '" class="btn w-100 text-start bz-btn-subtle rounded-3 px-3 py-2 mb-2 d-flex justify-content-between align-items-center">' +
-                '<span><i class="bi bi-music-note-list me-2"></i>' + esc(p.name) + '</span>' +
-                '<span class="badge bg-white bg-opacity-10">' + p.tracks.length + '</span>' +
+              '<button type="button" data-pick-pl="' + esc(p.id) + '" class="btn w-100 text-start bz-ad-pl-btn rounded-pill px-3.5 py-2.5 mb-2 d-flex justify-content-between align-items-center">' +
+                '<span class="text-truncate me-2"><i class="bi bi-music-note-list me-2 text-white-50"></i>' + esc(p.name) + '</span>' +
+                '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz">' + p.tracks.length + '</span>' +
               '</button>'
             );
           }).join('');

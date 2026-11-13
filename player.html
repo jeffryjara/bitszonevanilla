@@ -95,7 +95,7 @@
   <div class="bz-app-frame">
     <!-- Sidebar Desktop -->
     <aside id="bzDesktopSidebar" class="bz-sidebar">
-      <div class="d-flex align-items-center justify-content-between mb-3 px-2" style="height: 44px;">
+      <div class="d-flex align-items-center justify-content-between mb-3 px-2 bz-sidebar-header" style="height: 44px;">
         <div class="bz-brand-group d-flex align-items-center gap-2 overflow-hidden">
           <a href="./index.html" class="text-decoration-none d-flex align-items-center" title="Volver al Landing">
             <span class="fw-bold text-white" style="font-size: 1.25rem; letter-spacing: -0.02em;">Bits<span style="color: rgba(255,255,255,0.52);">zone</span></span>
@@ -149,12 +149,12 @@
         <!-- Separador superior con más espacio antes del almacenamiento -->
         <hr class="border-white border-opacity-10 my-3" />
 
-        <!-- Sección Almacenamiento integrada al sidebar (fiel a Bitszone original: pasa desapercibida, sin fondo gris ni apariencia de botón) -->
+        <!-- Sección Almacenamiento integrada al sidebar (fiel a Bitszone original: pasa desapercibida, visible colapsado y expandido) -->
         <div id="btnSidebarStorage" role="button" tabindex="0" class="bz-storage-details w-100 text-start px-2 py-2" title="Mis descargas y almacenamiento">
-          <div class="d-flex align-items-center justify-content-between mb-2">
+          <div class="d-flex align-items-center justify-content-between mb-2 bz-storage-row">
             <div class="d-flex align-items-center min-w-0">
-              <i class="bi bi-hdd text-white-50 fs-5 flex-shrink-0 me-3" style="width: 24px; text-align: center;"></i>
-              <div class="min-w-0">
+              <i class="bi bi-hdd text-white-50 fs-5 flex-shrink-0 me-3 bz-storage-icon" style="width: 24px; text-align: center;"></i>
+              <div class="min-w-0 bz-storage-text-wrap">
                 <div class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.08em;">Almacenamiento</div>
                 <div id="storageAvailText" style="font-size: 0.76rem; color: rgba(255,255,255,0.7);">
                   <strong class="text-white">5.00 GB</strong> de 5.00 GB
@@ -163,7 +163,7 @@
             </div>
             <i class="bi bi-chevron-right text-white-50 small opacity-40 bz-storage-chevron ms-2 flex-shrink-0"></i>
           </div>
-          <div class="progress rounded-pill" style="height: 4px; background: rgba(255,255,255,0.12);">
+          <div class="progress rounded-pill bz-storage-progress-wrap" style="height: 4px; background: rgba(255,255,255,0.12);">
             <div id="storageProgressBar" class="progress-bar rounded-pill" style="width: 0%; background: linear-gradient(90deg, #60a5fa, #a855f7);"></div>
           </div>
         </div>
@@ -441,17 +441,20 @@
   </div>
 
   <!-- Modal: Atajos de Teclado (Liquid Glass flotante) -->
-  <div class="modal fade bz-modal-glass" id="shortcutsModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
-      <div class="modal-content p-4 position-relative">
+  <div class="modal fade" id="shortcutsModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+      <div class="modal-content bz-ad-card position-relative overflow-hidden p-4 p-md-5">
         <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar">
           <i class="bi bi-x-lg"></i>
         </button>
-        <div class="d-flex align-items-center gap-2 mb-3">
-          <h4 class="font-serif-italic h2 text-white mb-0">Atajos de teclado</h4>
-          <button type="button" id="btnShortcutsToSettings" class="bz-icon-action text-white-50" title="Ir a configuración">
-            <i class="bi bi-sliders"></i>
-          </button>
+        <div class="text-center mb-3">
+          <span class="badge rounded-pill bz-ad-badge mb-2"><i class="bi bi-keyboard me-1.5"></i> Atajos de Teclado</span>
+          <div class="d-flex align-items-center justify-content-center gap-2">
+            <h3 class="font-serif-italic text-white mb-0">Controles Rápidos</h3>
+            <button type="button" id="btnShortcutsToSettings" class="bz-icon-action text-white-50" title="Ir a configuración">
+              <i class="bi bi-sliders"></i>
+            </button>
+          </div>
         </div>
         <div class="d-grid gap-2 small">
           <div class="d-flex align-items-center justify-content-between py-2 border-bottom border-white border-opacity-10">
@@ -617,15 +620,20 @@
   </div>
 
   <!-- Modal: Aviso de Cambios sin Guardar -->
-  <div class="modal fade bz-modal-glass" id="unsavedGuardModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-      <div class="modal-content p-4 text-center">
-        <i class="bi bi-exclamation-triangle fs-2 text-warning mb-2"></i>
-        <h5 class="fw-bold text-white mb-2">Cambios sin guardar</h5>
-        <p id="unsavedModalPrompt" class="small text-white-50 mb-4">Tienes cambios pendientes.</p>
-        <div class="d-grid gap-2">
-          <button id="btnUnsavedSaveExit" type="button" class="btn bz-btn-primary py-2">Guardar y salir</button>
-          <button id="btnUnsavedDiscardExit" type="button" class="btn bz-btn-subtle py-2">Salir sin guardar</button>
+  <div class="modal fade" id="unsavedGuardModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 420px;">
+      <div class="modal-content bz-ad-card position-relative overflow-hidden text-center p-4 p-md-5">
+        <div class="d-flex justify-content-center mb-3">
+          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-exclamation-circle me-1.5 text-warning"></i> Atención</span>
+        </div>
+        <div class="bz-ad-cover-wrap mb-3 d-flex align-items-center justify-content-center">
+          <i class="bi bi-exclamation-triangle-fill text-warning fs-1" style="filter: drop-shadow(0 0 14px rgba(234, 179, 8, 0.45));"></i>
+        </div>
+        <h3 class="font-serif-italic text-white mb-2">Cambios sin guardar</h3>
+        <p id="unsavedModalPrompt" class="text-white-50 small mb-4">Tienes cambios pendientes en tu perfil.</p>
+        <div class="d-flex align-items-center justify-content-center gap-3">
+          <button id="btnUnsavedDiscardExit" type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill">Salir sin guardar</button>
+          <button id="btnUnsavedSaveExit" type="button" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill">Guardar y salir</button>
         </div>
       </div>
     </div>
@@ -667,72 +675,101 @@
   </div>
 
   <!-- Modal: Crear Nueva Playlist -->
-  <div class="modal fade bz-modal-glass" id="createPlaylistModal" data-bs-backdrop="false" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-      <div class="modal-content p-4 position-relative">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
-        <h4 class="font-serif-italic h3 text-white mb-3">Nueva Playlist</h4>
+  <div class="modal fade" id="createPlaylistModal" data-bs-backdrop="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+      <div class="modal-content bz-ad-card position-relative overflow-hidden text-center p-4 p-md-5">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <div class="d-flex justify-content-center mb-3">
+          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-folder-plus me-1.5"></i> Nueva Lista</span>
+        </div>
+        <div class="bz-ad-cover-wrap mb-3 d-flex align-items-center justify-content-center">
+          <i class="bi bi-music-note-list text-white fs-1" style="filter: drop-shadow(0 0 12px rgba(192, 132, 252, 0.45));"></i>
+        </div>
+        <h3 class="font-serif-italic text-white mb-2">Crear Playlist</h3>
+        <p class="text-white-50 small mb-4">Dale un nombre a tu lista para organizar tus canciones favoritas.</p>
         <form id="formCreatePlaylist">
-          <input id="inputNewPlaylistName" type="text" required class="form-control bz-input-dark mb-3" placeholder="Ej. Favoritas de viaje" />
-          <button type="submit" class="btn bz-btn-primary w-100 py-2">Crear lista</button>
+          <input id="inputNewPlaylistName" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 mb-3 text-center" placeholder="Ej. Favoritas de viaje" />
+          <div class="d-flex align-items-center justify-content-center gap-3 pt-1">
+            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill">Crear lista</button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 
   <!-- Modal: Agregar canción a Playlist -->
-  <div class="modal fade bz-modal-glass" id="addToPlaylistModal" data-bs-backdrop="false" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-      <div class="modal-content p-4 position-relative">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
-        <h4 class="font-serif-italic h3 text-white mb-3">Añadir a Playlist</h4>
-        <div id="addToPlaylistBody" class="mb-3"></div>
-        <form id="formQuickCreatePlaylist" class="border-top border-white border-opacity-10 pt-3 d-flex gap-2">
-          <input id="inputQuickPlaylistName" type="text" required class="form-control bz-input-dark form-control-sm" placeholder="Nueva playlist..." />
-          <button type="submit" class="btn bz-btn-primary btn-sm px-3 flex-shrink-0"><i class="bi bi-plus-lg"></i></button>
+  <div class="modal fade" id="addToPlaylistModal" data-bs-backdrop="false" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+      <div class="modal-content bz-ad-card position-relative overflow-hidden p-4 p-md-5">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <div class="text-center mb-3">
+          <span class="badge rounded-pill bz-ad-badge mb-2"><i class="bi bi-music-note-list me-1.5"></i> Playlists</span>
+          <h3 class="font-serif-italic text-white mb-1">Añadir a Playlist</h3>
+          <p class="text-white-50 small mb-0">Elige una lista o crea una nueva al instante.</p>
+        </div>
+        <div id="addToPlaylistBody" class="my-3" style="max-height: 220px; overflow-y: auto;"></div>
+        <form id="formQuickCreatePlaylist" class="border-top border-white border-opacity-10 pt-3 d-flex gap-2 align-items-center">
+          <input id="inputQuickPlaylistName" type="text" required class="form-control bz-input-dark rounded-pill px-3 py-2 text-start flex-grow-1" placeholder="Nueva playlist..." style="font-size: 0.88rem;" />
+          <button type="submit" class="btn bz-ad-btn-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 shadow-sm" style="width: 40px; height: 40px; padding: 0;" title="Crear y añadir"><i class="bi bi-plus-lg"></i></button>
         </form>
       </div>
     </div>
   </div>
 
   <!-- Modales del Dashboard Admin Demo -->
-  <div class="modal fade bz-modal-glass" id="addAdminModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content p-4 position-relative">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
-        <h4 class="font-serif-italic h3 text-white mb-2">Agregar Administrador (Demo)</h4>
-        <p class="small text-white-50 mb-3">Añade una cuenta administrativa dentro de la tabla demostrativa.</p>
+  <div class="modal fade" id="addAdminModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px;">
+      <div class="modal-content bz-ad-card position-relative overflow-hidden text-center p-4 p-md-5">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <div class="d-flex justify-content-center mb-3">
+          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-shield-lock me-1.5"></i> Administrador Demo</span>
+        </div>
+        <h3 class="font-serif-italic text-white mb-2">Agregar Administrador</h3>
+        <p class="small text-white-50 mb-4">Añade una cuenta administrativa dentro de la tabla demostrativa.</p>
         <form id="formAddDemoAdmin" class="d-grid gap-3">
-          <input id="inputAddAdminEmail" type="text" required class="form-control bz-input-dark" placeholder="ej. colaborador@bitszone.app" />
-          <button type="submit" class="btn bz-btn-primary py-2">Asignar como Admin</button>
+          <input id="inputAddAdminEmail" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 text-center" placeholder="ej. colaborador@bitszone.app" />
+          <div class="d-flex align-items-center justify-content-center gap-3 pt-1">
+            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill">Asignar Admin</button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 
-  <div class="modal fade bz-modal-glass" id="releaseDemoModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content p-4 position-relative">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
-        <h4 class="font-serif-italic h3 text-white mb-2">Registrar Lanzamiento (Demo)</h4>
-        <p class="small text-white-50 mb-3">Agrega un álbum demostrativo temporal al catálogo actual.</p>
+  <div class="modal fade" id="releaseDemoModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 460px;">
+      <div class="modal-content bz-ad-card position-relative overflow-hidden text-center p-4 p-md-5">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <div class="d-flex justify-content-center mb-3">
+          <span class="badge rounded-pill bz-ad-badge"><i class="bi bi-disc me-1.5"></i> Catálogo Demo</span>
+        </div>
+        <h3 class="font-serif-italic text-white mb-2">Registrar Lanzamiento</h3>
+        <p class="small text-white-50 mb-4">Agrega un álbum demostrativo temporal al catálogo actual.</p>
         <form id="formReleaseDemo" class="d-grid gap-3">
-          <input id="relTitleInput" type="text" required class="form-control bz-input-dark" placeholder="Título del álbum o pista" />
-          <input id="relArtistInput" type="text" required class="form-control bz-input-dark" placeholder="Artista o grupo" />
-          <button type="submit" class="btn bz-btn-primary py-2">Agregar al catálogo Demo</button>
+          <input id="relTitleInput" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 text-center" placeholder="Título del álbum o pista" />
+          <input id="relArtistInput" type="text" required class="form-control bz-input-dark rounded-pill px-4 py-2.5 text-center" placeholder="Artista o grupo" />
+          <div class="d-flex align-items-center justify-content-center gap-3 pt-1">
+            <button type="button" class="btn bz-ad-btn-skip py-2.5 px-4 rounded-pill flex-fill" data-bs-dismiss="modal">Cancelar</button>
+            <button type="submit" class="btn bz-ad-btn-primary py-2.5 px-4 rounded-pill shadow-sm flex-fill">Agregar</button>
+          </div>
         </form>
       </div>
     </div>
   </div>
 
-  <div class="modal fade bz-modal-glass" id="catalogDiagModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content p-4 position-relative">
-        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
-        <h4 class="font-serif-italic h3 text-white mb-3">Estado del Catálogo</h4>
-        <div id="catalogDiagBody" class="mb-3"></div>
-        <div class="text-end">
-          <button type="button" class="btn bz-btn-primary px-4 py-2" data-bs-dismiss="modal">Cerrar</button>
+  <div class="modal fade" id="catalogDiagModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 480px;">
+      <div class="modal-content bz-ad-card position-relative overflow-hidden p-4 p-md-5">
+        <button type="button" class="bz-modal-close-float" data-bs-dismiss="modal" aria-label="Cerrar"><i class="bi bi-x-lg"></i></button>
+        <div class="text-center mb-3">
+          <span class="badge rounded-pill bz-ad-badge mb-2"><i class="bi bi-activity me-1.5"></i> Diagnóstico</span>
+          <h3 class="font-serif-italic text-white mb-1">Estado del Catálogo</h3>
+        </div>
+        <div id="catalogDiagBody" class="mb-4"></div>
+        <div class="text-center">
+          <button type="button" class="btn bz-ad-btn-primary rounded-pill px-5 py-2.5 shadow-sm" data-bs-dismiss="modal">Entendido</button>
         </div>
       </div>
     </div>

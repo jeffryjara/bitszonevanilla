@@ -1797,11 +1797,73 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
 
 .bz-sidebar.is-collapsed .bz-nav-label,
 .bz-sidebar.is-collapsed .bz-brand-group,
-.bz-sidebar.is-collapsed .bz-storage-details {
-  opacity: 0;
-  width: 0;
-  overflow: hidden;
-  pointer-events: none;
+.bz-sidebar.is-collapsed .bz-storage-text-wrap,
+.bz-sidebar.is-collapsed .bz-storage-chevron,
+.bz-sidebar.is-collapsed .bz-storage-progress-wrap {
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+.bz-sidebar.is-collapsed .bz-sidebar-header {
+  padding: 0 !important;
+  justify-content: center !important;
+}
+
+.bz-sidebar.is-collapsed .bz-nav-btn {
+  padding: 0 !important;
+  justify-content: center !important;
+}
+
+.bz-sidebar.is-collapsed .bz-nav-btn span.d-flex {
+  gap: 0 !important;
+  justify-content: center !important;
+}
+
+.bz-sidebar.is-collapsed .bz-nav-btn > i,
+.bz-sidebar.is-collapsed .bz-nav-btn span.d-flex > i,
+.bz-sidebar.is-collapsed .bz-nav-btn #sidebarAvatarBox {
+  margin: 0 !important;
+}
+
+.bz-sidebar.is-collapsed hr {
+  width: 36px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bz-sidebar.is-collapsed #btnSidebarStorage {
+  padding: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  height: 41px;
+  border-radius: 0.7rem;
+}
+
+.bz-sidebar.is-collapsed #btnSidebarStorage .bz-storage-row {
+  margin-bottom: 0 !important;
+  justify-content: center !important;
+  width: 100%;
+}
+
+.bz-sidebar.is-collapsed #btnSidebarStorage .bz-storage-row > div {
+  justify-content: center !important;
+  width: 100%;
+}
+
+.bz-sidebar.is-collapsed #btnSidebarStorage .bz-storage-icon {
+  margin-right: 0 !important;
+  width: 24px;
+  text-align: center;
+}
+
+.bz-sidebar.is-collapsed #btnSidebarStorage:hover {
+  background: rgba(255, 255, 255, 0.055) !important;
 }
 
 .bz-storage-details {
@@ -1811,7 +1873,7 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   box-shadow: none !important;
   cursor: pointer;
   border-radius: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
   user-select: none;
 }
 .bz-storage-details:hover {
@@ -1858,6 +1920,18 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   white-space: nowrap;
   transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
   cursor: pointer;
+}
+
+.bz-nav-btn > i,
+.bz-nav-btn span.d-flex > i,
+.bz-nav-btn #sidebarAvatarBox {
+  width: 24px;
+  min-width: 24px;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .bz-nav-btn:hover {
@@ -2325,14 +2399,27 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   position: relative;
   width: 295px;
   max-width: 100%;
+  display: inline-flex;
+  align-items: center;
+}
+
+.bz-search-pill-wrap i.bi-search {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  pointer-events: none;
+  color: rgba(255, 255, 255, 0.55);
+  font-size: 0.88rem;
 }
 
 .bz-search-pill-input {
   width: 100%;
   height: 38px;
-  padding: 0 2.2rem 0 2.5rem;
+  padding: 0 2.2rem 0 2.65rem !important;
   border-radius: 999px;
-  border: 1px solid transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.075);
   backdrop-filter: blur(18px);
   color: #ffffff;
@@ -3200,22 +3287,35 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   font-weight: 600;
 }
 
-/* Modales Bootstrap en Liquid Glass */
-.bz-modal-glass .modal-content {
-  background: rgba(14, 10, 24, 0.9);
-  color: #ffffff;
-  border: 1px solid rgba(216, 180, 254, 0.22);
-  border-radius: 1.5rem;
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
-  box-shadow: 0 32px 80px rgba(0, 0, 0, 0.82), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+/* Modales Bootstrap en Liquid Glass Obsidian */
+.bz-modal-glass .modal-content,
+.modal-content.bz-ad-card,
+.bz-ad-modal .modal-content.bz-ad-card,
+#authRequiredModal .modal-content.bz-ad-card,
+#confirmActionModal .modal-content.bz-ad-card,
+#addToPlaylistModal .modal-content,
+#createPlaylistModal .modal-content,
+#shortcutsModal .modal-content,
+#unsavedGuardModal .modal-content {
+  border-radius: 32px !important;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 65%),
+              linear-gradient(180deg, rgba(22, 22, 26, 0.96) 0%, rgba(10, 10, 12, 0.98) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  backdrop-filter: blur(40px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(40px) saturate(160%) !important;
+  box-shadow: 0 35px 90px rgba(0, 0, 0, 0.85),
+              0 0 0 1px rgba(255, 255, 255, 0.05),
+              inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
   overflow: hidden;
+  color: #ffffff;
 }
 
 #addToPlaylistModal,
 #createPlaylistModal,
 #authRequiredModal,
-#confirmActionModal {
+#confirmActionModal,
+#shortcutsModal,
+#unsavedGuardModal {
   z-index: 1090;
   background: rgba(5, 5, 10, 0.65);
   backdrop-filter: blur(12px);
@@ -3224,9 +3324,9 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
 
 .bz-modal-close-float {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  z-index: 25;
+  top: 1.25rem;
+  right: 1.25rem;
+  z-index: 30;
   width: 36px;
   height: 36px;
   border-radius: 50%;
@@ -3237,11 +3337,29 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
 .bz-modal-close-float:hover {
   background: rgba(255, 255, 255, 0.18);
   color: #ffffff;
+  transform: scale(1.06);
+}
+
+.bz-ad-pl-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  transition: all 0.2s ease;
+}
+.bz-ad-pl-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.22);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+#downloadsCountBadge {
+  transition: opacity 0.25s ease, transform 0.25s ease;
 }
 
 /* Bloqueo estricto de scroll e interacción exterior durante el anuncio */
