@@ -4579,6 +4579,31 @@
       }, { passive: true });
     })();
 
+    // Hoja inferior del reproductor expandido (móvil): tocar o arrastrar la pestañita la abre / cierra
+    (function () {
+      var modal = document.getElementById('expandedPlayerModal');
+      var sheet = modal && modal.querySelector('.bz-exp-right-col');
+      if (!sheet) return;
+      var y0 = null, onHandle = false;
+      function mobile() { return window.innerWidth < 992; }
+      function setOpen(v) { modal.classList.toggle('is-sheet-open', v); }
+      sheet.addEventListener('pointerdown', function (e) {
+        if (!mobile()) return;
+        var top = sheet.getBoundingClientRect().top;
+        onHandle = e.clientY - top < 48 || !modal.classList.contains('is-sheet-open');
+        y0 = onHandle ? e.clientY : null;
+      });
+      window.addEventListener('pointerup', function (e) {
+        if (y0 === null) return;
+        var dy = e.clientY - y0;
+        y0 = null;
+        if (Math.abs(dy) < 8) setOpen(!modal.classList.contains('is-sheet-open'));
+        else setOpen(dy < 0);
+      });
+      window.addEventListener('pointercancel', function () { y0 = null; });
+      modal.addEventListener('hidden.bs.modal', function () { setOpen(false); });
+    })();
+
     // Barra inferior líquida: el selector se desliza (con efecto de estiramiento) hacia la pestaña activa
     (function () {
       var pill = document.getElementById('bzTabbarPill');

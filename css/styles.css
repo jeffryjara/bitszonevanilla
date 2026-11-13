@@ -5997,6 +5997,265 @@ html, body {
 @media (max-width: 991.98px) {
   #expandedPlayerModal .modal-body > .container-fluid { padding-left: 34px !important; padding-right: 34px !important; }
   #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { min-height: calc(100dvh - 2rem); position: relative; padding-bottom: 34px; justify-content: center; }
+  .bz-cover-vinyl-stage { display: block; margin: 2.75rem auto 1.25rem; }
+  .bz-exp-cover-frame { margin: 0 auto; }
+}
+@media (max-width: 767.98px) {
+  /* Cola: botones más compactos para dejar espacio al título */
+  .bz-exp-track-item .bz-exp-row-actions { gap: 0 !important; }
+  .bz-exp-track-item .bz-exp-row-actions .bz-icon-action { width: 28px; height: 28px; padding: 0; }
+}
+@media (max-width: 767.98px) {
+  /* Biblioteca / Descargas: cabecera alineada a la izquierda y barra compacta, como la referencia */
+  .bz-library-dropdown-btn { text-align: left; }
+  .bz-hero-stat-pill { font-size: 0.7rem; padding: 0.24rem 0.6rem; }
+  .bz-toolbar-row .bz-segmented-pill { height: 34px; }
+  .bz-toolbar-row .bz-segmented-btn { font-size: 0.6875rem; padding: 0 0.85rem; }
+  .bz-search-pill-wrap { width: 100%; }
+  .bz-search-pill-wrap > .bi-search { z-index: 2; }
+  .bz-section-empty h3 { font-size: 1.1rem; }
+}
+@media (max-width: 767.98px) {
+  /* Inicio igual a la referencia: márgenes que crecen con el ancho (16px a 375px, 37px a 560px),
+     tarjetas al 40% de la fila, artistas al 34% y separación de 11px */
+  .bz-main-scroll {
+    padding-left: clamp(12px, calc(11.35vw - 30.6px), 40px);
+    padding-right: clamp(12px, calc(11.35vw - 30.6px), 40px);
+  }
+  .bz-horiz-row { gap: 11px; }
+  .bz-catalog-card { width: 40%; }
+  .bz-artist-card { width: 34%; }
+  .bz-main-scroll section h2.h4 { font-size: 1.0625rem; }
+}
+@media (max-width: 767.98px) {
+  /* Ajuste fino: 180px a 375px y 193px a 560px (tarjetas); 150px y 165px (artistas), igual que la referencia */
+  .bz-catalog-card { width: calc(7vw + 154px); }
+  .bz-artist-card { width: calc(8.1vw + 120px); }
+}
+@media (max-width: 575.98px) {
+  /* Biblioteca / Descargas como la referencia: pestañas y "Ordenar" compactos a la izquierda, solo el buscador a todo el ancho */
+  .bz-toolbar-row { flex-direction: row; flex-wrap: wrap; align-items: center; }
+  .bz-toolbar-row .bz-segmented-pill { width: auto; justify-content: flex-start; }
+  .bz-toolbar-row .bz-segmented-btn { flex: 0 0 auto; }
+  .bz-toolbar-row > .dropdown { flex: 0 0 auto; }
+  .bz-toolbar-row .bz-sort-pill { width: auto; justify-content: flex-start; }
+  .bz-toolbar-row .bz-search-pill-wrap { flex: 1 0 100%; }
+  .bz-section-hero { flex-direction: row; align-items: center; }
+}
+
+/* Modo claro (agregado por el equipo): versiones claras de la barra inferior y el mini reproductor móviles */
+@media (max-width: 991.98px) {
+  /* El cajón cerrado no deja ver su sombra/borde en el filo derecho */
+  .bz-sidebar { visibility: hidden; transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), visibility 0s linear 0.32s; }
+  body.bz-drawer-open .bz-sidebar { visibility: visible; transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1), visibility 0s; }
+
+  body.bz-theme-light .bz-tabbar-pill {
+    background: rgba(255, 255, 255, 0.78);
+    border-color: rgba(15, 10, 30, 0.1);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 12px 30px rgba(15, 10, 30, 0.14);
+  }
+  body.bz-theme-light .bz-tab-selector {
+    background: rgba(124, 58, 237, 0.12);
+    border-color: rgba(124, 58, 237, 0.22);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 4px 14px rgba(124, 58, 237, 0.15);
+  }
+  body.bz-theme-light .bz-tab-btn,
+  body.bz-theme-light .bz-tab-btn i { color: rgba(15, 10, 30, 0.6); }
+  body.bz-theme-light .bz-tab-btn.is-active,
+  body.bz-theme-light.bz-drawer-open .bz-tab-btn.is-menu-on { color: #1a1033; }
+  body.bz-theme-light .bz-tab-btn.is-active i,
+  body.bz-theme-light.bz-drawer-open .bz-tab-btn.is-menu-on i { color: #6d28d9; }
+  body.bz-theme-light #mobMiniCard {
+    background: rgba(255, 255, 255, 0.95);
+    border-color: rgba(15, 10, 30, 0.1);
+    box-shadow: 0 12px 30px rgba(15, 10, 30, 0.14);
+  }
+  body.bz-theme-light #mobMiniCard .text-white,
+  body.bz-theme-light #mobMiniFavBtn,
+  body.bz-theme-light #mobMiniNextBtn { color: #1a1033 !important; }
+  body.bz-theme-light #mobMiniCard .text-white-50 { color: rgba(15, 10, 30, 0.6) !important; }
+  body.bz-theme-light #mobMiniPlayBtn { background: #1a1033; color: #fff; border-color: #1a1033; }
+}
+@media (max-width: 767.98px) {
+  /* Inicio según las capturas del original: 180px (375px) → 210px (~545px) en tarjetas,
+     150px → 180px en artistas, margen 16px → 20px y secciones un poco más juntas */
+  .bz-main-scroll {
+    padding-left: calc(2.38vw + 3px);
+    padding-right: calc(2.38vw + 3px);
+  }
+  .bz-horiz-row { gap: 12px; }
+  .bz-catalog-card { width: calc(17.86vw + 113px); }
+  .bz-artist-card { width: calc(17.86vw + 83px); }
+  .bz-main-scroll #bzMainStage > section.mb-5,
+  .bz-main-scroll #bzMainStage section.mb-5 { margin-bottom: 2.1rem !important; }
+}
+
+
+/* ==========================================================================
+   Vista de álbum en móvil — medidas del Bitszone original (561px y 375px)
+   ========================================================================== */
+@media (max-width: 767.98px) {
+  /* Filas a 16px de cada borde, sin importar el margen del escenario */
+  .bz-detail-viewport {
+    margin-left: calc(9px - 2.38vw);
+    margin-right: calc(9px - 2.38vw);
+    padding: 29px 0 1rem;
+    min-height: 0;
+  }
+  .bz-detail-split { padding: 0; }
+  /* Botón atrás flotando sobre la esquina, la portada sube */
+  .bz-detail-back-pin { position: absolute; top: 13px; left: 11px; margin: 0; z-index: 25; }
+  .bz-detail-back-pin button { width: 40px; height: 40px; }
+  .bz-album-cover-wrap { margin-bottom: 16px; }
+  .bz-album-cover-box { width: min(63.5vw, 260px); }
+  /* Dock de cristal: 62px de alto, botones de 48px, ancho según su contenido */
+  .bz-album-action-dock {
+    display: flex;
+    width: fit-content;
+    margin: 20px auto 0;
+    padding: 7px;
+    gap: 2px;
+  }
+  .bz-album-action-dock .bz-album-play-pill {
+    flex: none;
+    height: 48px;
+    padding: 0 22px 0 18px;
+    font-size: 0.875rem;
+  }
+  .bz-album-dock-btn { width: 48px; height: 48px; }
+  /* Título grande y bloque de datos */
+  .bz-detail-viewport span.text-uppercase.d-block { font-size: 0.75rem !important; letter-spacing: 0.25em !important; margin-bottom: 8px !important; }
+  .bz-detail-viewport h1 { font-size: 2.25rem !important; line-height: 1.2 !important; letter-spacing: -0.025em !important; margin-bottom: 12px !important; }
+  .bz-detail-split > .row > .col-lg-7 { margin-top: 25px; }
+  .bz-album-tracklist-scroll { padding: 0; }
+  .bz-detail-viewport { padding-bottom: 0; }
+  /* Filas de 64px con 4px de separación: número, título/artista y menú "..." */
+  .bz-album-track-row {
+    grid-template-columns: 28px minmax(0, 1fr) auto auto;
+    gap: 4px;
+    padding: 9px 8px;
+    min-height: 64px;
+  }
+  .bz-album-track-row + .bz-album-track-row { margin-top: 4px; }
+  .bz-row-idx-wrap { width: 28px; }
+  .bz-row-idx-wrap .bz-row-idx-num { font-size: 1rem; font-weight: 500; color: rgba(255, 255, 255, 0.5); }
+  .bz-album-track-row .fw-semibold.text-white {
+    font-size: 0.9375rem !important;
+    font-weight: 500 !important;
+    line-height: 22px;
+  }
+  .bz-album-track-row .text-white-50.text-truncate {
+    font-size: 0.8125rem !important;
+    line-height: 19px;
+    margin-top: 3px;
+  }
+  /* Sin hover en móvil: el corazón queda siempre visible; el resto va en el menú "..." */
+  .bz-album-track-row .bz-row-hover-actions { display: inline-flex !important; opacity: 1 !important; }
+  .bz-album-track-row .bz-row-hover-actions [data-row-addpl],
+  .bz-album-track-row .bz-row-hover-actions [data-row-dl] { display: none; }
+  .bz-album-track-row .bz-row-hover-actions [data-row-fav] { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.6); font-size: 1.05rem; }
+  .bz-row-more .bz-icon-action { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.6); font-size: 1.125rem; }
+  .bz-row-more .dropdown-menu { z-index: 1080; }
+}
+
+
+/* Efecto resorte: el contenido se desplaza con un rebote suave al llegar al tope; se evita el rebote nativo para que no se duplique */
+.bz-main-scroll, #expandedPlayerModal { overscroll-behavior-y: none; }
+
+/* Menús desplegables: cristal translúcido sin contorno, reflejan lo que hay detrás */
+.bz-library-popover-menu,
+.dropdown-menu.bz-library-popover-menu {
+  background: rgba(20, 16, 30, 0.55) !important;
+  border: 0 !important;
+  backdrop-filter: blur(28px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(180%) !important;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.5) !important;
+}
+/* Mini reproductor móvil: cristal plano y sin borde, como la referencia */
+@media (max-width: 991.98px) {
+  #mobMiniCard {
+    background: rgba(18, 14, 26, 0.55);
+    border: 0;
+    border-radius: 16px;
+    backdrop-filter: blur(28px) saturate(180%);
+    -webkit-backdrop-filter: blur(28px) saturate(180%);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+}
+
+/* Menús: cristal muy difuminado que toma el color del álbum / fondo ambiental de detrás */
+.bz-library-popover-menu,
+.dropdown-menu.bz-library-popover-menu {
+  background: rgba(14, 10, 24, 0.34) !important;
+  backdrop-filter: blur(44px) saturate(210%) brightness(0.9) !important;
+  -webkit-backdrop-filter: blur(44px) saturate(210%) brightness(0.9) !important;
+}
+
+/* Vista de álbum en escritorio: vinilo que gira al sonar, filas más amplias como el original */
+@media (min-width: 992px) {
+  .bz-vinyl {
+    position: absolute;
+    top: 5%;
+    left: 28%;
+    width: 90%;
+    height: 90%;
+    border-radius: 50%;
+    z-index: -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+      repeating-radial-gradient(circle, rgba(255, 255, 255, 0.06) 0 1px, rgba(0, 0, 0, 0.92) 2px 5px),
+      #0a0a0a;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateX(-30%) scale(0.9);
+    transition: opacity 0.6s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .bz-vinyl::after { /* reflejo del disco */
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 20deg, transparent 0 20%, rgba(255, 255, 255, 0.1) 25%, transparent 30% 70%, rgba(255, 255, 255, 0.1) 75%, transparent 80%);
+  }
+  .bz-vinyl-label {
+    width: 34%;
+    height: 34%;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 0 0 5px #050505, inset 0 0 0 2px rgba(0, 0, 0, 0.5);
+  }
+  .bz-vinyl-on .bz-vinyl {
+    opacity: 1;
+    transform: none;
+    animation: bz-vinyl-spin 4s linear infinite;
+  }
+  @keyframes bz-vinyl-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .bz-vinyl-on .bz-vinyl { animation: none; } }
+  .bz-album-track-row { padding: 1rem 1.6rem; gap: 1.1rem; }
+  .bz-album-track-row + .bz-album-track-row { margin-top: 0.15rem; }
+  .bz-album-track-row .fw-semibold.text-white { font-size: 1.1rem !important; }
+  .bz-album-track-row .text-white-50.text-truncate { font-size: 0.875rem !important; }
+  .bz-album-track-row > .d-flex > .font-mono-bz { font-family: inherit; font-size: 0.9rem !important; }
+}
+@media (max-width: 991.98px) { .bz-vinyl { display: none; } }
+
+/* Inicio en escritorio: medidas del Bitszone original a 1918px (tarjetas 256px, artistas 224px, separación 24px) */
+@media (min-width: 1200px) {
+  .bz-main-scroll { padding: 1.45rem 2rem 2.5rem 2.05rem; }
+  .bz-main-scroll #bzMainStage { padding-left: 0; padding-right: 0; }
+  .bz-horiz-row { gap: 24px; }
+  .bz-catalog-card { width: clamp(214px, 13.35vw, 256px); }
+  .bz-artist-card { width: clamp(204px, 11.68vw, 224px); }
+}
+
+/* Reproductor expandido en móvil: una sola pantalla como el original (sin volumen ni dock, controles a lo ancho) */
+@media (max-width: 991.98px) {
+  #expandedPlayerModal .modal-body > .container-fluid { padding-left: 34px !important; padding-right: 34px !important; }
+  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { min-height: calc(100dvh - 2rem); position: relative; padding-bottom: 34px; justify-content: center; }
   #expandedPlayerModal .modal-body .row > .col-lg-6:first-child::after {
     content: ""; position: absolute; left: 50%; bottom: 10px; width: 44px; height: 5px;
     margin-left: -22px; border-radius: 999px; background: rgba(255, 255, 255, 0.35);
@@ -6007,10 +6266,34 @@ html, body {
   #expDurationTime .badge { display: none; }
   /* Barra con los tiempos a los lados */
   .bz-exp-seekwrap { display: grid; grid-template-columns: auto 1fr auto; align-items: center; column-gap: 12px; max-width: none !important; }
-  .bz-exp-seekwrap .bz-exp-times { display: contents; }
-  .bz-exp-seekwrap #expCurrentTime { order: 1; }
-  .bz-exp-seekwrap #expSeekArea { order: 2; margin: 0 !important; }
-  .bz-exp-seekwrap #expDurationTime { order: 3; }
+  .bz-exp-seekwrap > div:not(#expSeekArea) { display: contents !important; }
+  .bz-exp-seekwrap #expCurrentTime { grid-area: 1 / 1; }
+  .bz-exp-seekwrap #expSeekArea { grid-area: 1 / 2; margin: 0 !important; }
+  .bz-exp-seekwrap #expDurationTime { grid-area: 1 / 3; white-space: nowrap; }
   .bz-exp-seekwrap .bz-exp-times span { font-family: inherit; font-size: 0.8125rem; font-weight: 600; margin: 0; }
   .bz-exp-controls { width: 100%; justify-content: space-between !important; }
+}
+
+/* Pestañita inferior: la lista (pistas / letras / cola) es una hoja que asoma y se abre al tocar o arrastrar */
+@media (max-width: 991.98px) {
+  .bz-exp-right-col {
+    position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+    height: 86dvh; min-height: 0; max-height: none !important;
+    padding: 28px 16px 12px !important;
+    border-radius: 28px 28px 0 0;
+    background: rgba(20, 16, 30, 0.6);
+    backdrop-filter: blur(32px) saturate(170%);
+    -webkit-backdrop-filter: blur(32px) saturate(170%);
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transform: translateY(calc(100% - 34px));
+    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+    touch-action: none;
+  }
+  .bz-exp-right-col::before {
+    content: ""; position: absolute; top: 11px; left: 50%; width: 44px; height: 5px;
+    margin-left: -22px; border-radius: 999px; background: rgba(255, 255, 255, 0.4);
+  }
+  .bz-exp-modal.is-sheet-open .bz-exp-right-col { transform: none; }
+  .bz-exp-right-col .bz-exp-right-scroll { touch-action: pan-y; }
+  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { padding-bottom: 48px; }
 }
