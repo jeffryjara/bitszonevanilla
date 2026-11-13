@@ -5983,3 +5983,12 @@ html, body {
   .bz-album-track-row > .d-flex > .font-mono-bz { font-family: inherit; font-size: 0.9rem !important; }
 }
 @media (max-width: 991.98px) { .bz-vinyl { display: none; } }
+
+/* Inicio en escritorio: medidas del Bitszone original a 1918px (tarjetas 256px, artistas 224px, separación 24px) */
+@media (min-width: 1200px) {
+  .bz-main-scroll { padding: 1.45rem 2rem 2.5rem 2.05rem; }
+  .bz-main-scroll #bzMainStage { padding-left: 0; padding-right: 0; }
+  .bz-horiz-row { gap: 24px; }
+  .bz-catalog-card { width: clamp(214px, 13.35vw, 256px); }
+  .bz-artist-card { width: clamp(204px, 11.68vw, 224px); }
+}
