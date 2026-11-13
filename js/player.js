@@ -69,26 +69,26 @@
     {
       badge: 'Bitszone Premium',
       title: 'Música sin límites',
-      desc: 'Escucha canciones completas sin límites de 30 segundos ni anuncios.',
+      desc: 'Escucha canciones completas sin límites de 30 segundos, sin pausas y con la máxima fidelidad.',
       image: './assets/img/bitszone-icon.png'
     },
     {
-      badge: 'SoundWave Audio',
-      title: 'Audio Espacial Hi-Res',
-      desc: 'Disfruta la máxima fidelidad en todas tus pistas favoritas.',
-      image: './assets/img/albums/meteora.jpg'
+      badge: 'Audio Lossless Hi-Fi',
+      title: 'Fidelidad de estudio 320 kbps',
+      desc: 'Descubre cada detalle y matiz acústico con la mejor resolución sonora al iniciar tu sesión gratis.',
+      image: './assets/img/albums/hybrid-theory.jpg'
     },
     {
-      badge: 'CyberGroove 2026',
-      title: 'Festival en Vivo',
-      desc: 'Más de 40 artistas internacionales. Entradas ya disponibles.',
-      image: './assets/img/albums/calm.jpg'
+      badge: 'Bitszone Cloud',
+      title: 'Tus listas sincronizadas',
+      desc: 'Crea playlists ilimitadas, guarda tus favoritos y continúa escuchando en todos tus dispositivos.',
+      image: './assets/img/acceder-image.png'
     },
     {
-      badge: 'Bitszone Offline',
-      title: 'Música sin conexión',
-      desc: 'Crea tu cuenta gratis para descargar y escuchar sin internet.',
-      image: './assets/img/albums/thriller.jpg'
+      badge: 'Modo Offline',
+      title: 'Tu música a donde vayas',
+      desc: 'Accede sin interrupciones ni consumo innecesario de tus datos móviles con una cuenta gratuita.',
+      image: './assets/img/bitszone-icon.png'
     }
   ];
 
@@ -193,10 +193,16 @@
     var barEl = document.getElementById('adProgressBar');
     var skipBtn = document.getElementById('btnSkipAd');
 
-    if (badgeEl) badgeEl.innerHTML = '<i class="bi bi-badge-ad me-1"></i> ' + esc(sponsor.badge);
+    if (badgeEl) badgeEl.innerHTML = '<i class="bi bi-stars me-1 text-white-50"></i> ' + esc(sponsor.badge);
     if (titleEl) titleEl.textContent = sponsor.title;
     if (descEl) descEl.textContent = sponsor.desc;
-    if (imgEl) imgEl.src = sponsor.image;
+    if (imgEl) {
+      imgEl.onerror = function () {
+        this.onerror = null;
+        this.src = './assets/img/bitszone-icon.png';
+      };
+      imgEl.src = sponsor.image || './assets/img/bitszone-icon.png';
+    }
     if (secLeftEl) secLeftEl.textContent = '15s';
 
     if (barEl) {

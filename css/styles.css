@@ -2484,64 +2484,138 @@ body.bz-ad-locked #expandedPlayerModal {
   pointer-events: none !important;
 }
 
-.bz-ad-modal .modal-content {
-  border-radius: 28px;
-  background: radial-gradient(circle at 50% 0%, rgba(168, 85, 247, 0.22), transparent 75%),
-              rgba(15, 8, 28, 0.96);
-  border: 1px solid rgba(192, 132, 252, 0.35);
-  backdrop-filter: blur(32px);
-  -webkit-backdrop-filter: blur(32px);
-  box-shadow: 0 25px 70px rgba(0, 0, 0, 0.9), 0 0 45px rgba(168, 85, 247, 0.32);
+/* Tarjeta Obsidian Liquid Glass: sobria, elegante, monocromática con micro-relieves */
+.bz-ad-modal .modal-content.bz-ad-card {
+  border-radius: 32px;
+  background: radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08) 0%, transparent 65%),
+              linear-gradient(180deg, rgba(22, 22, 26, 0.96) 0%, rgba(10, 10, 12, 0.98) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(40px) saturate(160%);
+  -webkit-backdrop-filter: blur(40px) saturate(160%);
+  box-shadow: 0 35px 90px rgba(0, 0, 0, 0.85),
+              0 0 0 1px rgba(255, 255, 255, 0.05),
+              inset 0 1px 0 rgba(255, 255, 255, 0.18);
   pointer-events: auto !important;
 }
 
+/* Barra de progreso sutil y limpia */
 .bz-ad-progress-track {
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: rgba(255, 255, 255, 0.12);
+  height: 3px;
+  background: rgba(255, 255, 255, 0.08);
   overflow: hidden;
 }
 
 .bz-ad-progress-bar {
   height: 100%;
   width: 0%;
-  background: linear-gradient(90deg, #a855f7, #f472b6, #c084fc);
-  box-shadow: 0 0 12px rgba(168, 85, 247, 0.9);
+  background: #ffffff;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.7);
 }
 
+/* Kicker Badge minimalista */
 .bz-ad-badge {
-  background: rgba(168, 85, 247, 0.25);
-  color: #e9d5ff;
-  border: 1px solid rgba(192, 132, 252, 0.45);
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   font-size: 0.72rem;
-  letter-spacing: 0.05em;
-  padding: 0.38em 0.85em;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.35rem 0.8rem;
 }
 
+/* Contador de segundos discreto */
+.bz-ad-countdown-pill {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Contenedor del ícono central: más amplio, marco elegante con micro-borde */
 .bz-ad-cover-wrap {
-  width: 86px;
-  height: 86px;
+  width: 96px;
+  height: 96px;
   margin: 0 auto;
-  border-radius: 20px;
+  border-radius: 24px;
   overflow: hidden;
   position: relative;
-  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.6), 0 0 28px rgba(168, 85, 247, 0.4);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55),
+              inset 0 1px 0 rgba(255, 255, 255, 0.22);
 }
 
 .bz-ad-cover-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
 .bz-ad-cover-sheen {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, transparent 55%);
   pointer-events: none;
+}
+
+/* Tipografía de alto contraste sobria */
+.bz-ad-title {
+  font-size: 1.32rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  margin-bottom: 0.45rem;
+}
+
+.bz-ad-desc {
+  font-size: 0.88rem;
+  line-height: 1.48;
+  color: rgba(255, 255, 255, 0.6);
+  max-width: 380px;
+  margin: 0 auto 1.5rem;
+}
+
+/* Botón principal estilo Apple / Obsidian: fondo blanco nítido, ultra llamativo y lujoso */
+.bz-ad-btn-primary {
+  background: #ffffff !important;
+  color: #09090b !important;
+  border: none !important;
+  font-weight: 650;
+  font-size: 0.92rem;
+  letter-spacing: -0.01em;
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.18), 0 2px 6px rgba(0, 0, 0, 0.4);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.bz-ad-btn-primary:hover {
+  background: #f4f4f5 !important;
+  color: #000000 !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.28), 0 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+.bz-ad-btn-primary:active {
+  transform: translateY(0);
+}
+
+/* Botón secundario para omitir */
+.bz-ad-btn-skip {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: rgba(255, 255, 255, 0.78) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-weight: 500;
+  font-size: 0.82rem;
+  transition: all 0.2s ease;
+}
+
+.bz-ad-btn-skip:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 
 /* Dashboard Admin Demo Chart */

@@ -684,41 +684,44 @@
 
   <!-- Modal Intersticial de Anuncios (15s para usuarios sin sesión) -->
   <div class="modal fade bz-ad-modal" id="adInterstitialModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 410px;">
-      <div class="modal-content bz-ad-card p-4 position-relative overflow-hidden text-center">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 470px;">
+      <div class="modal-content bz-ad-card position-relative overflow-hidden text-center">
         <!-- Barra de Progreso Superior del Anuncio (15s) -->
         <div class="bz-ad-progress-track">
           <div id="adProgressBar" class="bz-ad-progress-bar"></div>
         </div>
 
-        <!-- Header: Kicker a la izquierda y Cuenta Regresiva a la derecha -->
-        <div class="d-flex align-items-center justify-content-between mb-4 mt-1">
-          <span id="adSponsorBadge" class="badge rounded-pill bz-ad-badge">
-            <i class="bi bi-badge-ad me-1"></i> Publicidad
-          </span>
-          <span id="adCountdownText" class="font-mono-bz small text-white-50">
-            Continuará en <strong id="adSecondsLeft" class="text-white">15s</strong>
-          </span>
-        </div>
+        <div class="p-4 p-sm-5">
+          <!-- Header: Kicker a la izquierda y Cuenta Regresiva a la derecha -->
+          <div class="d-flex align-items-center justify-content-between mb-4">
+            <span id="adSponsorBadge" class="badge rounded-pill bz-ad-badge">
+              <i class="bi bi-stars me-1 text-white-50"></i> Publicidad
+            </span>
+            <div class="bz-ad-countdown-pill d-inline-flex align-items-center gap-1.5 px-3 py-1 rounded-pill">
+              <span class="small font-mono-bz text-white-50" style="font-size: 0.78rem;">Continuará en</span>
+              <strong id="adSecondsLeft" class="font-mono-bz text-white ms-1" style="font-size: 0.82rem;">15s</strong>
+            </div>
+          </div>
 
-        <!-- Arte / Ícono Central Limpio con Resplandor Suave -->
-        <div class="bz-ad-cover-wrap mb-3">
-          <img id="adSponsorImage" src="./assets/img/bitszone-icon.png" alt="Sponsor" class="bz-ad-cover-img" />
-          <div class="bz-ad-cover-sheen"></div>
-        </div>
+          <!-- Arte / Ícono Central Elegante con marco minimalista -->
+          <div class="bz-ad-cover-wrap mb-4">
+            <img id="adSponsorImage" src="./assets/img/bitszone-icon.png" alt="Bitszone" class="bz-ad-cover-img" onerror="this.onerror=null; this.src='./assets/img/bitszone-icon.png';" />
+            <div class="bz-ad-cover-sheen"></div>
+          </div>
 
-        <!-- Contenido Esencial y Directo (Sin cajas anidadas) -->
-        <h3 id="adSponsorTitle" class="h5 fw-bold text-white mb-2">Desbloquea Bitszone Premium</h3>
-        <p id="adSponsorDesc" class="small text-white-50 mb-4 px-2" style="font-size: 0.85rem; line-height: 1.45;">Escucha canciones completas sin límites de 30 segundos ni pausas publicitarias.</p>
+          <!-- Contenido Esencial, Elegante y de Alto Impacto -->
+          <h3 id="adSponsorTitle" class="bz-ad-title">Desbloquea Bitszone Premium</h3>
+          <p id="adSponsorDesc" class="bz-ad-desc">Escucha canciones completas sin límites de 30 segundos, sin pausas publicitarias y con audio de máxima calidad.</p>
 
-        <!-- Botones de Acción -->
-        <div class="d-grid gap-2">
-          <a href="./login.html" class="btn bz-btn-primary py-2.5 rounded-pill fw-semibold shadow-sm">
-            <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar sesión gratis
-          </a>
-          <button id="btnSkipAd" type="button" class="btn bz-btn-subtle py-2 rounded-pill small d-none" style="font-size: 0.82rem;">
-            Omitir anuncio <i class="bi bi-arrow-right ms-1"></i>
-          </button>
+          <!-- Botones de Acción -->
+          <div class="d-grid gap-2.5 pt-1">
+            <a href="./login.html" class="btn bz-ad-btn-primary py-2.5 rounded-pill shadow-sm">
+              <i class="bi bi-box-arrow-in-right me-1.5"></i> Iniciar sesión gratis
+            </a>
+            <button id="btnSkipAd" type="button" class="btn bz-ad-btn-skip py-2 rounded-pill d-none">
+              Omitir anuncio <i class="bi bi-arrow-right ms-1"></i>
+            </button>
+          </div>
         </div>
       </div>
     </div>
