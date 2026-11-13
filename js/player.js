@@ -2972,9 +2972,12 @@
     var allFav = tracks.length > 0 && tracks.every(function (t) { return Storage.isFavorite(t.id); });
     var allDl = tracks.length > 0 && tracks.every(function (t) { return Storage.isDownloaded(t.id); });
 
+    // El vinilo solo aparece y gira mientras suena una canción de este álbum
+    var vinylOn = !!(appState.isPlaying && appState.nowPlayingTrack && tracks.some(function (t) { return Number(t.id) === Number(appState.nowPlayingTrack.id); }));
     var leftColHtml =
       '<div class="col-12 col-lg-5 d-flex flex-column align-items-center text-center">' +
-        '<div class="bz-album-cover-wrap">' +
+        '<div class="bz-album-cover-wrap' + (vinylOn ? ' bz-vinyl-on' : '') + '">' +
+          '<div class="bz-vinyl" aria-hidden="true"><span class="bz-vinyl-label" style="background-image:url(&quot;' + esc(albumObj.coverUrl) + '&quot;)"></span></div>' +
           '<div class="bz-album-cover-box">' +
             '<img src="' + esc(albumObj.coverUrl) + '" alt="' + esc(albumObj.title) + '" />' +
             '<div class="bz-glass-sheen"></div>' +

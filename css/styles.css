@@ -5932,10 +5932,9 @@ html, body {
   -webkit-backdrop-filter: blur(44px) saturate(210%) brightness(0.9) !important;
 }
 
-/* Vista de álbum en escritorio: disco de vinilo, filas más amplias como el original */
+/* Vista de álbum en escritorio: vinilo que gira al sonar, filas más amplias como el original */
 @media (min-width: 992px) {
-  .bz-album-cover-wrap::before {
-    content: "";
+  .bz-vinyl {
     position: absolute;
     top: 5%;
     left: 28%;
@@ -5943,16 +5942,44 @@ html, body {
     height: 90%;
     border-radius: 50%;
     z-index: -1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background:
-      radial-gradient(circle, #050505 0 11%, transparent 11.5%),
-      repeating-radial-gradient(circle, rgba(255, 255, 255, 0.05) 0 1px, rgba(0, 0, 0, 0.9) 2px 5px),
+      repeating-radial-gradient(circle, rgba(255, 255, 255, 0.06) 0 1px, rgba(0, 0, 0, 0.92) 2px 5px),
       #0a0a0a;
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    transform: translateX(-30%) scale(0.9);
+    transition: opacity 0.6s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
   }
+  .bz-vinyl::after { /* reflejo del disco */
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: conic-gradient(from 20deg, transparent 0 20%, rgba(255, 255, 255, 0.1) 25%, transparent 30% 70%, rgba(255, 255, 255, 0.1) 75%, transparent 80%);
+  }
+  .bz-vinyl-label {
+    width: 34%;
+    height: 34%;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 0 0 5px #050505, inset 0 0 0 2px rgba(0, 0, 0, 0.5);
+  }
+  .bz-vinyl-on .bz-vinyl {
+    opacity: 1;
+    transform: none;
+    animation: bz-vinyl-spin 4s linear infinite;
+  }
+  @keyframes bz-vinyl-spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .bz-vinyl-on .bz-vinyl { animation: none; } }
   .bz-album-track-row { padding: 1rem 1.6rem; gap: 1.1rem; }
   .bz-album-track-row + .bz-album-track-row { margin-top: 0.15rem; }
   .bz-album-track-row .fw-semibold.text-white { font-size: 1.1rem !important; }
   .bz-album-track-row .text-white-50.text-truncate { font-size: 0.875rem !important; }
   .bz-album-track-row > .d-flex > .font-mono-bz { font-family: inherit; font-size: 0.9rem !important; }
 }
+@media (max-width: 991.98px) { .bz-vinyl { display: none; } }
