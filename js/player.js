@@ -988,8 +988,45 @@
     updateStorageMeterUI();
   }
 
+  function getUnseenDownloadsCount() {
+    var total = Storage.getDownloads ? Storage.getDownloads().length : 0;
+    var rawSeen = localStorage.getItem('bz_seen_downloads_count');
+    if (rawSeen === null) {
+      localStorage.setItem('bz_seen_downloads_count', String(total));
+      return 0;
+    }
+    var seen = parseInt(rawSeen, 10);
+    if (isNaN(seen) || seen < 0) seen = 0;
+    if (seen > total) {
+      seen = total;
+      localStorage.setItem('bz_seen_downloads_count', String(seen));
+    }
+    return Math.max(0, total - seen);
+  }
+
+  function markDownloadsAsSeen() {
+    var total = Storage.getDownloads ? Storage.getDownloads().length : 0;
+    localStorage.setItem('bz_seen_downloads_count', String(total));
+    updateDownloadsBadgeUI();
+  }
+
+  function updateDownloadsBadgeUI() {
+    var badge = document.getElementById('downloadsCountBadge');
+    if (!badge) return;
+    if (appState.view === 'downloads') {
+      badge.classList.add('d-none');
+      return;
+    }
+    var unseen = getUnseenDownloadsCount();
+    if (unseen > 0) {
+      badge.textContent = String(unseen);
+      badge.classList.remove('d-none');
+    } else {
+      badge.classList.add('d-none');
+    }
+  }
+
   function updateStorageMeterUI() {
-    var dlCount = Storage.getDownloads().length;
     var usedMb = Storage.getUsedMb ? Storage.getUsedMb() : (Storage.getUsedBytes() / (1024 * 1024));
     var baseMb = Storage.BASE_STORAGE_MB || 5120.0;
     var availMb = Math.max(0, baseMb - usedMb);
@@ -998,7 +1035,6 @@
 
     var bar = document.getElementById('storageProgressBar');
     var availEl = document.getElementById('storageAvailText');
-    var badge = document.getElementById('downloadsCountBadge');
 
     if (bar) {
       bar.style.width = (usedMb > 0 ? Math.max(2, usedPct) : 0).toFixed(1) + '%';
@@ -1012,11 +1048,7 @@
         availEl.innerHTML = '<strong class="text-white">' + availMb.toFixed(1) + ' MB</strong> de 5.00 GB';
       }
     }
-    if (badge) {
-      badge.textContent = String(dlCount);
-      var isDownloadsView = appState.view === 'downloads';
-      badge.classList.toggle('d-none', dlCount === 0 || isDownloadsView);
-    }
+    updateDownloadsBadgeUI();
   }
 
   function downloadAlbumProgressively(album, missingTracks, onFinish) {
@@ -2340,12 +2372,11 @@
       btn.classList.toggle('is-active', isAct);
     });
 
-    // Ocultar indicador de descargas al entrar a la sección Mis descargas
-    var dlBadge = document.getElementById('downloadsCountBadge');
-    if (dlBadge) {
-      var isDownloads = viewName === 'downloads';
-      var dlCount = Storage.getDownloads ? Storage.getDownloads().length : 0;
-      dlBadge.classList.toggle('d-none', isDownloads || dlCount === 0);
+    // Ocultar indicador de descargas al entrar a la sección Mis descargas o actualizar si hay nuevas
+    if (viewName === 'downloads') {
+      markDownloadsAsSeen();
+    } else {
+      updateDownloadsBadgeUI();
     }
 
     // Cerrar offcanvas móvil si estaba abierto
@@ -3548,7 +3579,7 @@
               '</div>' +
             '</div>' +
           '</div>' +
-          '<button type="button" id="btnLibraryNewPlaylist" class="btn bz-btn-primary btn-sm px-4 py-2"><i class="bi bi-plus-lg me-1"></i>Nueva Playlist</button>' +
+          '<button type="button" id="btnLibraryNewPlaylist" class="btn bz-btn-hero-subtle btn-sm px-3 py-2"><i class="bi bi-plus-lg me-1"></i>Nueva Playlist</button>' +
         '</div>';
 
       var plBody = playlists.length === 0
@@ -3556,7 +3587,7 @@
             '<div class="bz-empty-orb is-playlists"><i class="bi bi-music-note-list"></i></div>' +
             '<h3 class="h4 fw-bold text-white mb-0">Aún no tienes listas</h3>' +
             '<p class="text-white-50 small mb-0" style="max-width:340px;">Crea una playlist personalizada para agrupar tus canciones favoritas.</p>' +
-            '<button type="button" class="btn bz-btn-primary btn-sm px-4 py-2 mt-3" data-empty-create-pl><i class="bi bi-plus-lg me-1"></i>Crear playlist</button>' +
+            '<button type="button" class="btn bz-btn-hero-subtle btn-sm px-3 py-2 mt-3" data-empty-create-pl><i class="bi bi-plus-lg me-1"></i>Crear playlist</button>' +
           '</div>'
         : '<div class="row g-3 pt-2">' +
             playlists.map(function (p) {

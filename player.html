@@ -114,11 +114,10 @@
         <button type="button" class="bz-nav-btn" data-nav-view="library-favorites" title="Biblioteca">
           <i class="bi bi-collection fs-6"></i><span class="bz-nav-label">Biblioteca</span>
         </button>
-        <button type="button" class="bz-nav-btn justify-content-between" data-nav-view="downloads" title="Mis descargas">
-          <span class="d-flex align-items-center gap-3">
-            <i class="bi bi-cloud-arrow-down fs-6"></i><span class="bz-nav-label">Mis descargas</span>
-          </span>
-          <span id="downloadsCountBadge" class="badge rounded-pill d-none bz-nav-label" style="background: rgba(96,165,250,0.22); color: #93c5fd;">0</span>
+        <button type="button" class="bz-nav-btn" data-nav-view="downloads" title="Mis descargas">
+          <i class="bi bi-cloud-arrow-down fs-6"></i>
+          <span class="bz-nav-label flex-grow-1 text-start">Mis descargas</span>
+          <span id="downloadsCountBadge" class="badge rounded-pill d-none bz-nav-label ms-auto" style="background: rgba(96,165,250,0.22); color: #93c5fd;">0</span>
         </button>
         <button type="button" class="bz-nav-btn bz-nav-btn--admin d-none mt-1" data-nav-view="dashboard" data-admin-only title="Dashboard Demo">
           <i class="bi bi-speedometer2 fs-6"></i><span class="bz-nav-label">Dashboard</span>
@@ -150,10 +149,10 @@
         <hr class="border-white border-opacity-10 my-3" />
 
         <!-- Sección Almacenamiento integrada al sidebar (fiel a Bitszone original: pasa desapercibida, visible colapsado y expandido) -->
-        <div id="btnSidebarStorage" role="button" tabindex="0" class="bz-storage-details w-100 text-start px-2 py-2" title="Mis descargas y almacenamiento">
-          <div class="d-flex align-items-center justify-content-between mb-2 bz-storage-row">
+        <div id="btnSidebarStorage" role="button" tabindex="0" class="bz-storage-details w-100 text-start" title="Mis descargas y almacenamiento">
+          <div class="d-flex align-items-center justify-content-between bz-storage-row">
             <div class="d-flex align-items-center min-w-0">
-              <i class="bi bi-hdd text-white-50 fs-5 flex-shrink-0 me-3 bz-storage-icon" style="width: 24px; text-align: center;"></i>
+              <i class="bi bi-hdd text-white-50 fs-5 flex-shrink-0 bz-storage-icon" style="width: 24px; text-align: center;"></i>
               <div class="min-w-0 bz-storage-text-wrap">
                 <div class="text-white-50 text-uppercase fw-semibold" style="font-size: 0.65rem; letter-spacing: 0.08em;">Almacenamiento</div>
                 <div id="storageAvailText" style="font-size: 0.76rem; color: rgba(255,255,255,0.7);">
