@@ -5473,7 +5473,7 @@ html, body {
 
 @media (max-width: 767.98px) {
   .bz-main-scroll {
-    padding: 0.75rem calc(2.38vw + 3px) 140px !important;
+    padding: 0.75rem calc(2.38vw + 3px) 28px !important;
   }
   .bz-miniplayer {
     position: relative;
@@ -5864,7 +5864,8 @@ html, body {
   .bz-detail-viewport span.text-uppercase.d-block { font-size: 0.75rem !important; letter-spacing: 0.25em !important; margin-bottom: 8px !important; }
   .bz-detail-viewport h1 { font-size: 2.25rem !important; line-height: 1.2 !important; letter-spacing: -0.025em !important; margin-bottom: 12px !important; }
   .bz-detail-split > .row > .col-lg-7 { margin-top: 25px; }
-  .bz-album-tracklist-scroll { padding-left: 0; padding-right: 0; }
+  .bz-album-tracklist-scroll { padding: 0; }
+  .bz-detail-viewport { padding-bottom: 0; }
   /* Filas de 64px con 4px de separación: número, título/artista y menú "..." */
   .bz-album-track-row {
     grid-template-columns: 28px minmax(0, 1fr) 28px;
@@ -5889,3 +5890,8 @@ html, body {
   .bz-row-more .bz-icon-action { width: 28px; height: 28px; padding: 0; display: inline-flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.6); font-size: 1.125rem; }
   .bz-row-more .dropdown-menu { z-index: 1080; }
 }
+
+
+/* Efecto resorte: el contenido se desplaza con un rebote suave al llegar al tope; se evita el rebote nativo para que no se duplique */
+.bz-main-scroll, #expandedPlayerModal { overscroll-behavior-y: none; }
+#bzMainStage, #expandedPlayerModal .modal-dialog { will-change: transform; }

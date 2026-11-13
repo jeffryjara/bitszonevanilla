@@ -4491,6 +4491,67 @@
       if (e.key === 'Escape') document.body.classList.remove('bz-drawer-open');
     });
 
+    // Efecto resorte (rubber-band): al llegar al tope arriba o abajo el contenido cede y rebota
+    function attachElastic(scroller, getContent) {
+      if (!scroller || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var MAX = 120;
+      var last = 0, pull = 0, timer = null;
+      function atTop() { return scroller.scrollTop <= 0; }
+      function atBottom() { return scroller.scrollTop + scroller.clientHeight >= scroller.scrollHeight - 1; }
+      function rubber(d) { var a = Math.abs(d); return Math.sign(d) * MAX * (1 - 1 / (a * 0.5 / MAX + 1)); }
+      function apply(d) {
+        var el = getContent();
+        if (!el) return;
+        el.style.transition = 'none';
+        el.style.transform = d ? 'translate3d(0,' + rubber(d).toFixed(1) + 'px,0)' : '';
+      }
+      function release() {
+        var el = getContent();
+        pull = 0;
+        if (!el) return;
+        el.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+        el.style.transform = '';
+      }
+      // Dedo
+      scroller.addEventListener('touchstart', function (e) { last = e.touches[0].clientY; pull = 0; }, { passive: true });
+      scroller.addEventListener('touchmove', function (e) {
+        var y = e.touches[0].clientY;
+        var d = y - last;
+        last = y;
+        if (pull === 0) {
+          if ((d > 0 && atTop()) || (d < 0 && atBottom())) pull = d;
+        } else {
+          var wasTop = pull > 0;
+          pull += d;
+          // si el dedo regresa más allá del punto de partida, se vuelve al scroll normal
+          if ((wasTop && pull <= 0) || (!wasTop && pull >= 0)) pull = 0;
+        }
+        if (pull !== 0) {
+          apply(pull);
+          if (e.cancelable) e.preventDefault();
+        } else {
+          var el = getContent();
+          if (el && el.style.transform) { apply(0); }
+        }
+      }, { passive: false });
+      scroller.addEventListener('touchend', function () { if (pull !== 0 || (getContent() && getContent().style.transform)) release(); });
+      scroller.addEventListener('touchcancel', function () { release(); });
+      // Rueda / trackpad
+      scroller.addEventListener('wheel', function (e) {
+        if (!((e.deltaY > 0 && atBottom()) || (e.deltaY < 0 && atTop()))) return;
+        pull -= e.deltaY * 0.6;
+        pull = Math.max(-MAX * 3, Math.min(MAX * 3, pull));
+        apply(pull);
+        clearTimeout(timer);
+        timer = setTimeout(release, 110);
+      }, { passive: true });
+    }
+    attachElastic(document.getElementById('bzMainScroll'), function () { return document.getElementById('bzMainStage'); });
+    (function () {
+      var m = document.getElementById('expandedPlayerModal');
+      if (m) attachElastic(m, function () { return m.querySelector('.modal-dialog'); });
+    })();
+
     // Barra inferior líquida: el selector se desliza (con efecto de estiramiento) hacia la pestaña activa
     (function () {
       var pill = document.getElementById('bzTabbarPill');
