@@ -6308,6 +6308,19 @@ html, body {
     margin-left: -22px; border-radius: 999px; background: rgba(255, 255, 255, 0.4);
   }
   .bz-exp-modal.is-sheet-open .bz-exp-right-col { transform: none; }
-  .bz-exp-right-col .bz-exp-right-scroll { touch-action: pan-y; }
+  .bz-exp-right-col .bz-exp-right-scroll {
+    touch-action: pan-y; padding-top: 6px;
+    mask-image: linear-gradient(to bottom, transparent 0, black 14px, black 94%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 14px, black 94%, transparent 100%);
+  }
+  /* Título, artista y controles como el original */
+  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { padding-left: 8px; padding-right: 8px; }
+  .bz-cover-vinyl-stage { padding: 0 6px; }
+  .bz-exp-controls #expPrevBtn, .bz-exp-controls #expNextBtn {
+    width: 56px; height: 56px; border-radius: 50%; font-size: 2rem !important;
+    background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.14);
+  }
+  .bz-exp-controls #expShuffleBtn, .bz-exp-controls #expRepeatBtn { font-size: 1.4rem !important; width: 44px; height: 44px; }
+  .bz-exp-controls #expPlayBtn { transform: scale(1.1); }
   
 }

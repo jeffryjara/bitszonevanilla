@@ -4584,20 +4584,27 @@
       var modal = document.getElementById('expandedPlayerModal');
       var sheet = modal && modal.querySelector('.bz-exp-right-col');
       if (!sheet) return;
-      var y0 = null, onHandle = false;
+      var y0 = null, onHandle = false, isBtn = false;
       function mobile() { return window.innerWidth < 992; }
       function setOpen(v) { modal.classList.toggle('is-sheet-open', v); }
       sheet.addEventListener('pointerdown', function (e) {
         if (!mobile()) return;
         var top = sheet.getBoundingClientRect().top;
-        onHandle = e.clientY - top < 48 || !modal.classList.contains('is-sheet-open');
+        var open = modal.classList.contains('is-sheet-open');
+        // Abierta: solo la franja de la barrita agarra; los botones y filas de la lista no cierran la hoja
+        onHandle = !open || e.clientY - top < 30;
+        isBtn = !!(e.target.closest && e.target.closest('button, [data-exp-tab], a'));
         y0 = onHandle ? e.clientY : null;
       });
       window.addEventListener('pointerup', function (e) {
         if (y0 === null) return;
         var dy = e.clientY - y0;
         y0 = null;
-        if (Math.abs(dy) < 8) setOpen(!modal.classList.contains('is-sheet-open'));
+        if (Math.abs(dy) < 8) {
+          var open = modal.classList.contains('is-sheet-open');
+          if (open && isBtn) return;
+          setOpen(!open);
+        }
         else setOpen(dy < 0);
       });
       window.addEventListener('pointercancel', function () { y0 = null; });
