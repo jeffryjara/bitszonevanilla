@@ -411,7 +411,7 @@
         // Gráficos: tráfico (barras o línea) + géneros (pastel)
         '<div class="row g-4 mb-4">' +
           '<div class="col-12 col-xl-8">' +
-            '<div class="bz-glass-card p-4 h-100">' +
+            '<div class="bz-glass-card bz-traffic-card p-4 h-100 d-flex flex-column">' +
               '<div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3 mb-3">' +
                 '<div>' +
                   '<h4 class="h5 fw-bold text-white mb-1"><i class="bi bi-graph-up-arrow me-2" style="color:var(--bz-lavender);"></i>' + esc(_t('admin.trafficTitle', 'Tráfico y Reproducciones')) + '</h4>' +

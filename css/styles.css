@@ -6462,3 +6462,12 @@ html, body {
 .bz-line-dot:hover { r: 8; fill: #c084fc; }
 body.bz-theme-light .bz-dash-strip-value, body.bz-theme-light .bz-pie-center strong, body.bz-theme-light .bz-pie-legend li { color: #1f1633; }
 body.bz-theme-light .bz-line-axis { fill: rgba(31, 22, 51, 0.6); }
+
+/* Tráfico: el gráfico ocupa toda la altura de la tarjeta (que iguala a la del pastel) */
+.bz-traffic-card .bz-chart-wrap { flex: 1 1 auto; height: auto; min-height: 260px; gap: clamp(0.6rem, 2vw, 1.6rem); padding-top: 2.5rem; }
+.bz-traffic-card .bz-chart-track { max-width: clamp(44px, 5.2vw, 84px); border-radius: 1.1rem; }
+.bz-traffic-card .bz-chart-bar { border-radius: 0.9rem; }
+.bz-traffic-card .bz-chart-col > span { font-size: 0.85rem !important; margin-top: 0.75rem !important; }
+.bz-traffic-card .bz-line-chart { flex: 1 1 auto; display: flex; align-items: center; }
+.bz-pie-chart { width: min(210px, 100%); }
+.bz-pie-legend li { padding: 0.32rem 0.6rem; }
