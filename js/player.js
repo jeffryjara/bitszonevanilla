@@ -3374,6 +3374,104 @@
     );
   }
 
+  // ---- Biblioteca: selección múltiple, tabla por álbum y detalle de álbum ----
+  function libToggleSel(pfx, key) {
+    var m = appState[pfx + 'SelMap'] || {};
+    if (m[key]) delete m[key]; else m[key] = true;
+    appState[pfx + 'SelMap'] = m;
+    renderCurrentView();
+  }
+
+  // Quita de la colección (favoritos / licencias / descargas) las canciones indicadas
+  function removeLibTracks(tracks, kind) {
+    tracks.forEach(function (t) {
+      if (kind === 'downloads') Storage.removeDownload(t.id);
+      else if (kind === 'licenses') Storage.removeLicense(t.id);
+      else if (Storage.isFavorite(t.id)) Storage.toggleFavorite(t);
+    });
+    if (kind === 'downloads') updateStorageMeterUI();
+    updatePlayerBarsUI();
+    renderCurrentView();
+  }
+
+  function libRightMeta(t, kind) {
+    return kind === 'downloads' ? formatTrackSizeMb(t) : (kind === 'licenses' ? getLicenseDaysLeftText(t.addedAt) : formatTimeAgo(t.addedAt));
+  }
+
+  function renderLibHeadHtml(kind) {
+    var addedLbl = kind === 'downloads' ? _t('lib.colSize', 'Tamaño') : (kind === 'licenses' ? _t('lib.colExpires', 'Vence') : _t('lib.colAdded', 'Añadido'));
+    var actLbl = kind === 'favorites' ? _t('lib.colFavs', 'Favoritos') : (kind === 'licenses' ? _t('lib.colLicense', 'Licencia') : _t('lib.colActions', 'Acciones'));
+    return '<div class="bz-lib-row bz-lib-head"><div class="bz-lib-num">#</div><div>' + esc(_t('lib.colTitle', 'Título')) + '</div><div class="bz-lib-added">' + esc(addedLbl) + '</div><div class="bz-lib-time">' + esc(_t('lib.colTime', 'Tiempo')) + '</div><div class="bz-lib-actions">' + esc(actLbl) + '</div></div>';
+  }
+
+  function renderLibRowHtml(t, i, kind, selMode, selMap) {
+    var playing = appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) === Number(t.id);
+    var on = !!selMap['t' + t.id];
+    var isLic = Storage.isLicensed(t.id);
+    var rmIcon = kind === 'downloads' ? '<i class="bi bi-trash"></i>' : (kind === 'licenses' ? '<i class="bi bi-star-fill text-warning"></i>' : '<i class="bi bi-heart-fill"></i>');
+    var rmTitle = kind === 'downloads' ? _t('downloads.removeTitle', 'Eliminar descarga') : (kind === 'licenses' ? _t('licenses.removeTitle', 'Quitar licencia') : _t('favorites.removeTitle', 'Quitar de favoritos'));
+    return (
+      '<div class="bz-lib-row bz-sel-item ' + (playing ? 'is-playing ' : '') + (on ? 'is-selected' : '') + '" style="--j:' + (i % 3) + ';" data-col-play-id="' + t.id + '">' +
+        '<div class="bz-lib-num">' +
+          (selMode
+            ? '<span class="bz-sel-check is-inline ' + (on ? 'is-on' : '') + '"><i class="bi bi-check-lg"></i></span>'
+            : (playing && appState.isPlaying ? '<div class="fx-eq mx-auto" style="width:18px;"><i></i><i></i><i></i></div>' : (i + 1))) +
+        '</div>' +
+        '<div class="min-w-0">' +
+          '<div class="bz-lib-title text-truncate">' + (isLic ? '<i class="bi bi-star-fill text-warning me-1 small"></i>' : '') + esc(t.title) + '</div>' +
+          '<div class="bz-lib-sub text-truncate">' + esc(t.artist) + '</div>' +
+        '</div>' +
+        '<div class="bz-lib-added">' + esc(libRightMeta(t, kind)) + '</div>' +
+        '<div class="bz-lib-time font-mono-bz">' + formatDurationMs(t.duration) + '</div>' +
+        '<div class="bz-lib-actions">' +
+          '<button type="button" class="bz-icon-action" data-col-addpl="' + t.id + '" title="' + esc(_t('tracks.addPl', 'Agregar a playlist')) + '"><i class="bi bi-three-dots"></i></button>' +
+          (kind === 'downloads' ? '<button type="button" class="bz-icon-action" data-col-file="' + t.id + '" title="' + esc(_t('tracks.downloadMp3', 'Descargar archivo MP3')) + '"><i class="bi bi-file-earmark-arrow-down"></i></button>' : '') +
+          '<button type="button" class="bz-icon-action ' + (kind === 'favorites' ? 'is-favorited' : '') + '" data-col-rm="' + t.id + '" title="' + esc(rmTitle) + '">' + rmIcon + '</button>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderLibGroupHtml(g, kind, selMode, selMap) {
+    return (
+      '<section class="bz-lib-group">' +
+        '<div class="bz-lib-group-head">' +
+          '<img src="' + esc(g.coverUrl) + '" width="64" height="64" class="rounded-3 object-fit-cover" alt="" />' +
+          '<div class="min-w-0 flex-grow-1"><h3 class="bz-lib-group-title text-truncate">' + esc(g.title) + '</h3><div class="bz-lib-sub text-truncate">' + esc(g.artist) + '</div></div>' +
+          '<div class="d-flex align-items-center gap-2">' +
+            '<button type="button" class="bz-lib-circle is-play" data-grp-play="' + esc(g.id) + '" title="' + esc(_t('library.playAll', 'Escuchar todo')) + '"><i class="bi bi-play-fill"></i></button>' +
+            '<button type="button" class="bz-lib-circle" data-grp-rm="' + esc(g.id) + '" title="' + esc(_t('lib.removeAll', 'Quitar todo')) + '"><i class="bi bi-trash"></i></button>' +
+          '</div>' +
+        '</div>' +
+        renderLibHeadHtml(kind) +
+        g.tracks.map(function (t, i) { return renderLibRowHtml(t, i, kind, selMode, selMap); }).join('') +
+      '</section>'
+    );
+  }
+
+  // Detalle de un álbum dentro de la biblioteca: portada grande a la izquierda y sus canciones a la derecha
+  function renderLibAlbumDetail(g, kind, selMode, selMap) {
+    return (
+      '<div class="bz-lib-detail">' +
+        '<div class="bz-lib-detail-left">' +
+          '<button type="button" id="btnColBackToAlbums" class="bz-lib-circle is-back" title="' + esc(_t('library.allAlbums', 'Todos los álbumes')) + '"><i class="bi bi-arrow-left"></i></button>' +
+          '<div class="bz-lib-detail-cover"><img src="' + esc(g.coverUrl) + '" alt="' + esc(g.title) + '" /></div>' +
+          '<span class="bz-hero-kicker mt-3">' + esc(_t('lib.albumKicker', 'ÁLBUM')) + '</span>' +
+          '<h2 class="bz-lib-detail-title">' + esc(g.title) + '</h2>' +
+          '<div class="bz-lib-sub mb-3">' + esc(g.artist) + ' • ' + g.tracks.length + ' ' + _t(g.tracks.length === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</div>' +
+          '<div class="bz-lib-dock">' +
+            '<button type="button" class="bz-lib-play-pill" data-grp-play="' + esc(g.id) + '"><i class="bi bi-play-fill"></i> ' + esc(_t('lib.playAlbum', 'Reproducir todo')) + '</button>' +
+            '<button type="button" class="bz-lib-circle" data-grp-rm="' + esc(g.id) + '" title="' + esc(_t('lib.removeAll', 'Quitar todo')) + '"><i class="bi bi-trash"></i></button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="bz-lib-detail-right">' +
+          renderLibHeadHtml(kind) +
+          g.tracks.map(function (t, i) { return renderLibRowHtml(t, i, kind, selMode, selMap); }).join('') +
+        '</div>' +
+      '</div>'
+    );
+  }
+
   function renderCollectionSection(container, cfg) {
     // cfg: { kind: 'favorites' | 'licenses' | 'downloads', title, kicker, iconClass, tracks, statePrefix: 'lib'|'dl', emptyTitle, emptyText, searchPlaceholder, libTab }
     var pfx = cfg.statePrefix;
@@ -3387,6 +3485,11 @@
     var search = (appState[searchKey] || '').trim();
     var q = search.toLowerCase();
     var selAlbumId = appState[selAlbumKey];
+    var selModeKey = pfx + 'SelMode', selMapKey = pfx + 'SelMap';
+    var selMode = !!appState[selModeKey];
+    var selMap = appState[selMapKey] || {};
+    var selCount = Object.keys(selMap).length;
+    var albumUnits = viewMode === 'albumes' && !selAlbumId;
 
     var rawTracks = cfg.tracks || [];
     var filteredTracks = rawTracks.filter(function (t) {
@@ -3422,6 +3525,10 @@
       return 0;
     });
 
+    groups.forEach(function (g) {
+      g.tracks = filteredTracks.filter(function (t) { return g.tracks.indexOf(t) !== -1; });
+    });
+
     // Estadísticas globales sin filtro para el Hero
     var totalAlbumMap = {};
     rawTracks.forEach(function (t) { totalAlbumMap[t.albumId || t.albumTitle || t.id] = true; });
@@ -3441,12 +3548,22 @@
       ? '<span>' + esc(cfg.title) + '</span>'
       : renderLibraryHeroDropdownHtml(cfg.libTab, cfg.title);
 
-    var heroActions = rawTracks.length ? (
-      '<div class="d-flex gap-2">' +
-        '<button type="button" id="btnColPlayAll" class="btn bz-btn-hero-subtle btn-sm px-3 py-2"><i class="bi bi-play-fill me-1"></i>' + esc(_t('library.playAll', 'Escuchar todo')) + '</button>' +
-        (cfg.kind === 'downloads' ? '<button type="button" id="btnColClearDownloads" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2"><i class="bi bi-trash me-1"></i>' + esc(_t('downloads.clearAll', 'Vaciar')) + '</button>' : '') +
-      '</div>'
-    ) : '';
+    var heroActions = '';
+    if (selMode) {
+      heroActions =
+        '<div class="bz-select-bar">' +
+          '<span class="bz-select-label">' + esc(selCount ? (selCount === 1 ? _t('lib.selectedOne', '1 seleccionado') : _t('lib.selectedN', '{n} seleccionados', { n: selCount })) : (albumUnits ? _t('lib.chooseAlbums', 'Elige álbumes') : _t('lib.chooseSongs', 'Elige canciones'))) + '</span>' +
+          '<button type="button" class="bz-select-btn" data-sel-all>' + esc(_t('lib.selectAll', 'Todo')) + '</button>' +
+          '<button type="button" class="bz-select-btn is-danger" data-sel-del ' + (selCount ? '' : 'disabled') + '><i class="bi bi-trash"></i> ' + esc(_t('lib.delete', 'Eliminar')) + '</button>' +
+          '<button type="button" class="bz-select-btn is-done" data-sel-done>' + esc(_t('lib.done', 'Listo')) + '</button>' +
+        '</div>';
+    } else if (rawTracks.length) {
+      heroActions =
+        '<div class="d-flex gap-2">' +
+          '<button type="button" id="btnColSelect" class="btn bz-btn-hero-subtle btn-sm px-3 py-2"><i class="bi bi-list-check me-1"></i>' + esc(_t('lib.select', 'Seleccionar')) + '</button>' +
+          (cfg.kind === 'downloads' ? '<button type="button" id="btnColClearDownloads" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-2"><i class="bi bi-trash me-1"></i>' + esc(_t('downloads.clearAll', 'Vaciar')) + '</button>' : '') +
+        '</div>';
+    }
 
     var heroHtml =
       '<div class="bz-section-hero">' +
@@ -3511,36 +3628,32 @@
     } else if (viewMode === 'albumes') {
       var activeGroup = selAlbumId ? groups.find(function (g) { return g.id === selAlbumId; }) : null;
       if (activeGroup) {
-        bodyHtml =
-          '<div class="mb-3">' +
-            '<button type="button" id="btnColBackToAlbums" class="btn bz-btn-subtle btn-sm px-3 py-1 mb-3"><i class="bi bi-arrow-left me-1"></i>' + esc(_t('library.allAlbums', 'Todos los álbumes')) + '</button>' +
-            '<div class="d-flex align-items-center gap-3 mb-4">' +
-              '<img src="' + esc(activeGroup.coverUrl) + '" width="76" height="76" class="rounded-4 object-fit-cover shadow" alt="" />' +
-              '<div><h4 class="fw-bold text-white mb-0">' + esc(activeGroup.title) + '</h4><div class="small text-white-50">' + esc(activeGroup.artist) + ' · ' + activeGroup.tracks.length + ' ' + _t(activeGroup.tracks.length === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</div></div>' +
-            '</div>' +
-            renderTracksTableHtml(activeGroup.tracks, cfg.kind) +
-          '</div>';
+        bodyHtml = renderLibAlbumDetail(activeGroup, cfg.kind, selMode, selMap);
       } else {
         bodyHtml =
-          '<div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-xl-6 g-3 pt-2">' +
-            groups.map(function (g) {
+          '<div class="bz-lib-album-grid ' + (selMode ? 'is-select-mode' : '') + '">' +
+            groups.map(function (g, i) {
+              var on = !!selMap[g.id];
               return (
-                '<div class="col">' +
-                  '<div class="bz-catalog-card w-100" data-col-open-alb="' + esc(g.id) + '">' +
-                    '<div class="bz-cover-box mb-2">' +
-                      '<img src="' + esc(g.coverUrl) + '" alt="' + esc(g.title) + '" loading="lazy" />' +
-                      '<span class="position-absolute bottom-0 end-0 m-2 badge rounded-pill" style="background:rgba(0,0,0,0.72);">' + g.tracks.length + '</span>' +
-                    '</div>' +
-                    '<div class="text-white fw-semibold text-truncate" style="font-size:0.88rem;">' + esc(g.title) + '</div>' +
-                    '<div class="text-white-50 text-truncate" style="font-size:0.76rem;">' + esc(g.artist) + '</div>' +
+                '<div class="bz-lib-album bz-sel-item ' + (on ? 'is-selected' : '') + '" style="--j:' + (i % 3) + ';" data-col-open-alb="' + esc(g.id) + '">' +
+                  '<div class="bz-cover-box mb-2">' +
+                    '<img src="' + esc(g.coverUrl) + '" alt="' + esc(g.title) + '" loading="lazy" />' +
+                    (selMode
+                      ? '<span class="bz-sel-check ' + (on ? 'is-on' : '') + '"><i class="bi bi-check-lg"></i></span>'
+                      : '<span class="position-absolute bottom-0 end-0 m-2 badge rounded-pill" style="background:rgba(0,0,0,0.72);">' + g.tracks.length + '</span>') +
                   '</div>' +
+                  '<div class="text-white fw-semibold text-truncate" style="font-size:0.88rem;">' + esc(g.title) + '</div>' +
+                  '<div class="text-white-50 text-truncate" style="font-size:0.76rem;">' + esc(g.artist) + '</div>' +
                 '</div>'
               );
             }).join('') +
           '</div>';
       }
     } else {
-      bodyHtml = renderTracksTableHtml(filteredTracks, cfg.kind);
+      bodyHtml =
+        '<div class="bz-lib-groups ' + (selMode ? 'is-select-mode' : '') + '">' +
+          groups.map(function (g) { return renderLibGroupHtml(g, cfg.kind, selMode, selMap); }).join('') +
+        '</div>';
     }
 
     container.innerHTML = heroHtml + toolbarHtml + bodyHtml;
@@ -3557,6 +3670,7 @@
       btn.addEventListener('click', function () {
         appState[viewModeKey] = btn.getAttribute('data-col-mode');
         appState[selAlbumKey] = null;
+        appState[selMapKey] = {};
         renderCurrentView();
       });
     });
@@ -3626,8 +3740,73 @@
 
     container.querySelectorAll('[data-col-open-alb]').forEach(function (card) {
       card.addEventListener('click', function () {
-        appState[selAlbumKey] = card.getAttribute('data-col-open-alb');
+        var aid = card.getAttribute('data-col-open-alb');
+        if (selMode) { libToggleSel(pfx, aid); return; }
+        appState[selAlbumKey] = aid;
+        appState[selMapKey] = {};
         renderCurrentView();
+      });
+    });
+
+    // Selección múltiple (Seleccionar / Todo / Eliminar / Listo)
+    var selectBtn = document.getElementById('btnColSelect');
+    if (selectBtn) selectBtn.addEventListener('click', function () { appState[selModeKey] = true; appState[selMapKey] = {}; renderCurrentView(); });
+    var selDone = container.querySelector('[data-sel-done]');
+    if (selDone) selDone.addEventListener('click', function () { appState[selModeKey] = false; appState[selMapKey] = {}; renderCurrentView(); });
+    var selAll = container.querySelector('[data-sel-all]');
+    if (selAll) selAll.addEventListener('click', function () {
+      var all = {};
+      if (albumUnits) groups.forEach(function (g) { all[g.id] = true; });
+      else filteredTracks.forEach(function (t) { all['t' + t.id] = true; });
+      appState[selMapKey] = Object.keys(all).length === selCount ? {} : all;
+      renderCurrentView();
+    });
+    var selDel = container.querySelector('[data-sel-del]');
+    if (selDel) selDel.addEventListener('click', function () {
+      var doomed = albumUnits
+        ? groups.filter(function (g) { return selMap[g.id]; }).reduce(function (acc, g) { return acc.concat(g.tracks); }, [])
+        : filteredTracks.filter(function (t) { return selMap['t' + t.id]; });
+      if (!doomed.length) return;
+      openConfirmDialog(
+        _t('lib.deleteConfirmTitle', '¿Eliminar la selección?'),
+        _t('lib.deleteConfirmMsg', 'Se quitarán {n} canciones de esta lista.', { n: doomed.length }),
+        function () {
+          appState[selModeKey] = false; appState[selMapKey] = {};
+          removeLibTracks(doomed, cfg.kind);
+          showToast(_t('lib.deletedToast', 'Se quitaron {n} canciones', { n: doomed.length }));
+        },
+        _t('lib.delete', 'Eliminar'),
+        'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
+        'bi-trash3-fill',
+        _t('library.kicker', 'BIBLIOTECA')
+      );
+    });
+
+    // Reproducir / quitar un álbum completo
+    container.querySelectorAll('[data-grp-play]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var g = groups.find(function (x) { return x.id === btn.getAttribute('data-grp-play'); });
+        if (g && g.tracks.length) playTrack(g.tracks[0], { id: g.id, title: g.title, artist: g.artist, coverUrl: g.coverUrl }, g.tracks);
+      });
+    });
+    container.querySelectorAll('[data-grp-rm]').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var g = groups.find(function (x) { return x.id === btn.getAttribute('data-grp-rm'); });
+        if (!g) return;
+        openConfirmDialog(
+          _t('lib.removeAlbumTitle', '¿Quitar este álbum de la lista?'),
+          _t('lib.removeAlbumMsg', 'Se quitarán {n} canciones de "{title}".', { n: g.tracks.length, title: g.title }),
+          function () {
+            appState[selAlbumKey] = null;
+            removeLibTracks(g.tracks, cfg.kind);
+          },
+          _t('lib.delete', 'Eliminar'),
+          'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
+          'bi-trash3-fill',
+          _t('library.kicker', 'BIBLIOTECA')
+        );
       });
     });
 
@@ -3677,6 +3856,7 @@
     container.querySelectorAll('[data-col-play-id]').forEach(function (row) {
       row.addEventListener('click', function () {
         var tid = Number(row.getAttribute('data-col-play-id'));
+        if (appState[cfg.statePrefix + 'SelMode']) { libToggleSel(cfg.statePrefix, 't' + tid); return; }
         var tr = activeTracks.find(function (x) { return Number(x.id) === tid; });
         if (tr) playTrack(tr, { id: cfg.kind, title: cfg.title, artist: 'Bitszone', coverUrl: tr.albumCover }, activeTracks);
       });
