@@ -6310,8 +6310,8 @@ html, body {
   .bz-exp-modal.is-sheet-open .bz-exp-right-col { transform: none; }
   .bz-exp-right-col .bz-exp-right-scroll {
     touch-action: pan-y; padding-top: 6px;
-    mask-image: linear-gradient(to bottom, transparent 0, black 14px, black 94%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 14px, black 94%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0, black 94%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0, black 94%, transparent 100%);
   }
   /* Título, artista y controles como el original */
   #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { padding-left: 8px; padding-right: 8px; }
@@ -6344,7 +6344,7 @@ html, body {
   #expandedPlayerModal .bz-exp-controls { order: 3; }
   #expandedPlayerModal .bz-exp-seekwrap { order: 4; }
   #expTrackTitle { font-size: clamp(1.9rem, 2.2vw, 3rem) !important; letter-spacing: -0.01em; line-height: 1.15; }
-  #expTrackArtist, #expAlbumName { text-transform: uppercase; font-size: 1.05rem; font-weight: 600; letter-spacing: 0.02em; }
+  #expTrackArtist { text-transform: uppercase; } #expAlbumName { text-transform: none; } #expTrackArtist, #expAlbumName { font-size: 1.05rem; font-weight: 600; letter-spacing: 0.02em; }
   #expandedPlayerModal .text-center > .text-white-50.text-truncate { font-size: 1.05rem !important; }
 
   .bz-exp-controls { width: min(100%, 500px); justify-content: space-between !important; margin-bottom: 2.7rem !important; }
@@ -6370,8 +6370,8 @@ html, body {
     height: calc(100dvh - 10dvh - 70px) !important; min-height: 0; max-height: none !important;
   }
   .bz-exp-right-scroll {
-    mask-image: linear-gradient(to bottom, transparent 0, black 3%, black 94%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 3%, black 94%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 0, black 95%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, black 0, black 95%, transparent 100%);
   }
   .bz-exp-track-item { padding: 0.4rem 1rem; gap: 2.2rem; font-size: clamp(1.3rem, 1.8vw, 2.2rem); }
   .bz-exp-track-item .bz-exp-idx { font-size: 1.05rem; min-width: 2.4rem; }
