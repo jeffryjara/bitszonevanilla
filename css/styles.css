@@ -4920,8 +4920,21 @@ body.bz-theme-light .form-select:focus {
   color: #0f172a !important;
   box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.15) !important;
 }
-body.bz-theme-light .bz-segmented-dock {
+body.bz-theme-light .bz-segmented-dock,
+body.bz-theme-light .bz-dock-pills {
   background: #f1f5f9 !important;
+  border-color: rgba(15, 23, 42, 0.08) !important;
+}
+body.bz-theme-light .bz-dock-pills .nav-link {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-dock-pills .nav-link:hover {
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-dock-pills .nav-link.active {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.1) !important;
   border-color: rgba(15, 23, 42, 0.08) !important;
 }
 body.bz-theme-light .bz-chart-track {
@@ -5413,9 +5426,17 @@ body.bz-high-contrast .bz-admin-kpi-card {
   color: #ffffff !important;
   border: 2px solid #ffffff !important;
 }
-body.bz-high-contrast .bz-segmented-dock {
+body.bz-high-contrast .bz-segmented-dock,
+body.bz-high-contrast .bz-dock-pills {
   background: #000000 !important;
   border: 2px solid #ffffff !important;
+}
+body.bz-high-contrast .bz-dock-pills .nav-link {
+  color: #ffffff !important;
+}
+body.bz-high-contrast .bz-dock-pills .nav-link.active {
+  background: #ffffff !important;
+  color: #000000 !important;
 }
 body.bz-high-contrast .bz-chart-track {
   background: #000000 !important;

@@ -228,6 +228,7 @@
       return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
     });
   }
+  var esc = escHtml;
 
   function renderDashboard(container, ctx) {
     var notify = ctx.notify || function () {};
