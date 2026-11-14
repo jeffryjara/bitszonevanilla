@@ -139,6 +139,7 @@
   var state = {
     activeTab: 'overview',
     timeRange: '7d',
+    chartType: 'bar',
     userFilter: 'all',
     searchQuery: '',
     users: []
@@ -229,6 +230,63 @@
     });
   }
   var esc = escHtml;
+
+  // Gráfico de pastel (dona) en SVG puro: segmentos con hover y total al centro
+  function renderPieChart() {
+    var R = 42, C = 2 * Math.PI * R, gap = 1.2, cum = 0;
+    var total = GENRE_DISTRIBUTION.reduce(function (a, g) { return a + g.percent; }, 0) || 1;
+    var segs = GENRE_DISTRIBUTION.map(function (g, i) {
+      var len = Math.max(0, (g.percent / total) * C - gap);
+      var seg = '<circle class="bz-pie-seg" data-pie-seg="' + i + '" cx="60" cy="60" r="' + R + '" fill="none" stroke="' + g.color + '" stroke-width="16"' +
+        ' stroke-dasharray="' + len.toFixed(2) + ' ' + (C - len).toFixed(2) + '" stroke-dashoffset="' + (-cum).toFixed(2) + '" style="--i:' + i + ';"><title>' + escHtml(g.name) + ' · ' + g.percent + '%</title></circle>';
+      cum += (g.percent / total) * C;
+      return seg;
+    }).join('');
+    return (
+      '<div class="bz-pie-wrap">' +
+        '<div class="bz-pie-chart">' +
+          '<svg viewBox="0 0 120 120" role="img" aria-label="Distribución de géneros"><circle cx="60" cy="60" r="' + R + '" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="16"></circle>' +
+            '<g transform="rotate(-90 60 60)">' + segs + '</g></svg>' +
+          '<div class="bz-pie-center"><strong id="bzPieValue" class="font-mono-bz">284,910</strong><span id="bzPieLabel">' + esc(_t('admin.plays', 'Reproducciones')) + '</span></div>' +
+        '</div>' +
+        '<ul class="bz-pie-legend">' +
+          GENRE_DISTRIBUTION.map(function (g, i) {
+            return '<li data-pie-seg="' + i + '"><span class="bz-pie-dot" style="background:' + g.color + ';"></span><span class="bz-pie-name">' + escHtml(g.name) + '</span><span class="bz-pie-pct font-mono-bz">' + g.percent + '%</span></li>';
+          }).join('') +
+        '</ul>' +
+      '</div>'
+    );
+  }
+
+  // Gráfico de línea en SVG puro (curva suave con área y puntos)
+  function renderLineChart(items, maxVal) {
+    var W = 800, H = 250, padL = 44, padR = 16, padT = 16, padB = 34;
+    var top = Math.ceil(maxVal / 10000) * 10000 || 10;
+    var n = items.length;
+    var pts = items.map(function (c, i) {
+      return { x: padL + (n === 1 ? 0 : i * (W - padL - padR) / (n - 1)), y: padT + (1 - c.plays / top) * (H - padT - padB), c: c };
+    });
+    var d = pts.map(function (p, i) {
+      if (i === 0) return 'M' + p.x.toFixed(1) + ' ' + p.y.toFixed(1);
+      var q = pts[i - 1], mx = (q.x + p.x) / 2;
+      return 'C' + mx.toFixed(1) + ' ' + q.y.toFixed(1) + ' ' + mx.toFixed(1) + ' ' + p.y.toFixed(1) + ' ' + p.x.toFixed(1) + ' ' + p.y.toFixed(1);
+    }).join(' ');
+    var area = d + ' L' + pts[n - 1].x.toFixed(1) + ' ' + (H - padB) + ' L' + pts[0].x.toFixed(1) + ' ' + (H - padB) + ' Z';
+    var grid = [0, 1, 2, 3].map(function (k) {
+      var y = padT + k * (H - padT - padB) / 3, v = Math.round(top * (1 - k / 3));
+      return '<line x1="' + padL + '" x2="' + (W - padR) + '" y1="' + y.toFixed(1) + '" y2="' + y.toFixed(1) + '" class="bz-line-grid"/><text x="' + (padL - 8) + '" y="' + (y + 4).toFixed(1) + '" text-anchor="end" class="bz-line-axis">' + (v >= 1000 ? (v / 1000) + 'k' : v) + '</text>';
+    }).join('');
+    return (
+      '<div class="bz-line-chart"><svg viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Tráfico y reproducciones">' +
+        '<defs><linearGradient id="bzLineFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c084fc" stop-opacity="0.38"/><stop offset="1" stop-color="#c084fc" stop-opacity="0"/></linearGradient></defs>' +
+        grid + '<path d="' + area + '" fill="url(#bzLineFill)"/><path d="' + d + '" class="bz-line-path" fill="none" pathLength="1"/>' +
+        pts.map(function (p) {
+          return '<circle cx="' + p.x.toFixed(1) + '" cy="' + p.y.toFixed(1) + '" r="5" class="bz-line-dot"><title>' + p.c.label + ': ' + p.c.plays.toLocaleString() + ' plays · ' + p.c.users.toLocaleString() + ' ' + esc(_t('admin.chartListeners', 'oyentes')) + '</title></circle>' +
+            '<text x="' + p.x.toFixed(1) + '" y="' + (H - 10) + '" text-anchor="middle" class="bz-line-axis">' + p.c.label + '</text>';
+        }).join('') +
+      '</svg></div>'
+    );
+  }
 
   function renderDashboard(container, ctx) {
     var notify = ctx.notify || function () {};
@@ -324,54 +382,33 @@
           '</div>' +
         '</div>' +
 
-        // Fila 2: 4 Tarjetas de Telemetría e Infraestructura en Vivo (MÁS INFORMACIÓN)
-        '<div class="row g-3 mb-4">' +
-          '<div class="col-12 col-sm-6 col-xl-3">' +
-            '<div class="bz-glass-card p-3 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.03);">' +
-              '<div class="d-flex align-items-center justify-content-between mb-2">' +
-                '<span class="small text-white-50">' + esc(_t('admin.onlineListeners', 'Oyentes en Línea')) + '</span>' +
-                '<span class="badge rounded-pill bg-success bg-opacity-25 text-success font-mono-bz px-2 py-1"><i class="bi bi-broadcast me-1"></i>' + esc(_t('admin.live', 'En Vivo')) + '</span>' +
-              '</div>' +
-              '<div class="h3 fw-bold text-white mb-1 font-mono-bz">1,428</div>' +
-              '<div class="small text-white-50">' + esc(_t('admin.activeStreaming', 'Streaming simultáneo activo')) + '</div>' +
+        // Franja de telemetría: una sola tarjeta con 4 indicadores (menos ruido visual que 4 tarjetas)
+        '<div class="bz-glass-card bz-dash-strip mb-4">' +
+          '<div class="row g-0">' +
+            '<div class="col-6 col-xl-3 bz-dash-strip-item">' +
+              '<div class="bz-dash-strip-label">' + esc(_t('admin.onlineListeners', 'Oyentes en Línea')) + ' <span class="badge rounded-pill bg-success bg-opacity-25 text-success font-mono-bz"><i class="bi bi-broadcast me-1"></i>' + esc(_t('admin.live', 'En Vivo')) + '</span></div>' +
+              '<div class="bz-dash-strip-value font-mono-bz">1,428</div>' +
+              '<div class="bz-dash-strip-sub">' + esc(_t('admin.activeStreaming', 'Streaming simultáneo activo')) + '</div>' +
             '</div>' +
-          '</div>' +
-          '<div class="col-12 col-sm-6 col-xl-3">' +
-            '<div class="bz-glass-card p-3 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.03);">' +
-              '<div class="d-flex align-items-center justify-content-between mb-2">' +
-                '<span class="small text-white-50">' + esc(_t('admin.cdnStorage', 'Almacenamiento CDN')) + '</span>' +
-                '<span class="small text-white-50 font-mono-bz">71%</span>' +
-              '</div>' +
-              '<div class="h3 fw-bold text-white mb-2 font-mono-bz">14.2 <span class="fs-6 fw-normal text-white-50">/ 20 TB</span></div>' +
-              '<div class="progress rounded-pill bg-white bg-opacity-10" style="height: 6px;">' +
-                '<div class="progress-bar rounded-pill" style="width: 71%; background: linear-gradient(90deg, #c084fc, #f472b6);"></div>' +
-              '</div>' +
-              '<div class="small text-white-50 mt-1">' + esc(_t('admin.storageFree', '5.8 TB libres en almacenamiento')) + '</div>' +
+            '<div class="col-6 col-xl-3 bz-dash-strip-item">' +
+              '<div class="bz-dash-strip-label">' + esc(_t('admin.cdnStorage', 'Almacenamiento CDN')) + ' <span class="font-mono-bz">71%</span></div>' +
+              '<div class="bz-dash-strip-value font-mono-bz">14.2 <small>/ 20 TB</small></div>' +
+              '<div class="progress rounded-pill bg-white bg-opacity-10 mt-1" style="height: 5px;"><div class="progress-bar rounded-pill" style="width: 71%; background: linear-gradient(90deg, #c084fc, #f472b6);"></div></div>' +
             '</div>' +
-          '</div>' +
-          '<div class="col-12 col-sm-6 col-xl-3">' +
-            '<div class="bz-glass-card p-3 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.03);">' +
-              '<div class="d-flex align-items-center justify-content-between mb-2">' +
-                '<span class="small text-white-50">' + esc(_t('admin.uptime', 'Uptime y Disponibilidad')) + '</span>' +
-                '<span class="text-success small"><i class="bi bi-shield-fill-check"></i></span>' +
-              '</div>' +
-              '<div class="h3 fw-bold text-white mb-1 font-mono-bz">99.98%</div>' +
-              '<div class="small text-white-50">' + esc(_t('admin.uptimeDesc', 'Cero incidencias en 30 días')) + '</div>' +
+            '<div class="col-6 col-xl-3 bz-dash-strip-item">' +
+              '<div class="bz-dash-strip-label">' + esc(_t('admin.uptime', 'Uptime y Disponibilidad')) + ' <i class="bi bi-shield-fill-check text-success"></i></div>' +
+              '<div class="bz-dash-strip-value font-mono-bz">99.98%</div>' +
+              '<div class="bz-dash-strip-sub">' + esc(_t('admin.uptimeDesc', 'Cero incidencias en 30 días')) + '</div>' +
             '</div>' +
-          '</div>' +
-          '<div class="col-12 col-sm-6 col-xl-3">' +
-            '<div class="bz-glass-card p-3 h-100 d-flex flex-column justify-content-between" style="background: rgba(255,255,255,0.03);">' +
-              '<div class="d-flex align-items-center justify-content-between mb-2">' +
-                '<span class="small text-white-50">' + esc(_t('admin.streamingQuality', 'Calidad de Streaming')) + '</span>' +
-                '<span class="badge rounded-pill bg-white bg-opacity-10 text-white font-mono-bz">Hi-Res</span>' +
-              '</div>' +
-              '<div class="h3 fw-bold text-white mb-1 font-mono-bz">320 kbps</div>' +
-              '<div class="small text-white-50">' + esc(_t('admin.losslessAudio', 'Audio estéreo sin pérdidas')) + '</div>' +
+            '<div class="col-6 col-xl-3 bz-dash-strip-item">' +
+              '<div class="bz-dash-strip-label">' + esc(_t('admin.streamingQuality', 'Calidad de Streaming')) + ' <span class="badge rounded-pill bg-white bg-opacity-10 text-white font-mono-bz">Hi-Res</span></div>' +
+              '<div class="bz-dash-strip-value font-mono-bz">320 <small>kbps</small></div>' +
+              '<div class="bz-dash-strip-sub">' + esc(_t('admin.losslessAudio', 'Audio estéreo sin pérdidas')) + '</div>' +
             '</div>' +
           '</div>' +
         '</div>' +
 
-        // Fila 3: Gráfico de Tráfico (8 cols) + Distribución de Géneros (4 cols)
+        // Gráficos: tráfico (barras o línea) + géneros (pastel)
         '<div class="row g-4 mb-4">' +
           '<div class="col-12 col-xl-8">' +
             '<div class="bz-glass-card p-4 h-100">' +
@@ -380,14 +417,21 @@
                   '<h4 class="h5 fw-bold text-white mb-1"><i class="bi bi-graph-up-arrow me-2" style="color:var(--bz-lavender);"></i>' + esc(_t('admin.trafficTitle', 'Tráfico y Reproducciones')) + '</h4>' +
                   '<p class="small text-white-50 mb-0">' + esc(_t('admin.trafficDesc', 'Picos de actividad y telemetría de streaming')) + '</p>' +
                 '</div>' +
-                '<div class="bz-segmented-dock">' +
-                  ['24h', '7d', '30d'].map(function (r) {
-                    var label = r === '24h' ? _t('admin.range24h', '24 Horas') : r === '7d' ? _t('admin.range7d', '7 Días') : _t('admin.range30d', '30 Días');
-                    var activeCls = state.timeRange === r ? 'active' : '';
-                    return '<button type="button" class="bz-segmented-btn ' + activeCls + '" data-dash-range="' + r + '">' + label + '</button>';
-                  }).join('') +
+                '<div class="d-flex flex-wrap gap-2">' +
+                  '<div class="bz-segmented-dock">' +
+                    '<button type="button" class="bz-segmented-btn ' + (state.chartType === 'bar' ? 'active' : '') + '" data-dash-charttype="bar" title="' + esc(_t('admin.chartBars', 'Barras')) + '"><i class="bi bi-bar-chart-fill"></i></button>' +
+                    '<button type="button" class="bz-segmented-btn ' + (state.chartType === 'line' ? 'active' : '') + '" data-dash-charttype="line" title="' + esc(_t('admin.chartLine', 'Línea')) + '"><i class="bi bi-graph-up"></i></button>' +
+                  '</div>' +
+                  '<div class="bz-segmented-dock">' +
+                    ['24h', '7d', '30d'].map(function (r) {
+                      var label = r === '24h' ? _t('admin.range24h', '24 Horas') : r === '7d' ? _t('admin.range7d', '7 Días') : _t('admin.range30d', '30 Días');
+                      var activeCls = state.timeRange === r ? 'active' : '';
+                      return '<button type="button" class="bz-segmented-btn ' + activeCls + '" data-dash-range="' + r + '">' + label + '</button>';
+                    }).join('') +
+                  '</div>' +
                 '</div>' +
               '</div>' +
+              (state.chartType === 'line' ? renderLineChart(chartItems, maxPlays) :
               '<div class="bz-chart-wrap">' +
                 chartItems.map(function (c) {
                   var hPct = Math.max(14, Math.round((c.plays / maxPlays) * 100));
@@ -404,35 +448,19 @@
                     '</div>'
                   );
                 }).join('') +
-              '</div>' +
+              '</div>') +
             '</div>' +
           '</div>' +
 
           '<div class="col-12 col-xl-4">' +
-            '<div class="bz-glass-card p-4 h-100 d-flex flex-column justify-content-between">' +
-              '<div>' +
-                '<div class="d-flex align-items-center justify-content-between mb-3">' +
-                  '<h4 class="h5 fw-bold text-white mb-0"><i class="bi bi-pie-chart me-2" style="color:var(--bz-lavender);"></i>' + esc(_t('admin.genresTitle', 'Géneros en Tendencia')) + '</h4>' +
-                  '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz">' + esc(_t('admin.audience', 'Audiencia')) + '</span>' +
-                '</div>' +
-                '<p class="small text-white-50 mb-4">' + esc(_t('admin.genresDesc', 'Preferencia de géneros entre la comunidad de oyentes')) + '</p>' +
-                '<div class="d-grid gap-3">' +
-                  GENRE_DISTRIBUTION.map(function (g) {
-                    return (
-                      '<div>' +
-                        '<div class="d-flex justify-content-between align-items-center small mb-1">' +
-                          '<span class="text-white fw-medium">' + g.name + '</span>' +
-                          '<span class="font-mono-bz text-white-50">' + g.count + ' (' + g.percent + '%)</span>' +
-                        '</div>' +
-                        '<div class="progress rounded-pill bg-white bg-opacity-10" style="height: 6px;">' +
-                          '<div class="progress-bar rounded-pill" style="width:' + g.percent + '%; background-color:' + g.color + ';"></div>' +
-                        '</div>' +
-                      '</div>'
-                    );
-                  }).join('') +
-                '</div>' +
+            '<div class="bz-glass-card p-4 h-100 d-flex flex-column">' +
+              '<div class="d-flex align-items-center justify-content-between mb-1">' +
+                '<h4 class="h5 fw-bold text-white mb-0"><i class="bi bi-pie-chart me-2" style="color:var(--bz-lavender);"></i>' + esc(_t('admin.genresTitle', 'Géneros en Tendencia')) + '</h4>' +
+                '<span class="badge rounded-pill bg-white bg-opacity-10 text-white-50 font-mono-bz">' + esc(_t('admin.audience', 'Audiencia')) + '</span>' +
               '</div>' +
-              '<div class="pt-3 border-top border-white border-opacity-10 mt-3 d-flex align-items-center justify-content-between small text-white-50">' +
+              '<p class="small text-white-50 mb-3">' + esc(_t('admin.genresDesc', 'Preferencia de géneros entre la comunidad de oyentes')) + '</p>' +
+              renderPieChart() +
+              '<div class="pt-3 border-top border-white border-opacity-10 mt-auto d-flex align-items-center justify-content-between small text-white-50">' +
                 '<span>' + esc(_t('admin.mainPlatform', 'Plataforma principal:')) + '</span>' +
                 '<strong class="text-white font-mono-bz">' + esc(_t('admin.platformSplit', 'Web Desktop 58% · Móvil 36%')) + '</strong>' +
               '</div>' +
@@ -601,6 +629,35 @@
         renderDashboard(container, ctx);
       });
     });
+
+    container.querySelectorAll('[data-dash-charttype]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        state.chartType = btn.getAttribute('data-dash-charttype');
+        renderDashboard(container, ctx);
+      });
+    });
+
+    // Pastel: al pasar el ratón por un segmento o una fila de la leyenda se resalta y el centro muestra su dato
+    var pie = container.querySelector('.bz-pie-wrap');
+    if (pie) {
+      var pv = pie.querySelector('#bzPieValue'), pl = pie.querySelector('#bzPieLabel');
+      var pv0 = pv.textContent, pl0 = pl.textContent;
+      var pieOn = function (i) {
+        var g = GENRE_DISTRIBUTION[i];
+        pie.classList.add('is-hover');
+        pie.querySelectorAll('[data-pie-seg]').forEach(function (el) { el.classList.toggle('is-on', Number(el.getAttribute('data-pie-seg')) === i); });
+        pv.textContent = g.percent + '%'; pl.textContent = g.name;
+      };
+      var pieOff = function () {
+        pie.classList.remove('is-hover');
+        pie.querySelectorAll('[data-pie-seg]').forEach(function (el) { el.classList.remove('is-on'); });
+        pv.textContent = pv0; pl.textContent = pl0;
+      };
+      pie.querySelectorAll('[data-pie-seg]').forEach(function (el) {
+        el.addEventListener('mouseenter', function () { pieOn(Number(el.getAttribute('data-pie-seg'))); });
+        el.addEventListener('mouseleave', pieOff);
+      });
+    }
 
     container.querySelectorAll('[data-dash-range]').forEach(function (btn) {
       btn.addEventListener('click', function () {

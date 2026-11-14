@@ -6417,3 +6417,48 @@ html, body {
   .bz-exp-track-item.is-active { background: transparent; }
   .bz-exp-track-item:hover { background: rgba(255, 255, 255, 0.05); }
 }
+
+
+/* ==========================================================================
+   Dashboard: franja de telemetría, pastel (dona) y línea en SVG
+   ========================================================================== */
+.bz-dash-strip { padding: 0.35rem 0; }
+.bz-dash-strip-item { padding: 1rem 1.5rem; position: relative; }
+.bz-dash-strip-item + .bz-dash-strip-item::before {
+  content: ""; position: absolute; left: 0; top: 18%; bottom: 18%; width: 1px; background: rgba(255, 255, 255, 0.08);
+}
+.bz-dash-strip-label { display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; font-size: 0.8rem; color: rgba(255, 255, 255, 0.55); margin-bottom: 0.35rem; }
+.bz-dash-strip-value { font-size: 1.55rem; font-weight: 700; color: #fff; line-height: 1.2; }
+.bz-dash-strip-value small { font-size: 0.85rem; font-weight: 500; color: rgba(255, 255, 255, 0.5); }
+.bz-dash-strip-sub { font-size: 0.78rem; color: rgba(255, 255, 255, 0.5); margin-top: 2px; }
+@media (max-width: 1199.98px) {
+  .bz-dash-strip-item:nth-child(3)::before { display: none; }
+  .bz-dash-strip-item:nth-child(n+3) { border-top: 1px solid rgba(255, 255, 255, 0.08); }
+}
+
+.bz-pie-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.25rem; margin-bottom: 1.25rem; }
+.bz-pie-chart { position: relative; width: min(230px, 100%); aspect-ratio: 1; }
+.bz-pie-chart svg { width: 100%; height: 100%; display: block; overflow: visible; }
+.bz-pie-seg { cursor: pointer; transition: opacity 0.25s ease, stroke-width 0.25s ease; animation: bz-pie-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i) * 90ms); }
+@keyframes bz-pie-in { from { opacity: 0; stroke-width: 6; } to { opacity: 1; stroke-width: 16; } }
+.bz-pie-wrap.is-hover .bz-pie-seg:not(.is-on) { opacity: 0.28; }
+.bz-pie-seg.is-on { stroke-width: 19; }
+.bz-pie-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 28%; pointer-events: none; }
+.bz-pie-center strong { font-size: 1.6rem; color: #fff; line-height: 1.1; }
+.bz-pie-center span { font-size: 0.72rem; color: rgba(255, 255, 255, 0.55); margin-top: 2px; line-height: 1.2; }
+.bz-pie-legend { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 2px; }
+.bz-pie-legend li { display: flex; align-items: center; gap: 0.6rem; padding: 0.4rem 0.6rem; border-radius: 0.7rem; font-size: 0.85rem; color: #fff; cursor: default; transition: background-color 0.2s ease; }
+.bz-pie-legend li.is-on, .bz-pie-legend li:hover { background: rgba(255, 255, 255, 0.07); }
+.bz-pie-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.bz-pie-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bz-pie-pct { color: rgba(255, 255, 255, 0.6); font-size: 0.8rem; }
+
+.bz-line-chart svg { width: 100%; height: auto; display: block; overflow: visible; }
+.bz-line-grid { stroke: rgba(255, 255, 255, 0.07); stroke-dasharray: 3 5; }
+.bz-line-axis { fill: rgba(255, 255, 255, 0.5); font-size: 12px; font-family: var(--bs-font-monospace, monospace); }
+.bz-line-path { stroke: #c084fc; stroke-width: 3; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: bz-line-draw 1.1s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+@keyframes bz-line-draw { to { stroke-dashoffset: 0; } }
+.bz-line-dot { fill: #1a1226; stroke: #e9d5ff; stroke-width: 2.5; cursor: pointer; transition: r 0.2s ease; }
+.bz-line-dot:hover { r: 8; fill: #c084fc; }
+body.bz-theme-light .bz-dash-strip-value, body.bz-theme-light .bz-pie-center strong, body.bz-theme-light .bz-pie-legend li { color: #1f1633; }
+body.bz-theme-light .bz-line-axis { fill: rgba(31, 22, 51, 0.6); }
