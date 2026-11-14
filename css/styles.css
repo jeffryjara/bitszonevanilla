@@ -4498,8 +4498,8 @@ body.bz-reduce-motion .bz-loading-logo {
    MODO CLARO (LIGHT THEME) — Pure White Obsidian & Lavender Glow
    ========================================================================== */
 body.bz-theme-light {
-  --bz-bg-canvas: #ffffff;
-  --bz-bg-deep: #f8fafc;
+  --bz-bg-canvas: #f8fafc;
+  --bz-bg-deep: #edf2f7;
   --bz-bg-surface: #ffffff;
   --bz-bg-surface-2: #f1f5f9;
   --bz-text: #0f172a;
@@ -4508,25 +4508,54 @@ body.bz-theme-light {
   --bz-glass-bg: rgba(255, 255, 255, 0.9);
   --bz-glass-border: rgba(15, 23, 42, 0.08);
   --bz-glass-highlight: rgba(255, 255, 255, 0.98);
-  background: #ffffff !important;
-  background-color: #ffffff !important;
+  background: #f8fafc !important;
+  background-color: #f8fafc !important;
   color: #0f172a !important;
 }
 
-/* Lienzo ambiental luminoso sin degradados oscuros — Blanco Puro */
-body.bz-theme-light .bz-ambient-canvas,
+/* Lienzo ambiental en Modo Claro: degradados con tonos contrastantes para resaltar elementos blancos */
 body.bz-theme-light .bz-player-bg-layer,
-body.bz-theme-light[data-theme-mode] .bz-player-bg-layer,
-body.bz-theme-light .bz-player-bg-layer[class*="theme-"] {
-  background: #ffffff !important;
-  background-color: #ffffff !important;
-  background-image: none !important;
+body.bz-theme-light[data-theme-mode="catalog"] .bz-player-bg-layer {
+  background:
+    radial-gradient(ellipse 85% 55% at 50% -10%, rgba(147, 51, 234, 0.16), transparent 70%),
+    radial-gradient(ellipse 65% 45% at 85% 20%, rgba(99, 102, 241, 0.12), transparent 65%),
+    linear-gradient(180deg, #f8fafc 0%, #edf2f7 40%, #e2e8f0 100%) !important;
+}
+body.bz-theme-light[data-theme-mode="favorites"] .bz-player-bg-layer {
+  background:
+    radial-gradient(ellipse 80% 60% at 35% 0%, rgba(168, 85, 247, 0.25), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 85% 25%, rgba(236, 72, 153, 0.16), transparent 65%),
+    linear-gradient(160deg, #faf5ff 0%, #f3e8ff 45%, #e9d5ff 100%) !important;
+}
+body.bz-theme-light[data-theme-mode="playlists"] .bz-player-bg-layer {
+  background:
+    radial-gradient(ellipse 80% 60% at 35% 0%, rgba(34, 197, 94, 0.22), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 85% 25%, rgba(16, 185, 129, 0.16), transparent 65%),
+    linear-gradient(160deg, #f0fdf4 0%, #dcfce7 45%, #bbf7d0 100%) !important;
+}
+body.bz-theme-light[data-theme-mode="licenses"] .bz-player-bg-layer {
+  background:
+    radial-gradient(ellipse 80% 60% at 35% 0%, rgba(245, 158, 11, 0.24), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 85% 25%, rgba(251, 191, 36, 0.16), transparent 65%),
+    linear-gradient(160deg, #fffbeb 0%, #fef3c7 45%, #fde68a 100%) !important;
+}
+body.bz-theme-light[data-theme-mode="downloads"] .bz-player-bg-layer {
+  background:
+    radial-gradient(ellipse 80% 60% at 35% 0%, rgba(59, 130, 246, 0.24), transparent 70%),
+    radial-gradient(ellipse 55% 45% at 85% 25%, rgba(96, 165, 250, 0.16), transparent 65%),
+    linear-gradient(160deg, #eff6ff 0%, #dbeafe 45%, #bfdbfe 100%) !important;
+}
+body.bz-theme-light .bz-dynamic-bg-cover {
+  filter: blur(100px) saturate(180%);
+  opacity: 0;
+  transition: opacity 0.8s ease, background-image 0.8s ease;
+}
+body.bz-theme-light .bz-dynamic-bg-cover.is-visible {
+  opacity: 0.32 !important;
 }
 body.bz-theme-light .bz-dynamic-bg-scrim {
-  background: #ffffff !important;
-  background-image: none !important;
+  background: linear-gradient(180deg, rgba(248, 250, 252, 0.72) 0%, rgba(226, 232, 240, 0.92) 80%) !important;
 }
-body.bz-theme-light .bz-dynamic-bg-cover,
 body.bz-theme-light .bz-starfield,
 body.bz-theme-light .bz-noise-overlay,
 body.bz-theme-light .bz-molten-orb,
@@ -4608,12 +4637,23 @@ body.bz-theme-light #btnToggleDesktopSidebar {
   color: #475569 !important;
 }
 
-/* Almacenamiento en Sidebar */
+/* Separadores y Almacenamiento en Sidebar — Sin líneas molestas */
+body.bz-theme-light hr,
+body.bz-theme-light .bz-sidebar hr {
+  border: none !important;
+  height: 0 !important;
+  margin: 0.35rem 0 !important;
+  opacity: 0 !important;
+  display: none !important;
+}
 body.bz-theme-light #btnSidebarStorage {
-  border-color: rgba(15, 23, 42, 0.08) !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
 }
 body.bz-theme-light .bz-storage-progress-wrap {
-  background: rgba(15, 23, 42, 0.1) !important;
+  background: rgba(15, 23, 42, 0.08) !important;
 }
 body.bz-theme-light #storageAvailText {
   color: #64748b !important;
@@ -4622,13 +4662,13 @@ body.bz-theme-light #storageAvailText strong {
   color: #0f172a !important;
 }
 
-/* MiniPlayer en Modo Claro */
+/* MiniPlayer en Modo Claro — Sin borde rígido superior, integración fluida */
 body.bz-theme-light .bz-miniplayer {
-  background: rgba(255, 255, 255, 0.95) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
   backdrop-filter: blur(28px) !important;
   -webkit-backdrop-filter: blur(28px) !important;
-  border-top: 1px solid rgba(15, 23, 42, 0.08) !important;
-  box-shadow: 0 -4px 30px rgba(15, 23, 42, 0.05) !important;
+  border-top: none !important;
+  box-shadow: 0 -10px 30px rgba(15, 23, 42, 0.06) !important;
 }
 body.bz-theme-light .bz-miniplayer #miniTrackTitle {
   color: #0f172a !important;
@@ -4859,8 +4899,36 @@ body.bz-theme-light .bz-empty-orb.is-licenses i  { color: #b45309 !important; }
 body.bz-theme-light .bz-empty-orb.is-downloads i { color: #1d4ed8 !important; }
 
 body.bz-theme-light .bz-catalog-card {
-  background: #ffffff !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+body.bz-theme-light .bz-artist-card {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+body.bz-theme-light .bz-cover-box {
+  background: rgba(15, 23, 42, 0.04) !important;
+  border: none !important;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+}
+body.bz-theme-light .bz-artist-avatar {
+  background: rgba(15, 23, 42, 0.04) !important;
+  border: none !important;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+}
+body.bz-theme-light .bz-scroll-arrow {
+  background: rgba(255, 255, 255, 0.9) !important;
   border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.1) !important;
+}
+body.bz-theme-light .bz-scroll-arrow:hover {
+  background: #ffffff !important;
+  color: #7e22ce !important;
+  border-color: rgba(126, 34, 206, 0.3) !important;
+  box-shadow: 0 6px 16px rgba(126, 34, 206, 0.15) !important;
 }
 body.bz-theme-light .bz-track-row {
   border: 1px solid transparent !important;
@@ -4906,9 +4974,10 @@ body.bz-theme-light .bz-search-pill-wrap > i {
   color: #64748b !important;
 }
 body.bz-theme-light .bz-album-header-wrap {
-  background: #ffffff !important;
-  background-color: #ffffff !important;
+  background: transparent !important;
+  background-color: transparent !important;
   background-image: none !important;
+  border: none !important;
 }
 body.bz-theme-light .bz-album-play-pill {
   background: #0f172a !important;
@@ -5060,8 +5129,24 @@ body.bz-theme-light .bz-btn-hero-subtle:hover:not(:disabled) {
 }
 body.bz-theme-light .bz-btn-subtle {
   background: rgba(15, 23, 42, 0.04) !important;
-  border-color: rgba(15, 23, 42, 0.08) !important;
+  border: 1px solid transparent !important;
   color: #475569 !important;
+}
+body.bz-theme-light .bz-btn-subtle:hover {
+  background: rgba(15, 23, 42, 0.08) !important;
+  color: #0f172a !important;
+  border-color: transparent !important;
+}
+body.bz-theme-light [data-bs-toggle="dropdown"].rounded-circle,
+body.bz-theme-light .bz-btn-subtle.rounded-circle {
+  border: none !important;
+  background: rgba(15, 23, 42, 0.04) !important;
+  color: #475569 !important;
+}
+body.bz-theme-light [data-bs-toggle="dropdown"].rounded-circle:hover,
+body.bz-theme-light .bz-btn-subtle.rounded-circle:hover {
+  background: rgba(15, 23, 42, 0.09) !important;
+  color: #0f172a !important;
 }
 
 /* Tablas, Inputs y Dashboard en Modo Claro */
