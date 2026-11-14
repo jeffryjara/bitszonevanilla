@@ -6324,3 +6324,52 @@ html, body {
   .bz-exp-controls #expPlayBtn { transform: scale(1.1); }
   
 }
+
+/* ==========================================================================
+   Reproductor expandido en escritorio — distribución del Bitszone original (sin modo inmersión)
+   Portada grande con vinilo, título grande, controles en círculos y barra de progreso abajo con los tiempos a los lados
+   ========================================================================== */
+@media (min-width: 992px) {
+  #expandedPlayerModal .modal-body > .container-fluid { padding-left: 6.5vw !important; padding-right: 3.5vw !important; }
+  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { justify-content: center; padding-top: 9dvh; }
+  .bz-cover-vinyl-stage { margin-bottom: 3rem; }
+  .bz-exp-cover-frame { width: clamp(320px, min(27.8vw, 49dvh), 560px); height: clamp(320px, min(27.8vw, 49dvh), 560px); }
+  .bz-exp-cover-dock { right: -8px; bottom: -16px; padding: 0.4rem 0.85rem; gap: 0.5rem; }
+
+  /* Orden de arriba abajo: portada, título, controles, barra */
+  #expandedPlayerModal .modal-body .row > .col-lg-6:first-child > .text-center { order: 2; max-width: 100% !important; margin: 0 0 2.2rem !important; }
+  #expandedPlayerModal .bz-exp-controls { order: 3; }
+  #expandedPlayerModal .bz-exp-seekwrap { order: 4; }
+  #expTrackTitle { font-size: clamp(1.9rem, 2.2vw, 3rem) !important; letter-spacing: -0.01em; line-height: 1.15; }
+  #expTrackArtist, #expAlbumName { text-transform: uppercase; font-size: 1.05rem; font-weight: 600; letter-spacing: 0.02em; }
+  #expandedPlayerModal .text-center > .text-white-50.text-truncate { font-size: 1.05rem !important; }
+
+  .bz-exp-controls { width: min(100%, 500px); justify-content: space-between !important; margin-bottom: 2.7rem !important; }
+  .bz-exp-controls #expShuffleBtn, .bz-exp-controls #expRepeatBtn { font-size: 1.5rem !important; width: 48px; height: 48px; display: inline-flex; align-items: center; justify-content: center; }
+  .bz-exp-controls #expPrevBtn, .bz-exp-controls #expNextBtn {
+    width: 64px; height: 64px; border-radius: 50%; font-size: 2rem !important;
+    display: inline-flex; align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, 0.45); border: 1px solid rgba(255, 255, 255, 0.14);
+  }
+  .bz-exp-controls #expPlayBtn { transform: scale(1.15); }
+
+  .bz-exp-seekwrap { max-width: min(100%, 740px) !important; display: grid; grid-template-columns: auto 1fr auto; align-items: center; column-gap: 14px; margin-bottom: 0 !important; }
+  .bz-exp-seekwrap > div:not(#expSeekArea) { display: contents !important; }
+  .bz-exp-seekwrap #expCurrentTime { grid-area: 1 / 1; }
+  .bz-exp-seekwrap #expSeekArea { grid-area: 1 / 2; margin: 0 !important; }
+  .bz-exp-seekwrap #expDurationTime { grid-area: 1 / 3; white-space: nowrap; }
+  #expDurationTime .badge { display: none; }
+  .bz-exp-seekwrap .bz-exp-times span { font-size: 1rem; font-weight: 600; margin: 0; }
+
+  /* Columna derecha: pestañas arriba y lista grande que llena la altura */
+  .bz-exp-right-col {
+    align-self: flex-start; margin-top: 17dvh;
+    height: calc(100dvh - 17dvh - 60px) !important; min-height: 0; max-height: none !important;
+  }
+  .bz-exp-right-scroll {
+    mask-image: linear-gradient(to bottom, transparent 0, black 3%, black 94%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 3%, black 94%, transparent 100%);
+  }
+  .bz-exp-track-item { padding: 0.85rem 1rem; gap: 2.2rem; font-size: clamp(1.3rem, 1.8vw, 2.2rem); }
+  .bz-exp-track-item .bz-exp-idx { font-size: 1.05rem; min-width: 2.4rem; }
+}
