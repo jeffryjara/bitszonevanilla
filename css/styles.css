@@ -6583,3 +6583,33 @@ body.bz-theme-light .bz-line-axis { fill: rgba(31, 22, 51, 0.6); }
   .bz-lib-detail { grid-template-columns: 1fr; padding-left: 0; gap: 1rem; }
   .bz-lib-circle.is-back { justify-self: start; }
 }
+
+/* ==========================================================================
+   Listas de reproducción: tarjetas grandes con portada vacía, menú ··· y selección
+   ========================================================================== */
+.bz-pl-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 312px)); gap: 1.75rem 1.5rem; padding-top: 1.5rem; }
+.bz-pl-card { cursor: pointer; min-width: 0; }
+.bz-pl-cover {
+  position: relative; width: 100%; aspect-ratio: 1; border-radius: 1.25rem; overflow: hidden;
+  background: rgba(255, 255, 255, 0.07); display: flex; align-items: center; justify-content: center;
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.2s ease;
+}
+.bz-pl-card:hover .bz-pl-cover { background: rgba(255, 255, 255, 0.1); transform: translateY(-3px); }
+.bz-pl-cover img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bz-pl-cover > i.bi-music-note-list { font-size: 3rem; color: rgba(255, 255, 255, 0.35); }
+.bz-pl-meta { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; padding: 0.7rem 0.1rem 0; }
+.bz-pl-name { font-weight: 700; color: #fff; font-size: 1rem; }
+.bz-pl-count { font-size: 0.9rem; color: rgba(255, 255, 255, 0.55); margin-top: 1px; }
+.bz-pl-rename-input { width: 100%; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 0.5rem; color: #fff; font-weight: 700; font-size: 1rem; padding: 0 0.4rem; outline: none; }
+.bz-pl-card.is-selected .bz-pl-cover { outline: 3px solid #a855f7; outline-offset: -3px; }
+
+/* Lista vacía en el detalle */
+.bz-album-cover-box.is-empty { display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.08); }
+.bz-album-empty-ico { font-size: 4.5rem; color: rgba(255, 255, 255, 0.4); position: relative; z-index: 1; }
+.bz-empty-list { display: flex; flex-direction: column; gap: 0.4rem; padding: 6rem 0 0 2rem; color: rgba(255, 255, 255, 0.6); }
+.bz-empty-list strong { color: #fff; font-size: 1.15rem; }
+.bz-empty-list span { font-size: 0.9rem; }
+@media (max-width: 767.98px) {
+  .bz-pl-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .bz-empty-list { padding: 2rem 0 0; text-align: center; }
+}

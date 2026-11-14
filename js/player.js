@@ -2979,8 +2979,8 @@
       '<div class="col-12 col-lg-5 d-flex flex-column align-items-center text-center">' +
         '<div class="bz-album-cover-wrap' + (vinylOn ? ' bz-vinyl-on' : '') + '">' +
           '<div class="bz-vinyl" aria-hidden="true"><span class="bz-vinyl-label" style="background-image:url(&quot;' + esc(albumObj.coverUrl) + '&quot;)"></span></div>' +
-          '<div class="bz-album-cover-box">' +
-            '<img src="' + esc(albumObj.coverUrl) + '" alt="' + esc(albumObj.title) + '" />' +
+          '<div class="bz-album-cover-box' + (albumObj.coverUrl ? '' : ' is-empty') + '">' +
+            (albumObj.coverUrl ? '<img src="' + esc(albumObj.coverUrl) + '" alt="' + esc(albumObj.title) + '" />' : '<i class="bi bi-music-note-list bz-album-empty-ico"></i>') +
             '<div class="bz-glass-sheen"></div>' +
           '</div>' +
           '<div class="bz-album-action-dock">' +
@@ -3026,7 +3026,7 @@
     var rightColHtml =
       '<div class="col-12 col-lg-7">' +
         (tracks.length === 0
-          ? '<div class="py-5 text-center text-white-50">' + _t('album.emptyPlaylist', 'Esta lista aún no tiene canciones. Usa el botón + en cualquier canción del catálogo para agregarla.') + '</div>'
+          ? '<div class="bz-empty-list"><strong>' + esc(_t('lib.emptyListTitle', 'Esta lista está vacía')) + '</strong><span>' + esc(_t('lib.emptyListHint', 'Usa ··· o clic derecho en cualquier canción y elige "Guardar en lista de reproducción".')) + '</span></div>'
           : '<div class="bz-album-tracklist-scroll"><div class="bz-elastic-inner">' +
               tracks.map(function (t, i) {
                 var playing = appState.nowPlayingTrack && Number(appState.nowPlayingTrack.id) === Number(t.id);
@@ -3933,9 +3933,9 @@
         var fakeAlbum = {
           id: found.id,
           title: found.name,
-          artist: (Auth.getSession() ? Auth.getSession().name : _t('library.myLibrary', 'Mi Biblioteca')),
-          coverUrl: (found.tracks[0] && found.tracks[0].albumCover) || './assets/img/bitszone-icon.png',
-          year: _t('library.playlistBadge', 'Playlist'),
+          artist: _t('lib.yourList', 'Tu lista'),
+          coverUrl: (found.tracks[0] && found.tracks[0].albumCover) || '',
+          year: found.createdAt ? new Date(found.createdAt).getFullYear() : new Date().getFullYear(),
           totalDuration: found.tracks.reduce(function (s, t) { return s + (t.duration || 0); }, 0),
           tracks: found.tracks
         };
@@ -3947,6 +3947,26 @@
     if (appState.view === 'library-playlists') {
       var playlists = Storage.getPlaylists();
       var totalSongs = playlists.reduce(function (acc, p) { return acc + (p.tracks ? p.tracks.length : 0); }, 0);
+      var plSelMode = !!appState.plSelMode;
+      var plSel = appState.plSelMap || {};
+      var plSelCount = Object.keys(plSel).length;
+      var plActions;
+      if (plSelMode) {
+        plActions =
+          '<div class="bz-select-bar">' +
+            '<span class="bz-select-label">' + esc(plSelCount === 1 ? _t('lib.selectedOne', '1 seleccionado') : (plSelCount ? _t('lib.selectedN', '{n} seleccionados', { n: plSelCount }) : _t('lib.chooseLists', 'Elige listas'))) + '</span>' +
+            '<button type="button" class="bz-select-btn" data-pl-sel-all>' + esc(_t('lib.selectAll', 'Todo')) + '</button>' +
+            '<button type="button" class="bz-select-btn is-danger" data-pl-sel-del ' + (plSelCount ? '' : 'disabled') + '><i class="bi bi-trash"></i> ' + esc(_t('lib.delete', 'Eliminar')) + '</button>' +
+            '<button type="button" class="bz-select-btn is-done" data-pl-sel-done>' + esc(_t('lib.done', 'Listo')) + '</button>' +
+          '</div>';
+      } else {
+        plActions =
+          '<div class="d-flex gap-2">' +
+            (playlists.length ? '<button type="button" id="btnPlSelect" class="btn bz-btn-hero-subtle btn-sm px-3 py-2"><i class="bi bi-list-check me-1"></i>' + esc(_t('lib.select', 'Seleccionar')) + '</button>' : '') +
+            '<button type="button" id="btnLibraryNewPlaylist" class="btn bz-btn-hero-subtle btn-sm px-3 py-2"><i class="bi bi-plus-lg me-1"></i>' + esc(_t('library.newPlaylist', 'Nueva lista')) + '</button>' +
+          '</div>';
+      }
+
       var hero =
         '<div class="bz-section-hero">' +
           '<div class="d-flex align-items-center gap-3 gap-md-4 min-w-0">' +
@@ -3955,12 +3975,12 @@
               '<span class="bz-hero-kicker">' + esc(_t('library.kicker', 'BIBLIOTECA')) + '</span>' +
               '<div class="bz-hero-title">' + renderLibraryHeroDropdownHtml('playlists', _t('library.playlists', 'Listas de reproducción')) + '</div>' +
               '<div class="d-flex flex-wrap gap-2 mt-2">' +
-                '<span class="bz-hero-stat-pill"><i class="bi bi-collection"></i> ' + playlists.length + ' ' + _t(playlists.length === 1 ? 'library.playlistSingular' : 'library.playlistsPlural', 'listas') + '</span>' +
+                '<span class="bz-hero-stat-pill"><i class="bi bi-music-note-list"></i> ' + playlists.length + ' ' + _t(playlists.length === 1 ? 'library.playlistSingular' : 'library.playlistsPlural', 'listas') + '</span>' +
                 '<span class="bz-hero-stat-pill"><i class="bi bi-music-note-beamed"></i> ' + totalSongs + ' ' + _t(totalSongs === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</span>' +
               '</div>' +
             '</div>' +
           '</div>' +
-          '<button type="button" id="btnLibraryNewPlaylist" class="btn bz-btn-hero-subtle btn-sm px-3 py-2"><i class="bi bi-plus-lg me-1"></i>' + esc(_t('library.newPlaylist', 'Nueva Playlist')) + '</button>' +
+          plActions +
         '</div>';
 
       var plBody = playlists.length === 0
@@ -3970,15 +3990,29 @@
             '<p class="text-white-50 small mb-0" style="max-width:340px;">' + esc(_t('library.emptyPlaylistsDesc', 'Crea una playlist personalizada para agrupar tus canciones favoritas.')) + '</p>' +
             '<button type="button" class="btn bz-btn-hero-subtle btn-sm px-3 py-2 mt-3" data-empty-create-pl><i class="bi bi-plus-lg me-1"></i>' + esc(_t('library.createPlaylistBtn', 'Crear playlist')) + '</button>' +
           '</div>'
-        : '<div class="row g-3 pt-2">' +
-            playlists.map(function (p) {
-              var cover = (p.tracks[0] && p.tracks[0].albumCover) || './assets/img/bitszone-icon.png';
+        : '<div class="bz-pl-grid ' + (plSelMode ? 'is-select-mode' : '') + '">' +
+            playlists.map(function (p, i) {
+              var cover = p.tracks[0] && p.tracks[0].albumCover;
+              var on = !!plSel[p.id];
               return (
-                '<div class="col-6 col-sm-4 col-md-3 col-xl-2">' +
-                  '<div class="bz-catalog-card w-100" data-open-pl="' + esc(p.id) + '">' +
-                    '<div class="bz-cover-box mb-2"><img src="' + esc(cover) + '" alt="' + esc(p.name) + '" /></div>' +
-                    '<div class="text-white fw-semibold text-truncate" style="font-size:0.9rem;">' + esc(p.name) + '</div>' +
-                    '<div class="text-white-50" style="font-size:0.76rem;">' + p.tracks.length + ' ' + _t(p.tracks.length === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</div>' +
+                '<div class="bz-pl-card bz-sel-item ' + (on ? 'is-selected' : '') + '" style="--j:' + (i % 3) + ';" data-open-pl="' + esc(p.id) + '">' +
+                  '<div class="bz-pl-cover">' +
+                    (cover ? '<img src="' + esc(cover) + '" alt="' + esc(p.name) + '" />' : '<i class="bi bi-music-note-list"></i>') +
+                    (plSelMode ? '<span class="bz-sel-check ' + (on ? 'is-on' : '') + '"><i class="bi bi-check-lg"></i></span>' : '') +
+                  '</div>' +
+                  '<div class="bz-pl-meta">' +
+                    '<div class="min-w-0">' +
+                      '<div class="bz-pl-name text-truncate" data-pl-name="' + esc(p.id) + '">' + esc(p.name) + '</div>' +
+                      '<div class="bz-pl-count">' + p.tracks.length + ' ' + _t(p.tracks.length === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</div>' +
+                    '</div>' +
+                    (plSelMode ? '' :
+                      '<div class="dropdown" data-pl-menu>' +
+                        '<button type="button" class="bz-icon-action" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi bi-three-dots"></i></button>' +
+                        '<ul class="dropdown-menu dropdown-menu-end bz-library-popover-menu">' +
+                          '<li><button type="button" class="dropdown-item" data-pl-rename="' + esc(p.id) + '"><span>' + esc(_t('lib.renameList', 'Cambiar nombre')) + '</span><i class="bi bi-pencil"></i></button></li>' +
+                          '<li><button type="button" class="dropdown-item text-danger" data-pl-del="' + esc(p.id) + '"><span>' + esc(_t('album.deletePlaylist', 'Eliminar lista')) + '</span><i class="bi bi-trash"></i></button></li>' +
+                        '</ul>' +
+                      '</div>') +
                   '</div>' +
                 '</div>'
               );
@@ -3987,18 +4021,77 @@
 
       container.innerHTML = hero + plBody;
 
+      var rerender = function () { renderLibraryView(container); };
+      var delPlaylists = function (ids, msgName) {
+        openConfirmDialog(
+          _t('lib.deleteListsTitle', '¿Eliminar {n} lista(s)?', { n: ids.length }),
+          _t('lib.deleteListsMsg', 'Las canciones siguen en tu biblioteca; solo se borra la lista.'),
+          function () {
+            ids.forEach(function (id) { Storage.deletePlaylist(id); });
+            appState.plSelMode = false; appState.plSelMap = {};
+            showToast(_t('lib.listsDeleted', 'Listas eliminadas'));
+            rerender();
+          },
+          _t('lib.delete', 'Eliminar'),
+          'btn bz-ad-btn-danger py-2.5 px-4 rounded-pill shadow-sm flex-fill',
+          'bi-trash3-fill',
+          _t('library.kicker', 'BIBLIOTECA')
+        );
+      };
+
       var newPlBtn = container.querySelector('#btnLibraryNewPlaylist');
-      if (newPlBtn) {
-        newPlBtn.addEventListener('click', function () {
-          openCreatePlaylistModal();
-        });
-      }
+      if (newPlBtn) newPlBtn.addEventListener('click', function () { openCreatePlaylistModal(); });
       var emptyPlBtn = container.querySelector('[data-empty-create-pl]');
-      if (emptyPlBtn) {
-        emptyPlBtn.addEventListener('click', function () {
-          openCreatePlaylistModal();
+      if (emptyPlBtn) emptyPlBtn.addEventListener('click', function () { openCreatePlaylistModal(); });
+
+      var plSelBtn = container.querySelector('#btnPlSelect');
+      if (plSelBtn) plSelBtn.addEventListener('click', function () { appState.plSelMode = true; appState.plSelMap = {}; rerender(); });
+      var plDone = container.querySelector('[data-pl-sel-done]');
+      if (plDone) plDone.addEventListener('click', function () { appState.plSelMode = false; appState.plSelMap = {}; rerender(); });
+      var plAll = container.querySelector('[data-pl-sel-all]');
+      if (plAll) plAll.addEventListener('click', function () {
+        var all = {};
+        playlists.forEach(function (p) { all[p.id] = true; });
+        appState.plSelMap = Object.keys(all).length === plSelCount ? {} : all;
+        rerender();
+      });
+      var plDel = container.querySelector('[data-pl-sel-del]');
+      if (plDel) plDel.addEventListener('click', function () { delPlaylists(Object.keys(plSel)); });
+
+      container.querySelectorAll('[data-pl-menu]').forEach(function (m) {
+        m.addEventListener('click', function (e) { e.stopPropagation(); });
+      });
+      container.querySelectorAll('[data-pl-del]').forEach(function (b) {
+        b.addEventListener('click', function () { delPlaylists([b.getAttribute('data-pl-del')]); });
+      });
+      // Cambiar nombre: el título se vuelve un campo editable (Enter guarda, Esc cancela)
+      container.querySelectorAll('[data-pl-rename]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          var id = b.getAttribute('data-pl-rename');
+          var nameEl = container.querySelector('[data-pl-name="' + id + '"]');
+          if (!nameEl) return;
+          var old = nameEl.textContent;
+          var inp = document.createElement('input');
+          inp.type = 'text'; inp.value = old; inp.maxLength = 60; inp.className = 'bz-pl-rename-input';
+          nameEl.replaceWith(inp);
+          inp.addEventListener('click', function (e) { e.stopPropagation(); });
+          var done = false;
+          var finish = function (save) {
+            if (done) return; done = true;
+            if (save && inp.value.trim() && inp.value.trim() !== old) {
+              Storage.renamePlaylist(id, inp.value);
+              showToast(_t('lib.renamedToast', 'Lista renombrada'));
+            }
+            rerender();
+          };
+          inp.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') finish(true);
+            else if (e.key === 'Escape') finish(false);
+          });
+          inp.addEventListener('blur', function () { finish(true); });
+          setTimeout(function () { inp.focus(); inp.select(); }, 30);
         });
-      }
+      });
 
       container.querySelectorAll('[data-switch-lib]').forEach(function (btn) {
         btn.addEventListener('click', function () {
@@ -4008,8 +4101,16 @@
       });
       container.querySelectorAll('[data-open-pl]').forEach(function (card) {
         card.addEventListener('click', function () {
+          var id = card.getAttribute('data-open-pl');
+          if (appState.plSelMode) {
+            var m = appState.plSelMap || {};
+            if (m[id]) delete m[id]; else m[id] = true;
+            appState.plSelMap = m;
+            rerender();
+            return;
+          }
           appState.view = 'library-playlist-detail';
-          appState.selectedPlaylistId = card.getAttribute('data-open-pl');
+          appState.selectedPlaylistId = id;
           renderLibraryView(container);
         });
       });

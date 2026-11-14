@@ -203,6 +203,15 @@
     var list = getPlaylists().filter(function (p) { return p.id !== playlistId; });
     savePlaylists(list);
   }
+  function renamePlaylist(playlistId, name) {
+    var clean = String(name || '').trim();
+    if (!clean) return false;
+    var list = getPlaylists();
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id === playlistId) { list[i].name = clean; savePlaylists(list); return true; }
+    }
+    return false;
+  }
   function addTrackToPlaylist(playlistId, track) {
     var list = getPlaylists();
     for (var i = 0; i < list.length; i++) {
@@ -369,6 +378,7 @@
     getPlaylists: getPlaylists,
     createPlaylist: createPlaylist,
     deletePlaylist: deletePlaylist,
+    renamePlaylist: renamePlaylist,
     addTrackToPlaylist: addTrackToPlaylist,
     removeTrackFromPlaylist: removeTrackFromPlaylist,
     recordListen: recordListen,
