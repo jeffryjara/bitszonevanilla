@@ -1721,7 +1721,7 @@
     var btnText = isEn ? 'Sign in' : 'Iniciar sesión';
     return (
       '<div class="bz-lyrics-guest-hero d-flex flex-column align-items-center justify-content-center text-center px-4 py-5 w-100 flex-grow-1 my-auto">' +
-        '<h2 class="display-6 fw-bold mb-3" style="max-width: 380px; letter-spacing: -0.02em; line-height: 1.25; opacity: 0.75; color: #ffffff;">' +
+        '<h2 class="display-6 fw-bold mb-3 bz-lyrics-guest-title" style="max-width: 380px; letter-spacing: -0.02em; line-height: 1.25;">' +
           esc(title) +
         '</h2>' +
         '<a href="./login.html" class="btn bz-btn-hero btn-sm px-4 py-2 fw-semibold rounded-pill mt-2 shadow-sm">' +
@@ -1948,8 +1948,8 @@
         : 'No hay ninguna canción en reproducción';
       container.innerHTML =
         '<div class="d-flex flex-column align-items-center justify-content-center py-5 text-center px-3 flex-grow-1 my-auto" style="min-height: 260px;">' +
-          '<i class="bi bi-mic text-white-50 opacity-25 mb-3" style="font-size: 2.2rem;"></i>' +
-          '<p class="text-white-50 small mb-0" style="max-width: 240px;">' + esc(noneText) + '</p>' +
+          '<i class="bi bi-mic bz-lyrics-empty-desc mb-3" style="font-size: 2.2rem;"></i>' +
+          '<p class="bz-lyrics-empty-desc small mb-0" style="max-width: 240px;">' + esc(noneText) + '</p>' +
         '</div>';
       return;
     }
@@ -1991,9 +1991,9 @@
             var notFoundDesc = (window.BitszoneI18n && window.BitszoneI18n.getLanguage() === 'en') ? 'No synchronized lyrics found.' : 'No se encontró letra sincronizada.';
             container.innerHTML =
               '<div class="d-flex flex-column align-items-center justify-content-center py-5 text-center px-3 flex-grow-1 my-auto">' +
-                '<i class="bi bi-mic text-white-50 fs-2 mb-2"></i>' +
-                '<p class="text-white fw-bold small mb-1">' + esc(notFoundTitle) + '</p>' +
-                '<p class="text-white-50 small mb-0">' + esc(notFoundDesc) + '</p>' +
+                '<i class="bi bi-mic bz-lyrics-empty-desc fs-2 mb-2"></i>' +
+                '<p class="bz-lyrics-empty-title fw-bold small mb-1">' + esc(notFoundTitle) + '</p>' +
+                '<p class="bz-lyrics-empty-desc small mb-0">' + esc(notFoundDesc) + '</p>' +
               '</div>';
           }
         });
@@ -2315,11 +2315,11 @@
               } else {
                 container.innerHTML =
                   '<div class="d-flex flex-column align-items-center justify-content-center py-5 text-center px-4 flex-grow-1 my-auto">' +
-                    '<div class="rounded-4 bg-white bg-opacity-10 d-flex align-items-center justify-content-center text-white-50 mb-3 shadow-sm" style="width: 64px; height: 64px;">' +
-                      '<i class="bi bi-mic fs-2 text-white-50"></i>' +
+                    '<div class="bz-lyrics-empty-orb rounded-4 d-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 64px; height: 64px;">' +
+                      '<i class="bi bi-mic fs-2"></i>' +
                     '</div>' +
-                    '<p class="text-white fw-bold fs-5 mb-1">' + _t('lyrics.notFound', 'Letra no disponible') + '</p>' +
-                    '<p class="text-white-50 small mb-0" style="max-width: 320px;">' + _t('lyrics.notFoundDesc', 'No encontramos la letra sincronizada para esta canción.') + '</p>' +
+                    '<p class="bz-lyrics-empty-title fw-bold fs-5 mb-1">' + _t('lyrics.notFound', 'Letra no disponible') + '</p>' +
+                    '<p class="bz-lyrics-empty-desc small mb-0" style="max-width: 320px;">' + _t('lyrics.notFoundDesc', 'No encontramos la letra sincronizada para esta canción.') + '</p>' +
                   '</div>';
               }
             });
