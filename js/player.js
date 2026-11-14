@@ -3453,14 +3453,15 @@
   function renderLibAlbumDetail(g, kind, selMode, selMap) {
     return (
       '<div class="bz-lib-detail">' +
+        '<button type="button" id="btnColBackToAlbums" class="bz-lib-circle is-back" title="' + esc(_t('library.allAlbums', 'Todos los álbumes')) + '"><i class="bi bi-arrow-left"></i></button>' +
         '<div class="bz-lib-detail-left">' +
-          '<button type="button" id="btnColBackToAlbums" class="bz-lib-circle is-back" title="' + esc(_t('library.allAlbums', 'Todos los álbumes')) + '"><i class="bi bi-arrow-left"></i></button>' +
           '<div class="bz-lib-detail-cover"><img src="' + esc(g.coverUrl) + '" alt="' + esc(g.title) + '" /></div>' +
           '<span class="bz-hero-kicker mt-3">' + esc(_t('lib.albumKicker', 'ÁLBUM')) + '</span>' +
           '<h2 class="bz-lib-detail-title">' + esc(g.title) + '</h2>' +
           '<div class="bz-lib-sub mb-3">' + esc(g.artist) + ' • ' + g.tracks.length + ' ' + _t(g.tracks.length === 1 ? 'common.songSingular' : 'common.songsPlural', 'canciones') + '</div>' +
           '<div class="bz-lib-dock">' +
             '<button type="button" class="bz-lib-play-pill" data-grp-play="' + esc(g.id) + '"><i class="bi bi-play-fill"></i> ' + esc(_t('lib.playAlbum', 'Reproducir todo')) + '</button>' +
+            (kind === 'favorites' ? '<button type="button" class="bz-lib-circle is-liked" data-grp-rm="' + esc(g.id) + '" title="' + esc(_t('lib.removeAll', 'Quitar todo')) + '"><i class="bi bi-heart-fill"></i></button>' : '') +
             '<button type="button" class="bz-lib-circle" data-grp-rm="' + esc(g.id) + '" title="' + esc(_t('lib.removeAll', 'Quitar todo')) + '"><i class="bi bi-trash"></i></button>' +
           '</div>' +
         '</div>' +

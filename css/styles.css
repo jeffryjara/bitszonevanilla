@@ -6569,3 +6569,17 @@ body.bz-theme-light .bz-line-axis { fill: rgba(31, 22, 51, 0.6); }
   .bz-select-bar { flex-wrap: wrap; border-radius: 1.2rem; }
   .bz-lib-album-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Detalle de álbum de la biblioteca: flecha, portada y tabla en tres columnas como el original */
+.bz-lib-detail { grid-template-columns: 44px minmax(300px, 380px) minmax(0, 1fr); gap: 48px; padding: 0.5rem 0 0 32px; }
+.bz-lib-circle.is-back { position: static; width: 44px; height: 44px; }
+.bz-lib-circle.is-liked { color: #a855f7; background: transparent; }
+.bz-lib-circle.is-liked:hover { background: rgba(255, 255, 255, 0.1); color: #c084fc; }
+.bz-lib-detail-right .bz-lib-row:not(.bz-lib-head) { padding: 0.85rem 0.75rem; }
+.bz-lib-detail-right .bz-lib-title { font-size: 1.1rem; }
+.bz-lib-detail-right .bz-lib-sub { font-size: 0.92rem; }
+.bz-lib-detail-right .bz-lib-head { padding-bottom: 0.9rem; margin-bottom: 0.5rem; }
+@media (max-width: 991.98px) {
+  .bz-lib-detail { grid-template-columns: 1fr; padding-left: 0; gap: 1rem; }
+  .bz-lib-circle.is-back { justify-self: start; }
+}
