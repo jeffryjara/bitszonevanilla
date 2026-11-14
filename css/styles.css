@@ -4568,7 +4568,6 @@ body.bz-theme-light .bz-glass-sheen,
 body.bz-theme-light .bz-artist-halo,
 body.bz-theme-light .bz-artist-hero-glow,
 body.bz-theme-light .bz-album-header-ambient,
-body.bz-theme-light .bz-cover-overlay,
 body.bz-theme-light .bz-auth-vignette {
   display: none !important;
 }
@@ -4912,6 +4911,23 @@ body.bz-theme-light .bz-cover-box {
   background: rgba(15, 23, 42, 0.04) !important;
   border: none !important;
   box-shadow: 0 12px 28px rgba(15, 23, 42, 0.12), 0 2px 6px rgba(15, 23, 42, 0.04) !important;
+}
+body.bz-theme-light .bz-cover-overlay {
+  background: rgba(15, 23, 42, 0.28) !important;
+  backdrop-filter: blur(2px) !important;
+  -webkit-backdrop-filter: blur(2px) !important;
+}
+body.bz-theme-light .bz-play-orb {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
+  color: #7e22ce !important;
+  box-shadow: 0 12px 28px rgba(15, 23, 42, 0.28), 0 2px 8px rgba(126, 34, 206, 0.2) !important;
+}
+body.bz-theme-light .bz-play-orb:hover {
+  transform: scale(1.08) !important;
+  background: #ffffff !important;
+  color: #6b21a8 !important;
+  box-shadow: 0 16px 36px rgba(126, 34, 206, 0.35) !important;
 }
 body.bz-theme-light .bz-artist-avatar {
   background: rgba(15, 23, 42, 0.04) !important;
