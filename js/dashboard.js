@@ -565,7 +565,7 @@
                         ? '<img src="' + escHtml(u.avatar_url) + '" alt="" width="38" height="38" class="rounded-circle object-fit-cover" />'
                         : '<span class="rounded-circle d-inline-flex align-items-center justify-content-center fw-bold text-white" style="width:38px;height:38px;background:rgba(168,85,247,0.3);">' + escHtml(u.username.charAt(0).toUpperCase()) + '</span>';
                       
-                      var roleBadge = '<span class="badge rounded-pill" style="background:rgba(168,85,247,0.28);color:#e9d5ff;"><i class="bi bi-shield-check me-1"></i>' + esc(_t('admin.roleAdminBadge', 'Admin')) + '</span>';
+                      var roleBadge = '<span class="badge rounded-pill bz-role-badge"><i class="bi bi-shield-check me-1"></i>' + esc(_t('admin.roleAdminBadge', 'Admin')) + '</span>';
 
                       var statusHtml = u.status === 'online'
                         ? '<span class="text-success small"><i class="bi bi-circle-fill me-1" style="font-size:0.5rem;"></i>' + esc(_t('admin.statusOnline', 'En línea')) + '</span>'
