@@ -4579,6 +4579,44 @@
       }, { passive: true });
     })();
 
+    // Marquesina al pasar el ratón por nombres recortados (lista del reproductor expandido y título)
+    (function () {
+      function textEl(t) {
+        var row = t.closest && t.closest('.bz-exp-track-item');
+        if (row) return row.querySelector('span.text-truncate');
+        return t.closest && t.closest('#expTrackTitle');
+      }
+      function inner(el) {
+        var m = el.firstElementChild;
+        if (!m || !m.classList.contains('bz-marq')) { el.innerHTML = '<span class="bz-marq">' + el.innerHTML + '</span>'; m = el.firstElementChild; }
+        return m;
+      }
+      document.addEventListener('mouseover', function (e) {
+        var el = textEl(e.target);
+        if (!el || el.dataset.marq === '1') return;
+        var extra = el.scrollWidth - el.clientWidth;
+        if (extra <= 2) return;
+        el.dataset.marq = '1';
+        var m = inner(el);
+        extra = m.offsetWidth - el.clientWidth + 8;
+        el.style.textOverflow = 'clip';
+        m.style.transition = 'transform ' + Math.max(1.2, extra / 45).toFixed(2) + 's linear 0.25s';
+        m.style.transform = 'translateX(' + (-extra) + 'px)';
+      });
+      document.addEventListener('mouseout', function (e) {
+        var el = textEl(e.target);
+        if (!el || el.dataset.marq !== '1') return;
+        var host = el.closest('.bz-exp-track-item') || el;
+        if (e.relatedTarget && host.contains(e.relatedTarget)) return;
+        el.dataset.marq = '';
+        var m = el.firstElementChild;
+        if (!m) return;
+        m.style.transition = 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)';
+        m.style.transform = '';
+        setTimeout(function () { if (el.dataset.marq !== '1') el.style.textOverflow = ''; }, 700);
+      });
+    })();
+
     // Hoja inferior del reproductor expandido (móvil): tocar o arrastrar la pestañita la abre / cierra
     (function () {
       var modal = document.getElementById('expandedPlayerModal');
