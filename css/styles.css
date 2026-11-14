@@ -5576,6 +5576,16 @@ html, body {
   .bz-sidebar.is-collapsed .bz-nav-label,
   .bz-sidebar.is-collapsed .bz-brand-group,
   .bz-sidebar.is-collapsed .bz-storage-details { opacity: 1; width: auto; pointer-events: auto; }
+  /* En el cajón móvil el estado "colapsado" de escritorio no aplica: se ven etiquetas, marca y almacenamiento */
+  .bz-sidebar.is-collapsed .bz-nav-label,
+  .bz-sidebar.is-collapsed .bz-storage-text-wrap,
+  .bz-sidebar.is-collapsed .bz-storage-chevron { opacity: 1 !important; transform: none !important; pointer-events: auto !important; }
+  .bz-sidebar.is-collapsed .bz-brand-group { max-width: 170px !important; opacity: 1 !important; pointer-events: auto !important; }
+  .bz-sidebar.is-collapsed .bz-sidebar-header { padding: 0 4px !important; justify-content: space-between !important; }
+  .bz-sidebar.is-collapsed .bz-storage-details { padding: 0.45rem 12px !important; height: auto; min-height: 0; }
+  .bz-sidebar.is-collapsed .bz-storage-row { margin-bottom: 0.45rem !important; }
+  .bz-sidebar.is-collapsed .bz-storage-progress-wrap { max-height: 4px !important; opacity: 1 !important; }
+  .bz-sidebar.is-collapsed hr { width: 100%; }
   body.bz-drawer-open .bz-sidebar { transform: none; box-shadow: -20px 0 60px rgba(0, 0, 0, 0.6); }
   body.bz-drawer-open .bz-app-frame { z-index: 1050; }
   .bz-drawer-backdrop {
