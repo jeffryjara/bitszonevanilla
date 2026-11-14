@@ -6613,3 +6613,15 @@ body.bz-theme-light .bz-line-axis { fill: rgba(31, 22, 51, 0.6); }
   .bz-pl-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .bz-empty-list { padding: 2rem 0 0; text-align: center; }
 }
+
+/* Licencias: columnas Expiración y Hasta, menú de pista y corazón de la tarjeta de álbum */
+.bz-lib-row.is-lic { grid-template-columns: 44px minmax(0, 1fr) 140px 120px 100px 80px 100px; }
+.bz-lib-exp { font-size: 0.78rem; font-weight: 700; color: #facc15; text-align: center; }
+.bz-lib-until { font-size: 0.8rem; color: rgba(255, 255, 255, 0.7); text-align: center; }
+.bz-lib-head .bz-lib-exp, .bz-lib-head .bz-lib-until { color: rgba(255, 255, 255, 0.5); font-size: 0.68rem; font-weight: 700; }
+.bz-lib-ctx { position: fixed !important; inset: auto; min-width: 270px; z-index: 1090; margin: 0; transform: none !important; }
+.bz-lib-ctx .dropdown-item { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.bz-lib-ctx .dropdown-item.is-danger { color: #fca5a5; }
+.bz-alb-heart { flex-shrink: 0; }
+@media (max-width: 1199.98px) { .bz-lib-row.is-lic { grid-template-columns: 44px minmax(0, 1fr) 110px 90px 80px; } .bz-lib-row.is-lic .bz-lib-added, .bz-lib-row.is-lic .bz-lib-until { display: none; } }
+@media (max-width: 767.98px) { .bz-lib-row.is-lic { grid-template-columns: 32px minmax(0, 1fr) 62px 76px; } .bz-lib-row.is-lic .bz-lib-exp { display: none; } }
