@@ -6625,3 +6625,7 @@ body.bz-theme-light .bz-line-axis { fill: rgba(31, 22, 51, 0.6); }
 .bz-alb-heart { flex-shrink: 0; }
 @media (max-width: 1199.98px) { .bz-lib-row.is-lic { grid-template-columns: 44px minmax(0, 1fr) 110px 90px 80px; } .bz-lib-row.is-lic .bz-lib-added, .bz-lib-row.is-lic .bz-lib-until { display: none; } }
 @media (max-width: 767.98px) { .bz-lib-row.is-lic { grid-template-columns: 32px minmax(0, 1fr) 62px 76px; } .bz-lib-row.is-lic .bz-lib-exp { display: none; } }
+
+/* Buscador de "Añadir canciones a la cola": misma píldora de cristal que el resto de la app */
+.bz-exp-sug-search { width: 230px; }
+.bz-exp-sug-search .bz-search-pill-input { height: 40px; font-size: 0.85rem; }

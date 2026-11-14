@@ -2126,9 +2126,9 @@
         '<div class="mt-4 pt-3 border-top border-white border-opacity-10 px-2">' +
           '<div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">' +
             '<span class="text-white-50 text-uppercase fw-bold" style="font-size:0.72rem; letter-spacing:0.2em;">' + _t('queue.addSongsTitle', 'Añadir canciones a la cola') + '</span>' +
-            '<div class="position-relative" style="width: 195px;">' +
-              '<i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-white-50" style="font-size:0.75rem; pointer-events:none;"></i>' +
-              '<input id="expSugSearch" type="text" class="form-control form-control-sm bz-input-dark ps-4 py-1" style="font-size:0.78rem; border-radius:999px;" placeholder="' + _t('queue.searchSong', 'Buscar canción...') + '" value="' + esc(appState.expQueueSearch || '') + '" />' +
+            '<div class="bz-search-pill-wrap bz-exp-sug-search">' +
+              '<i class="bi bi-search"></i>' +
+              '<input id="expSugSearch" type="text" class="bz-search-pill-input" placeholder="' + _t('queue.searchSong', 'Buscar canción...') + '" value="' + esc(appState.expQueueSearch || '') + '" />' +
             '</div>' +
           '</div>' +
           '<div id="expSugList" class="d-grid gap-1"></div>' +
