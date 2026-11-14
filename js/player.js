@@ -2954,10 +2954,11 @@
   }
 
   function renderBackBtnNode(btnId) {
+    var label = _t('catalog.back', 'Atrás');
     return (
-      '<button type="button" id="' + btnId + '" class="bz-back-btn" aria-label="Atrás">' +
+      '<button type="button" id="' + btnId + '" class="bz-back-btn" aria-label="' + label + '">' +
         '<span class="bz-back-icon"><i class="bi bi-arrow-left"></i></span>' +
-        '<span class="bz-back-label">Atrás</span>' +
+        '<span class="bz-back-label">' + label + '</span>' +
       '</button>'
     );
   }

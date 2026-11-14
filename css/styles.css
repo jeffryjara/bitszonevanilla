@@ -2075,6 +2075,16 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   border: 1px solid rgba(192, 132, 252, 0.45);
 }
 
+.bz-role-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(168, 85, 247, 0.28);
+  color: #e9d5ff;
+  border: 1px solid rgba(192, 132, 252, 0.35);
+}
+
 /* Main Scrollable View Area */
 .bz-main-scroll {
   flex: 1;
@@ -2398,6 +2408,7 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   align-items: center;
   justify-content: space-between;
   gap: 1.15rem;
+  white-space: nowrap !important;
   background: transparent;
   transition: background-color 0.16s ease, color 0.16s ease;
 }
@@ -2450,6 +2461,10 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35);
 }
 
+.bz-exp-segmented-pill {
+  height: 42px;
+}
+
 .bz-segmented-btn {
   border: none;
   background: transparent;
@@ -2470,7 +2485,8 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
 .bz-segmented-btn:hover {
   color: #ffffff;
 }
-.bz-segmented-btn.is-active {
+.bz-segmented-btn.is-active,
+.bz-segmented-btn.active {
   background: rgba(255, 255, 255, 0.16);
   color: #ffffff;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
@@ -3454,16 +3470,28 @@ body[data-theme-mode="downloads"] .bz-player-bg-layer {
   color: #ffffff;
 }
 
+/* Desenfoque y fondo Liquid Glass para modales y backdrops */
+.modal-backdrop {
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+}
+.modal-backdrop.show {
+  opacity: 0.55 !important;
+}
+
 #addToPlaylistModal,
 #createPlaylistModal,
 #authRequiredModal,
 #confirmActionModal,
 #shortcutsModal,
-#unsavedGuardModal {
+#unsavedGuardModal,
+#addAdminModal,
+#releaseDemoModal,
+#catalogDiagModal {
   z-index: 1090;
   background: rgba(5, 5, 10, 0.65);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
 }
 
 .bz-modal-close-float {
@@ -4660,13 +4688,61 @@ body.bz-theme-light .bz-exp-close-btn {
   box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
 }
 body.bz-theme-light .bz-exp-track-item {
+  color: #1e293b !important;
   border-bottom-color: rgba(15, 23, 42, 0.06) !important;
+}
+body.bz-theme-light .bz-exp-track-item span,
+body.bz-theme-light .bz-exp-track-item .text-truncate {
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-exp-track-item .bz-exp-idx {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-exp-track-item .bz-exp-sub {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-exp-track-item .font-mono-bz {
+  color: #64748b !important;
 }
 body.bz-theme-light .bz-exp-track-item:hover {
   background: rgba(15, 23, 42, 0.04) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-exp-track-item:hover span,
+body.bz-theme-light .bz-exp-track-item:hover .text-truncate {
+  color: #0f172a !important;
+}
+body.bz-theme-light .bz-exp-track-item:hover .bz-exp-idx {
+  color: #0f172a !important;
 }
 body.bz-theme-light .bz-exp-track-item.is-active {
-  background: rgba(126, 34, 206, 0.08) !important;
+  background: rgba(126, 34, 206, 0.1) !important;
+  color: #7e22ce !important;
+}
+body.bz-theme-light .bz-exp-track-item.is-active span,
+body.bz-theme-light .bz-exp-track-item.is-active .text-truncate {
+  color: #7e22ce !important;
+  font-weight: 700 !important;
+}
+body.bz-theme-light .bz-exp-track-item.is-active .bz-exp-idx {
+  color: #7e22ce !important;
+  font-weight: 700 !important;
+}
+body.bz-theme-light .bz-exp-track-item.is-active .bz-exp-sub {
+  color: #9333ea !important;
+}
+body.bz-theme-light .bz-exp-track-item.is-active .font-mono-bz {
+  color: #7e22ce !important;
+}
+body.bz-theme-light .bz-exp-row-actions .bz-icon-action {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-exp-row-actions .bz-icon-action:hover {
+  color: #0f172a !important;
+  background: rgba(15, 23, 42, 0.06) !important;
+}
+body.bz-theme-light .bz-exp-row-actions .bz-icon-action.is-favorited {
+  color: #dc2626 !important;
 }
 body.bz-theme-light .bz-exp-cover-dock {
   background: rgba(255, 255, 255, 0.96) !important;
@@ -4676,7 +4752,17 @@ body.bz-theme-light .bz-exp-cover-dock {
 body.bz-theme-light #bzExpFloatingMenu {
   background: #ffffff !important;
   border: 1px solid rgba(15, 23, 42, 0.12) !important;
-  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 16px 40px rgba(15, 23, 42, 0.14) !important;
+  min-width: 260px !important;
+}
+body.bz-theme-light #bzExpFloatingMenu .dropdown-item {
+  color: #334155 !important;
+  white-space: nowrap !important;
+}
+body.bz-theme-light #bzExpFloatingMenu .dropdown-item:hover,
+body.bz-theme-light #bzExpFloatingMenu .dropdown-item:focus {
+  background: rgba(15, 23, 42, 0.05) !important;
+  color: #0f172a !important;
 }
 body.bz-theme-light .bz-exp-floating-item {
   color: #334155 !important;
@@ -4686,33 +4772,112 @@ body.bz-theme-light .bz-exp-floating-item:hover {
   color: #0f172a !important;
 }
 
-/* Hero de Secciones & Álbumes en Modo Claro — Sin degradados */
-body.bz-theme-light .bz-section-hero {
+/* Letras en Modo Claro (Reproductor Gigante y Lateral) */
+body.bz-theme-light .bz-lyric-line {
+  color: rgba(15, 23, 42, 0.38) !important;
+}
+body.bz-theme-light .bz-lyric-line:hover {
+  color: rgba(15, 23, 42, 0.78) !important;
+}
+body.bz-theme-light .bz-lyric-line.is-active,
+body.bz-theme-light .bz-lyric-line[data-active-lyric="true"] {
+  color: #0f172a !important;
+  text-shadow: 0 2px 14px rgba(126, 34, 206, 0.25) !important;
+}
+body.bz-theme-light .bz-lyric-line.is-past {
+  color: rgba(15, 23, 42, 0.25) !important;
+}
+
+/* Botón Atrás Expandible en Modo Claro */
+body.bz-theme-light .bz-back-btn {
   background: #ffffff !important;
-  background-color: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.15) !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.08) !important;
+}
+@media (min-width: 768px) and (hover: hover) {
+  body.bz-theme-light .bz-back-btn:hover {
+    background: #f8fafc !important;
+    border-color: rgba(126, 34, 206, 0.45) !important;
+    color: #7e22ce !important;
+    box-shadow: 0 6px 20px rgba(126, 34, 206, 0.15) !important;
+  }
+}
+body.bz-theme-light .bz-back-btn .bz-back-icon,
+body.bz-theme-light .bz-back-btn .bz-back-label {
+  color: inherit !important;
+}
+
+/* Badges ADMIN y ROL en Modo Claro */
+body.bz-theme-light .bz-admin-badge,
+body.bz-theme-light #sidebarAdminBadge,
+body.bz-theme-light .bz-role-badge {
+  background: rgba(126, 34, 206, 0.12) !important;
+  color: #7e22ce !important;
+  border: 1px solid rgba(126, 34, 206, 0.32) !important;
+}
+
+/* Teclas de Atajos de Teclado en Modo Claro */
+body.bz-theme-light .bz-kbd {
+  background: #f1f5f9 !important;
+  border: 1px solid #cbd5e1 !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08) !important;
+}
+
+/* Hero de Secciones & Álbumes en Modo Claro — Sin cajas ni bordes feos */
+body.bz-theme-light .bz-section-hero {
+  background: transparent !important;
+  background-color: transparent !important;
   background-image: none !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 body.bz-theme-light .bz-hero-title {
   color: #0f172a !important;
+}
+body.bz-theme-light .bz-hero-kicker {
+  color: #64748b !important;
 }
 body.bz-theme-light .bz-hero-stat-pill {
   background: rgba(15, 23, 42, 0.05) !important;
   color: #475569 !important;
   border: 1px solid rgba(15, 23, 42, 0.08) !important;
 }
+body.bz-theme-light .bz-hero-icon-tile.is-favorites { background: rgba(168, 85, 247, 0.14) !important; box-shadow: 0 10px 24px rgba(168, 85, 247, 0.12) !important; }
+body.bz-theme-light .bz-hero-icon-tile.is-favorites i { color: #7e22ce !important; }
+body.bz-theme-light .bz-hero-icon-tile.is-playlists { background: rgba(34, 197, 94, 0.14) !important; box-shadow: 0 10px 24px rgba(34, 197, 94, 0.12) !important; }
+body.bz-theme-light .bz-hero-icon-tile.is-playlists i { color: #15803d !important; }
+body.bz-theme-light .bz-hero-icon-tile.is-licenses  { background: rgba(245, 158, 11, 0.16) !important; box-shadow: 0 10px 24px rgba(245, 158, 11, 0.12) !important; }
+body.bz-theme-light .bz-hero-icon-tile.is-licenses i  { color: #b45309 !important; }
+body.bz-theme-light .bz-hero-icon-tile.is-downloads { background: rgba(59, 130, 246, 0.14) !important; box-shadow: 0 10px 24px rgba(59, 130, 246, 0.12) !important; }
+body.bz-theme-light .bz-hero-icon-tile.is-downloads i { color: #1d4ed8 !important; }
+
+body.bz-theme-light .bz-empty-orb.is-favorites i { color: #7e22ce !important; }
+body.bz-theme-light .bz-empty-orb.is-playlists i { color: #15803d !important; }
+body.bz-theme-light .bz-empty-orb.is-licenses i  { color: #b45309 !important; }
+body.bz-theme-light .bz-empty-orb.is-downloads i { color: #1d4ed8 !important; }
+
 body.bz-theme-light .bz-catalog-card {
   background: #ffffff !important;
   border: 1px solid rgba(15, 23, 42, 0.08) !important;
 }
 body.bz-theme-light .bz-track-row {
-  border-color: rgba(15, 23, 42, 0.06) !important;
+  border: 1px solid transparent !important;
 }
 body.bz-theme-light .bz-track-row:hover {
   background: rgba(15, 23, 42, 0.04) !important;
 }
 body.bz-theme-light .bz-track-row.is-playing {
   background: rgba(126, 34, 206, 0.08) !important;
+  border-color: rgba(126, 34, 206, 0.22) !important;
+}
+body.bz-theme-light .bz-album-track-row:hover {
+  background: rgba(15, 23, 42, 0.04) !important;
+}
+body.bz-theme-light .bz-album-track-row.is-playing {
+  background: rgba(126, 34, 206, 0.06) !important;
+  border-color: rgba(126, 34, 206, 0.35) !important;
 }
 body.bz-theme-light .bz-icon-action {
   color: #64748b !important;
@@ -4731,6 +4896,7 @@ body.bz-theme-light .bz-search-pill-wrap {
 }
 body.bz-theme-light .bz-search-pill-input {
   background: rgba(15, 23, 42, 0.04) !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
   color: #0f172a !important;
 }
 body.bz-theme-light .bz-search-pill-input::placeholder {
@@ -4753,8 +4919,17 @@ body.bz-theme-light .bz-album-play-pill:hover {
   box-shadow: 0 8px 24px rgba(15, 23, 42, 0.22) !important;
 }
 body.bz-theme-light .bz-library-dropdown-btn {
-  background: rgba(15, 23, 42, 0.05) !important;
-  border: 1px solid rgba(15, 23, 42, 0.1) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: #0f172a !important;
+  padding: 0 !important;
+}
+body.bz-theme-light .bz-library-dropdown-btn .bi-chevron-down {
+  color: #64748b !important;
+}
+body.bz-theme-light .bz-library-dropdown-btn:hover .bi-chevron-down,
+body.bz-theme-light .bz-library-dropdown-btn[aria-expanded="true"] .bi-chevron-down {
   color: #0f172a !important;
 }
 
@@ -4817,13 +4992,22 @@ body.bz-theme-light #adCardWrap {
   border: 1px solid rgba(15, 23, 42, 0.1) !important;
   color: #0f172a !important;
 }
+body.bz-theme-light .modal-backdrop.show {
+  opacity: 0.35 !important;
+  background-color: #0f172a !important;
+}
 body.bz-theme-light #addToPlaylistModal,
 body.bz-theme-light #createPlaylistModal,
 body.bz-theme-light #authRequiredModal,
 body.bz-theme-light #confirmActionModal,
 body.bz-theme-light #shortcutsModal,
-body.bz-theme-light #unsavedGuardModal {
-  background: rgba(15, 23, 42, 0.35) !important;
+body.bz-theme-light #unsavedGuardModal,
+body.bz-theme-light #addAdminModal,
+body.bz-theme-light #releaseDemoModal,
+body.bz-theme-light #catalogDiagModal {
+  background: rgba(15, 23, 42, 0.3) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
 }
 body.bz-theme-light .modal-header,
 body.bz-theme-light .modal-body,
@@ -4904,8 +5088,27 @@ body.bz-theme-light .bz-admin-kpi-card {
   background-color: #ffffff !important;
   background: #ffffff !important;
   background-image: none !important;
-  border: 1px solid rgba(15, 23, 42, 0.08) !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
   color: #0f172a !important;
+}
+body.bz-theme-light .bz-input-dark::placeholder {
+  color: #94a3b8 !important;
+}
+body.bz-theme-light .bz-input-dark:focus {
+  border-color: #7e22ce !important;
+  box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.15) !important;
+}
+body.bz-theme-light #dashUserSearch {
+  background-color: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.18) !important;
+  color: #0f172a !important;
+}
+body.bz-theme-light #dashUserSearch::placeholder {
+  color: #94a3b8 !important;
+}
+body.bz-theme-light #dashUserSearch:focus {
+  border-color: #7e22ce !important;
+  box-shadow: 0 0 0 3px rgba(126, 34, 206, 0.15) !important;
 }
 body.bz-theme-light .form-control,
 body.bz-theme-light .form-select {
@@ -4995,22 +5198,36 @@ body.bz-theme-light .bz-glass-pill-btn:hover {
   color: #0f172a !important;
 }
 
-/* Segmented Buttons en Modo Claro */
-body.bz-theme-light .bz-segmented-pill {
-  background: rgba(15, 23, 42, 0.05) !important;
-  border-color: rgba(15, 23, 42, 0.08) !important;
+/* Segmented Buttons en Modo Claro (Reproductor Gigante, Biblioteca, Descargas, Configuración, Dashboard) */
+body.bz-theme-light .bz-segmented-pill,
+body.bz-theme-light .bz-segmented-dock {
+  background: rgba(15, 23, 42, 0.06) !important;
+  border: 1px solid rgba(15, 23, 42, 0.09) !important;
+  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04) !important;
 }
+body.bz-theme-light .bz-segmented-btn,
 body.bz-theme-light .bz-seg-btn {
-  color: #64748b !important;
+  color: #475569 !important;
 }
+body.bz-theme-light .bz-segmented-btn:hover,
 body.bz-theme-light .bz-seg-btn:hover {
   color: #0f172a !important;
-  background: rgba(15, 23, 42, 0.04) !important;
+  background: rgba(15, 23, 42, 0.05) !important;
 }
-body.bz-theme-light .bz-seg-btn.is-active {
-  background: #0f172a !important;
-  color: #ffffff !important;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2) !important;
+body.bz-theme-light .bz-segmented-btn.is-active,
+body.bz-theme-light .bz-segmented-btn.active,
+body.bz-theme-light .bz-seg-btn.is-active,
+body.bz-theme-light .bz-seg-btn.active {
+  background: #ffffff !important;
+  color: #0f172a !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12), 0 0 0 1px rgba(15, 23, 42, 0.08) !important;
+  font-weight: 600 !important;
+}
+body.bz-theme-light .bz-segmented-btn.is-active i,
+body.bz-theme-light .bz-segmented-btn.active i,
+body.bz-theme-light .bz-seg-btn.is-active i,
+body.bz-theme-light .bz-seg-btn.active i {
+  color: #7e22ce !important;
 }
 
 /* Slider de Escala en Modo Claro */
@@ -5248,10 +5465,13 @@ body.bz-high-contrast .bz-btn-subtle,
 body.bz-high-contrast .bz-btn-primary,
 body.bz-high-contrast .bz-btn-hero,
 body.bz-high-contrast .bz-seg-btn,
+body.bz-high-contrast .bz-segmented-btn,
 body.bz-high-contrast .bz-sort-pill,
 body.bz-high-contrast .bz-album-play-pill,
 body.bz-high-contrast .bz-library-dropdown-btn,
 body.bz-high-contrast .bz-icon-action,
+body.bz-high-contrast .bz-back-btn,
+body.bz-high-contrast .bz-kbd,
 body.bz-high-contrast button {
   background: #000000 !important;
   background-color: #000000 !important;
@@ -5265,11 +5485,15 @@ body.bz-high-contrast .btn:hover,
 body.bz-high-contrast .bz-btn-hero-subtle:hover,
 body.bz-high-contrast .bz-btn-subtle:hover,
 body.bz-high-contrast .bz-seg-btn:hover,
+body.bz-high-contrast .bz-segmented-btn:hover,
 body.bz-high-contrast .bz-nav-btn:hover,
 body.bz-high-contrast .dropdown-item:hover,
 body.bz-high-contrast .bz-track-row:hover,
+body.bz-high-contrast .bz-back-btn:hover,
 body.bz-high-contrast .bz-nav-btn.is-active,
 body.bz-high-contrast .bz-seg-btn.is-active,
+body.bz-high-contrast .bz-segmented-btn.is-active,
+body.bz-high-contrast .bz-segmented-btn.active,
 body.bz-high-contrast .bz-scale-point.is-active,
 body.bz-high-contrast .dropdown-item.active,
 body.bz-high-contrast .bz-track-row.is-playing,
@@ -5286,11 +5510,15 @@ body.bz-high-contrast .badge.bg-secondary {
 
 body.bz-high-contrast .btn:hover *,
 body.bz-high-contrast .bz-seg-btn:hover *,
+body.bz-high-contrast .bz-segmented-btn:hover *,
 body.bz-high-contrast .bz-nav-btn:hover *,
 body.bz-high-contrast .dropdown-item:hover *,
 body.bz-high-contrast .bz-track-row:hover *,
+body.bz-high-contrast .bz-back-btn:hover *,
 body.bz-high-contrast .bz-nav-btn.is-active *,
 body.bz-high-contrast .bz-seg-btn.is-active *,
+body.bz-high-contrast .bz-segmented-btn.is-active *,
+body.bz-high-contrast .bz-segmented-btn.active *,
 body.bz-high-contrast .dropdown-item.active *,
 body.bz-high-contrast .bz-track-row.is-playing *,
 body.bz-high-contrast .bz-exp-track-item.is-active *,
