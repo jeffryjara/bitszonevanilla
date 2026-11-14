@@ -6259,7 +6259,7 @@ html, body {
   #expandedPlayerModal .modal-body > .container-fluid { padding-left: 20px !important; padding-right: 20px !important; }
   #expandedPlayerModal .modal-body .row > .col-lg-6:first-child { min-height: calc(100dvh - 2rem); position: relative; padding-top: 52px; padding-bottom: 44px; justify-content: space-evenly; }
   .bz-cover-vinyl-stage { display: block; width: 100%; margin: 0; }
-  .bz-exp-cover-frame { width: 100%; height: auto; max-height: 52dvh; margin: 0 auto; aspect-ratio: 1 / 1; }
+  .bz-exp-cover-frame { width: 100%; height: auto; max-height: 46dvh; margin: 0 auto; aspect-ratio: 1 / 1; }
   .bz-exp-cover-dock, .bz-exp-vinyl-peek, #expandedPlayerModal .d-lg-none.align-items-center.gap-2 { display: none !important; }
   #expDurationTime .badge { display: none; }
   /* Barra con los tiempos a los lados */
@@ -6270,6 +6270,12 @@ html, body {
   .bz-exp-seekwrap #expDurationTime { grid-area: 1 / 3; white-space: nowrap; }
   .bz-exp-seekwrap .bz-exp-times span { font-family: inherit; font-size: 0.8125rem; font-weight: 600; margin: 0; }
   .bz-exp-controls { width: 100%; justify-content: space-between !important; }
+  /* Sin scroll propio: la lista solo se ve al abrir la hoja inferior */
+  #expandedPlayerModal, #expandedPlayerModal .modal-dialog, #expandedPlayerModal .modal-content, #expandedPlayerModal .modal-body { overflow: hidden !important; }
+  #expandedPlayerModal .modal-body { height: 100dvh; }
+  .bz-exp-controls #expShuffleBtn, .bz-exp-controls #expRepeatBtn { font-size: 1.6rem !important; width: 52px; height: 52px; display: inline-flex; align-items: center; justify-content: center; }
+  .bz-exp-controls #expPrevBtn, .bz-exp-controls #expNextBtn { font-size: 2.6rem !important; width: 60px; height: 60px; display: inline-flex; align-items: center; justify-content: center; }
+  .bz-exp-controls #expPlayBtn { transform: scale(1.2); }
 }
 
 /* Pestañita inferior: la lista (pistas / letras / cola) es una hoja que asoma y se abre al tocar o arrastrar */
