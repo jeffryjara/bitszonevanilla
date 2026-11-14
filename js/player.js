@@ -2031,6 +2031,7 @@
                 (lic ? '<i class="bi bi-star-fill text-warning fs-6 flex-shrink-0"></i>' : '') +
                 '<span class="text-truncate">' + esc(t.title) + '</span>' +
               '</div>' +
+              '<div class="bz-exp-sub text-truncate">' + esc(t.artist || track.artist || '') + '</div>' +
             '</div>' +
             (active && appState.isPlaying ? '<div class="fx-eq me-1"><i></i><i></i><i></i></div>' : '') +
             '<div class="bz-exp-row-actions d-flex align-items-center gap-1 flex-shrink-0">' +
