@@ -6471,3 +6471,12 @@ body.bz-theme-light .bz-line-axis { fill: rgba(31, 22, 51, 0.6); }
 .bz-traffic-card .bz-line-chart { flex: 1 1 auto; display: flex; align-items: center; }
 .bz-pie-chart { width: min(210px, 100%); }
 .bz-pie-legend li { padding: 0.32rem 0.6rem; }
+
+/* Cabecera de Biblioteca como el original: icono grande y título más grande */
+@media (min-width: 992px) {
+  .bz-hero-icon-tile { width: 160px; height: 160px; border-radius: 34px; }
+  .bz-hero-icon-tile i { font-size: 3.7rem; }
+  .bz-hero-title { font-size: clamp(2.2rem, 3.2vw, 3.3rem); }
+  .bz-library-dropdown-btn .bi-chevron-down { font-size: 1.5rem; }
+  .bz-section-hero { padding: 1.6rem 0 1.8rem; }
+}

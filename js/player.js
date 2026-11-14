@@ -3361,7 +3361,7 @@
   function renderLibraryHeroDropdownHtml(activeLibTab, titleText) {
     return (
       '<div class="dropdown d-inline-block">' +
-        '<button type="button" class="bz-library-dropdown-btn" data-bs-toggle="dropdown" aria-expanded="false">' +
+        '<button type="button" class="bz-library-dropdown-btn" data-bs-toggle="dropdown" data-bs-display="static" aria-expanded="false">' +
           '<span>' + esc(titleText) + '</span>' +
           '<i class="bi bi-chevron-down"></i>' +
         '</button>' +
@@ -4615,6 +4615,30 @@
         m.style.transition = 'transform 0.7s cubic-bezier(0.22, 1, 0.36, 1)';
         m.style.transform = '';
         setTimeout(function () { if (el.dataset.marq !== '1') el.style.textOverflow = ''; }, 700);
+      });
+    })();
+
+    // Menú del título de Biblioteca: aparece donde se hizo clic (justo debajo del puntero), no pegado al borde del botón
+    (function () {
+      var lx = 0, ly = 0;
+      document.addEventListener('pointerdown', function (e) {
+        if (e.target.closest && e.target.closest('.bz-library-dropdown-btn')) { lx = e.clientX; ly = e.clientY; }
+      }, true);
+      document.addEventListener('shown.bs.dropdown', function (e) {
+        var btn = e.target;
+        if (!btn.classList || !btn.classList.contains('bz-library-dropdown-btn')) return;
+        var menu = btn.parentElement.querySelector('.dropdown-menu');
+        if (!menu) return;
+        var r = btn.getBoundingClientRect();
+        if (!lx && !ly) { lx = r.right; ly = r.bottom - 10; }
+        var w = menu.offsetWidth;
+        menu.style.setProperty('position', 'fixed', 'important');
+        menu.style.setProperty('transform', 'none', 'important');
+        menu.style.setProperty('inset', 'auto', 'important');
+        menu.style.setProperty('margin', '0', 'important');
+        menu.style.left = Math.max(12, Math.min(lx - 28, window.innerWidth - w - 12)) + 'px';
+        menu.style.top = (Math.max(ly, r.top) + 20) + 'px';
+        lx = ly = 0;
       });
     })();
 
